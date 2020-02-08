@@ -60,11 +60,11 @@ public class RestAPI extends RestBase {
 	 *  - interject / add directly to service user msg
 	 */
 	/////////////////////////////////////////////////////////////////
-	// INTERACT and get back lots of stuff
+	//  Get service list
 	/////////////////////////////////////////////////////////////////	
 	@POST
-	@Path("/interact")
-	public Response interactMsgPOST(@Context UriInfo info, 
+	@Path("/services")
+	public Response GetServicesPOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
@@ -100,7 +100,196 @@ public class RestAPI extends RestBase {
 		// add all the doc content
 		return rr.ret();
 	}
+	@POST
+	@Path("/{service}/users")
+	public Response GetServiceUsersPOST(@Context UriInfo info, 
+			@Context HttpServletRequest hsr,
+			@CookieParam("atok") String cookie_access_key, 
+			String body) {
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!checkAuth(rr, "user")) return rr.retNoAuth();
 
+		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
+		boolean save_usage = false, ctx_save = false, incoming = true;
+		List<String> knowledge = null;
+	
+
+		try {
+			JSONObject obj = new JSONObject(body);
+			text = getJStr(obj, "text");
+			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
+			if (paramHave(scontext)) context = scontext;
+			String slanguage = getJStr(obj, "language");
+			if (paramHave(slanguage)) language = slanguage;
+			
+			String spersona = getJStr(obj, "persona");
+			if (paramHave(spersona)) persona = spersona;
+			
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+		if (text != null) text = text.trim();
+		if (text.isEmpty()) text = null;
+		if (chid == null) {
+			event = "wake";
+			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
+		}
+		
+		// add all the doc content
+		return rr.ret();
+	}
+	@POST
+	@Path("/{service}/user/add")
+	public Response GetServiceUserAddPOST(@Context UriInfo info, 
+			@Context HttpServletRequest hsr,
+			@CookieParam("atok") String cookie_access_key, 
+			String body) {
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!checkAuth(rr, "user")) return rr.retNoAuth();
+
+		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
+		boolean save_usage = false, ctx_save = false, incoming = true;
+		List<String> knowledge = null;
+	
+
+		try {
+			JSONObject obj = new JSONObject(body);
+			text = getJStr(obj, "text");
+			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
+			if (paramHave(scontext)) context = scontext;
+			String slanguage = getJStr(obj, "language");
+			if (paramHave(slanguage)) language = slanguage;
+			
+			String spersona = getJStr(obj, "persona");
+			if (paramHave(spersona)) persona = spersona;
+			
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+		if (text != null) text = text.trim();
+		if (text.isEmpty()) text = null;
+		if (chid == null) {
+			event = "wake";
+			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
+		}
+		
+		// add all the doc content
+		return rr.ret();
+	}
+	@POST
+	@Path("/{service}/user/{user}/del")
+	public Response GetServiceUserDelPOST(@Context UriInfo info, 
+			@Context HttpServletRequest hsr,
+			@CookieParam("atok") String cookie_access_key, 
+			String body) {
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!checkAuth(rr, "user")) return rr.retNoAuth();
+
+		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
+		boolean save_usage = false, ctx_save = false, incoming = true;
+		List<String> knowledge = null;
+	
+
+		try {
+			JSONObject obj = new JSONObject(body);
+			text = getJStr(obj, "text");
+			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
+			if (paramHave(scontext)) context = scontext;
+			String slanguage = getJStr(obj, "language");
+			if (paramHave(slanguage)) language = slanguage;
+			
+			String spersona = getJStr(obj, "persona");
+			if (paramHave(spersona)) persona = spersona;
+			
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+		if (text != null) text = text.trim();
+		if (text.isEmpty()) text = null;
+		if (chid == null) {
+			event = "wake";
+			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
+		}
+		
+		// add all the doc content
+		return rr.ret();
+	}
+	@POST
+	@Path("/{service}/user/{user}")
+	public Response GetServiceUserGetPOST(@Context UriInfo info, 
+			@Context HttpServletRequest hsr,
+			@CookieParam("atok") String cookie_access_key, 
+			String body) {
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!checkAuth(rr, "user")) return rr.retNoAuth();
+
+		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
+		boolean save_usage = false, ctx_save = false, incoming = true;
+		List<String> knowledge = null;
+	
+
+		try {
+			JSONObject obj = new JSONObject(body);
+			text = getJStr(obj, "text");
+			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
+			if (paramHave(scontext)) context = scontext;
+			String slanguage = getJStr(obj, "language");
+			if (paramHave(slanguage)) language = slanguage;
+			
+			String spersona = getJStr(obj, "persona");
+			if (paramHave(spersona)) persona = spersona;
+			
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+		if (text != null) text = text.trim();
+		if (text.isEmpty()) text = null;
+		if (chid == null) {
+			event = "wake";
+			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
+		}
+		
+		// add all the doc content
+		return rr.ret();
+	}
+	@POST
+	@Path("/{service}/user/{user}")
+	public Response GetServiceUserUpdatePOST(@Context UriInfo info, 
+			@Context HttpServletRequest hsr,
+			@CookieParam("atok") String cookie_access_key, 
+			String body) {
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!checkAuth(rr, "user")) return rr.retNoAuth();
+
+		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
+		boolean save_usage = false, ctx_save = false, incoming = true;
+		List<String> knowledge = null;
+	
+
+		try {
+			JSONObject obj = new JSONObject(body);
+			text = getJStr(obj, "text");
+			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
+			if (paramHave(scontext)) context = scontext;
+			String slanguage = getJStr(obj, "language");
+			if (paramHave(slanguage)) language = slanguage;
+			
+			String spersona = getJStr(obj, "persona");
+			if (paramHave(spersona)) persona = spersona;
+			
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+		if (text != null) text = text.trim();
+		if (text.isEmpty()) text = null;
+		if (chid == null) {
+			event = "wake";
+			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
+		}
+		
+		// add all the doc content
+		return rr.ret();
+	}
 
 
 }

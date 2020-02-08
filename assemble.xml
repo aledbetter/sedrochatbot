@@ -12,22 +12,6 @@
 			<directory>target/dependency</directory>
 			<outputDirectory></outputDirectory>	 		 
 		</fileSet>
-		<fileSet>
-			<directory>models</directory>
-			<outputDirectory>models</outputDirectory>	 		 
-		</fileSet>
-		<fileSet>
-			<directory>cfg</directory>
-			<outputDirectory>cfg</outputDirectory>	 		 
-		</fileSet>
-		<fileSet>
-			<directory>en</directory>
-			<outputDirectory>en</outputDirectory>	 		 
-		</fileSet>
-		<fileSet>
-			<directory>ont</directory>
-			<outputDirectory>ont</outputDirectory>	 		 
-		</fileSet>
 	</fileSets>
 	<files>
 	    <file>
@@ -37,17 +21,9 @@
 	    <file>
 	      <source>LICENSE</source>
 	      <outputDirectory></outputDirectory>
-	    </file>	   
+	    </file>	   	    
 	    <file>
-	      <source>STATUS</source>
-	      <outputDirectory></outputDirectory>
-	    </file>	  
-	    <file>
-	      <source>BUGS</source>
-	      <outputDirectory></outputDirectory>
-	    </file>	  	    
-	    <file>
-	      <source>target/sedro-1.0.9999.war</source>
+	      <source>target/sedrochatbot-1.0.9999.war</source>
 	      <outputDirectory></outputDirectory>
 	    </file>
   </files>
