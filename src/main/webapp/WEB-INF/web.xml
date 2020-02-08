@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   <welcome-file-list>
-    <welcome-file>/w/00_DEV_00/index.html</welcome-file>
+    <welcome-file>/index.html</welcome-file>
   </welcome-file-list>
   <servlet>
     <servlet-name>default</servlet-name>
@@ -18,7 +18,7 @@
  
   <servlet>
     <servlet-name>LoadUtil</servlet-name>
-    <servlet-class>main.java.com.sedro.util.Servlet</servlet-class>
+    <servlet-class>main.java.com.sedroApps.Servlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
@@ -27,32 +27,20 @@
     <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
     <init-param>
       <param-name>jersey.config.server.provider.packages</param-name>
-      <param-value>main.java.com.sedro.apps.rest, main.java.com.sedro.probatedb, main.java.com.sedro.util</param-value>
+      <param-value>main.java.com.sedroApps</param-value>
     </init-param>
     <init-param>
         <param-name>jersey.config.server.provider.classnames</param-name>
-        <param-value>org.glassfish.jersey.media.multipart.MultiPartFeature;main.java.com.sedro.util.CharsetResponseFilter</param-value>
+        <param-value>org.glassfish.jersey.media.multipart.MultiPartFeaturer</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>Sedro WS</servlet-name>
-    <url-pattern>/api/*</url-pattern>
-  </servlet-mapping>
+
   <servlet-mapping>
     <servlet-name>default</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
-  
-  <filter>
-    <filter-name>SSLFilter</filter-name>
-    <filter-class>main.java.com.sedro.util.SSLFilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>SSLFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  
+
   <error-page>
     <error-code>404</error-code>
     <location>/error.html</location>

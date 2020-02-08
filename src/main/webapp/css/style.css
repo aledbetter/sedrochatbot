@@ -1,0 +1,172 @@
+@charset "UTF-8";
+
+html,body,p,div,a {
+	padding: 0px;
+	margin: 0 auto;
+	-webkit-text-size-adjust: none;
+	text-decoration: none;
+	border: 0px;
+	margin: 0px;
+	vertical-align: middle;
+}
+html,body,p,a {
+	line-height:1.3em;
+}
+
+/* this is to hid google's horible iframe that messes up the web pages: (Google = incompetent) */
+body > iframe:last-of-type  {
+	display: none;
+}
+
+body {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 13px;
+	color: #555;
+	height:100%;
+	text-align: center;
+	overflow-y: scroll;
+	/*overflow-x: hidden;*/
+	background: #E5E5E5;
+}
+a {
+	text-decoration: none;
+	color: #51a63f;
+	outline: none;
+	font-weight: normal;
+}
+a:hover, a:active  {
+	text-decoration: none;
+	color: orange;
+}
+a.disabledLink {
+	opacity: 0.2;
+	cursor: default;
+}
+
+li {
+	list-style: square;
+}
+img {
+	border: 0;
+	outline: none;
+}
+
+.underline {
+	text-decoration: underline;
+}
+
+a .underline {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+h2 {
+	font-size: 20px;
+	text-align: center;
+	padding: 0px;
+	margin: 10px;
+}
+
+h3 {
+	font-size: 16px;
+	color: #555;
+	margin: 2px 0px 4px 0;
+}
+/*page / section instructions heading*/
+h4 {
+	font-size: 15px;
+	color: #060;
+	margin: 0px;
+	text-align: center;
+	margin-bottom: 5px;
+}
+
+h5 {
+	font-size: 16px;
+	text-align: center;
+	padding: 0px;
+	margin: 10px;
+}
+/* standard content*/
+p {
+	padding: 0px 10px 5px 10px;
+}
+
+/* INPUT TYPES */
+input {
+	height: 18px;
+	font-size: 16px;
+}
+
+input, input[type=text],input[type=password],input[type=number],input[type=tel],input[type=email],input[type=file], textarea {
+	background-color: #FFF;
+	padding: 5px;
+	padding-top:6px;
+	padding-bottom:4px;
+	height:16px;
+	color: #555;
+	font-size:14px;
+	border-radius: 2px;
+	border: 2px solid #AAA;
+	font-family: Helvetica, Arial, sans-serif;
+	box-shadow: none;
+	position: relative;
+	outline: none;
+	-webkit-appearance: none;
+}
+
+textarea {
+	height: 18px;
+	font-size: 1.0em;
+	resize: none;
+	font-size:14px;
+	line-height:1.4em;
+	margin:0px;
+	font-family: Helvetica, Arial, sans-serif;
+	overflow:hidden;
+	box-shadow: none;
+	outline: none;
+	-webkit-appearance: none;
+}
+input.lightBorder, .lightBorder {
+	border: 2px solid #CCC;
+}
+input:focus, textarea:focus {
+	border-color:#51a63f;
+}
+input.error, textarea.error {
+	border: 2px solid #C30;
+}
+input.warn, textarea.warn {
+	border-color:#F5DA81;
+}
+
+input[type=checkbox] {
+	padding: 6px;
+	float:left;
+	height:10px;
+}
+
+select {
+	height: 30px !important;
+	font-size: 14px;
+	line-height: 30px;
+	vertical-align: middle;
+	margin: 0;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	-webkit-appearance: menulist-button;
+	color: #333;
+	padding:0px;
+	line-height:8px;
+	margin-top:0px;
+}
+
+select.error {
+	border: 2px solid #C30;
+}
+select.warn {
+	border: 2px solid #F5DA81;
+}
+
+
