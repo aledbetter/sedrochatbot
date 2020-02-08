@@ -42,10 +42,23 @@ import main.java.com.sedroApps.RestResp;
 
 @Path("/1.0/test/")
 @Produces(MediaType.APPLICATION_JSON)
-public class RestAPITest extends RestBase {
+public class RestAPI extends RestBase {
 	public static boolean debug_time = false;
 	
-	
+	/*
+	 * List services
+	 * service/List users
+	 * user/add
+	 * user/get
+	 * user/del
+	 * user/update
+	 * 
+	 * chat/xxx -> copy API from sedro
+	 * 
+	 * NEXT set
+	 *  - controls for users in services
+	 *  - interject / add directly to service user msg
+	 */
 	/////////////////////////////////////////////////////////////////
 	// INTERACT and get back lots of stuff
 	/////////////////////////////////////////////////////////////////	

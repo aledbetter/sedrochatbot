@@ -40,18 +40,10 @@ import org.apache.log4j.Logger;
 public class Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static final int GC_DELAY = (1000)*50;
-	private static final int GC_PERIOD = 1000*60*10;
-
-	
-	
-	static Logger logger = Logger.getLogger(Servlet.class);
-	
+		
+	static Logger logger = Logger.getLogger(Servlet.class);	
 	private static URL proxy_url = null;
-	private static Timer gc_timer = null;
-	
-	// Logger instance named "LoadUtil".
-  //  static Logger logger = Logger.getLogger(LoadUtil.class);
+
 	
     /**
      * @see HttpServlet#HttpServlet()
@@ -59,19 +51,6 @@ public class Servlet extends HttpServlet {
 	public Servlet() {
         super();
     	loadService(true);
-    	
-    //	logger.info("LoadUtil loading Serices Complete");
-//    	Security.addProvider(new BouncyCastleProvider());
-    	
-    	//////////////////////////////////
-    	// garbage collection timer
-    	gc_timer = new Timer();
-    	gc_timer.scheduleAtFixedRate(new TimerTask() {
-	            public void run() {
-	                //System.out.println("GC TIMER again");
-	    			System.gc(); // memory reduce..
-	            }
-	        }, GC_DELAY, GC_PERIOD);
     }
 
 	/**
@@ -87,17 +66,6 @@ public class Servlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 	}
-	/*
-    public static void main(String[] args) throws Exception{
-        Server server = new Server(Integer.valueOf(System.getenv("PORT")));
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-        server.setHandler(context);
-        context.addServlet(new ServletHolder(new HelloWorld()),"/*");
-        server.start();
-        server.join();   
-    }
-    */
 	
     /**
      * @see HttpServlet#HttpServlet()
@@ -115,17 +83,10 @@ public class Servlet extends HttpServlet {
 		
         // Set up a simple configuration that logs on the console.
         Logger root = Logger.getRootLogger();
-        //root.addAppender(new ConsoleAppender(
-        //	    new PatternLayout(PatternLayout.TTCC_CONVERSION_PATTERN)));
         root.setLevel(Level.ERROR);
         
             	
     	String pu = System.getenv("FIXIE_URL");
-    	// TEST
-    	if (true) {
-    		//pu = "http://fixie:Fa7kH8kVnESrTVZ@velodrome.usefixie.com:80";
-    		//http://fixie:ZIL6lqA7GLvu6eZ@velodrome.usefixie.com:80
-    	}
     	if (pu != null){
     		try {
 				proxy_url = new URL(pu);
@@ -138,21 +99,14 @@ public class Servlet extends HttpServlet {
     	if (proxy_url != null) {
         	System.out.println("Outgoing proxy = " + proxy_url.toString() + " [" + proxy_url.getHost() + "] " + proxy_url.getPort());
     	}
-    	
-    	
-    	//curl http://welcome.usefixie.com --proxy http://fixie:Fa7kH8kVnESrTVZ@velodrome.usefixie.com:80
-    	
+    	    	
         BasicConfigurator.configure();
         logger.setLevel(Level.ERROR); // set the log level to INFO
         System.out.println("LoadService initializing log4j Complete");      
         
 
     }
-//HACK	
-//	public static AppCore getCore() {
-//		return core;
-//	}
-//HACK
+
 	public static URL getProxyUrl() {
 		return proxy_url;
 	}
