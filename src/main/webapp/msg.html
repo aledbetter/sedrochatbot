@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>TSP Natural Language Understanding</title>
+	<meta charset="utf-8">
+	<meta http-equiv="Content-Type" content="text/html">
+	<meta name="description" content="Sedro Lexicon View">	
+	<meta name="keywords" content="Sedro, Lexicon, NLP, NLU" >	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta name="google-site-verification" content="MHUFkcDN5Hdi0GiO4tJ1vu5D23rr6UdaODT_DKr3hOU" />
+
+	<link rel="stylesheet" href="/w/00_DEV_00/css/style_std.css" />
+	 
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	
+	<script type="text/javascript" src="/w/00_DEV_00/js/xutil_std.js?version=1"></script> 
+	<script type="text/javascript" src="/w/00_DEV_00/js/api/api_sedro_std.js?version=2"></script> 
+	<script type="text/javascript" src="/w/00_DEV_00/js/chat.js?version=2"></script> 
+
+	<script>
+	  if (isProd()) {
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+		  ga('create', 'UA-121421609-1', 'auto');
+		  ga('send', 'pageview');
+	  }
+	</script>
+</head>
+
+<body style='background:#E5E5E5'>
+
+<div class="mainc vcard landing" id='index_page'>
+		
+	<div id='lheader'>
+		<div>
+			<h1>The Sedro Project</h1>
+			<h3>Natural Language Understanding</h3>
+			<h5>Version <span class="sedro_version"></span></h5>
+		</div>
+		<img src="/w/00_DEV_00/img/tsp-white-none.png" alt="{TSP}" />
+		<h1>Chat</h1>
+	</div>
+	
+	<div class="segment" style='margin-top:30px' id="lex">
+		<input type='hidden' id='treename' value='english'/>
+		<div class="cent">			
+		
+		
+			<div class="fullPanel" id='msg_panel' style='min-height:680px'>								
+				<div class='fLn'>
+					<div class='fLn notwoke' style='margin-bottom:10px;margin-top:30px;background:#666;color:#FFF;height:40px;font-size:18px;padding-top:12px'>		
+							&nbsp;&nbsp;Chat with Persona: <select id='persona' style='width:160px'><option value='sedro' selected>sedro</option></select>						
+						<div class='bslink' id='wake_now_bt' style='width:70px;text-align:center;float:right;font-size:16px;margin-right:8px;margin-top:3px;background:#EEE'>Wake</div>
+					</div>									
+					<!-- INTERACT: WAKE selected persona to interact with -->			
+					<div class='fLn woke' style='display:none'>					
+						<div class='fLn' style='margin-bottom:10px;margin-top:10px;background:#666;color:#FFF;padding-bottom:5px;padding-bottom:2px'>	
+							<span style='float:left;padding-top:5px'>&nbsp;Chatting: <span class='personaName' style='font-weight:bold'>...</span> {<span class='personaFullName' style='font-weight:bold'>...</span>}</span>			
+						</div>								
+						<!-- Chat View -->
+						<div class='fLn' id='interact_msg' style='height: 250px;overflow:scroll;overflow-x:hidden'></div>	
+						<!-- Text Box --><!-- Send Button -->
+						<div class='fLn interact' id='interact_wd'>
+							<div class='fLn' style='margin-top:5px;'>
+								<textarea id='interact_text' style='width:98%;min-height:40px;margin-top:3px'></textarea>
+							</div>
+							<div class='bslink' id='send_now_bt' style='width:70px;text-align:center;float:right;font-size:16px;margin-top:8px;background:#EEE;margin-right:1px;'>Send</div>			
+							<div class='bslink' id='bye_now_bt' style='width:70px;text-align:center;float:right;font-size:16px;margin-top:8px;background:#EEE;margin-right:1px;'>Bye</div>			
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+			 
+	<div class="footer">	
+		<div class='cent'>
+			<div class='fLn' style='position:relative'>
+			    <div class='nav'>
+				    <a href="http://www.sedro.xyz">www.sedro.xzy</a><br/>
+				    <a href="http://www.sedro.xyz/about/">About</a><br/>
+				    <a href="http://blog.sedro.xyz">TSP Blog</a><br/>
+				</div>	
+			    <div class='nav'>
+				    <a href="analyzer">Language Analyzer</a><br/>
+				    <a href="chat">Persona Chat - test</a><br/>
+				    <a href="msg">Persona Chat</a><br/>
+				</div>	
+				<div class='nav'>   
+				    <a href="api-current">REST APIs</a><br/>
+				    <a href="status">Release Status</a><br/>   
+				    <a href="bugs">Glitches</a><br/>				    				    
+				</div>	
+				<div class='nav'>
+				    <a href="http://www.sedro.xyz/privacy-policy/">Privacy Policy</a><br/>
+				    <a href="http://www.sedro.xyz/terms">Terms of Use</a><br/> 
+				</div>	
+ 			</div>		
+			<div class="cpw">&#169; 2020 The Sedro Project</div>
+		</div>
+	</div>
+
+</div>
+</body>
+</html>

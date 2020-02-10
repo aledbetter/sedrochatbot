@@ -97,11 +97,11 @@
 		</dependency>
 
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
-			<scope>compile</scope>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-core</artifactId>
+		    <version>2.11.1</version>
 		</dependency>
+
 		
 		<!--  some logging -->
 		<dependency>
@@ -114,7 +114,6 @@
 	       <artifactId>slf4j-log4j12</artifactId>
 	       <version>1.7.5</version>
 	   </dependency>
-
 		
 		<!-- https://mvnrepository.com/artifact/org.twitter4j/twitter4j-stream -->
 		<dependency>
@@ -166,65 +165,9 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-		    <plugin>
-		        <artifactId>maven-resources-plugin</artifactId>
-		        <version>3.1.0</version>
-		        <executions>
-		          <execution>
-		            <id>copy-resources</id>
-		            <phase>process-resources</phase>
-		            <goals>
-		              <goal>copy-resources</goal>
-		            </goals>
-		            <configuration>
-		              <outputDirectory>target/SedroChatbot-1.0.9999/</outputDirectory>
-		              <resources>          
-		                <resource>
-		                  <directory>.</directory>	                  
-					        <includes>
-					          <include>LICENSE</include>		      
-					        </includes>				       
-		                </resource>
-		              </resources>              
-		            </configuration>            
-		          </execution>
-		          <execution>
-		            <id>copy-resources-dev</id>
-		            <phase>process-resources</phase>
-		            <goals>
-		              <goal>copy-resources</goal>
-		            </goals>
-		            <configuration>
-		              <outputDirectory>src/main/webapp/</outputDirectory>
-		              <resources>          
-		                <resource>
-		                  <directory>.</directory>	                  
-					        <includes>
-					          <include>LICENSE</include>		      
-					        </includes>				       
-		                </resource>
-		              </resources>              
-		            </configuration>            
-		          </execution>
-		        </executions>
-		    </plugin>
+
 		    
 			<!-- pluggin to run Java app workers of from the command line -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>appassembler-maven-plugin</artifactId>
-				<version>1.1.1</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>assemble</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
@@ -248,24 +191,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.5.3</version>
-				<configuration>
-					<descriptors>
-						<descriptor>assemble.xml</descriptor>
-					</descriptors>
-					<tarLongFileMode>posix</tarLongFileMode>
-				</configuration>
-				 <executions>
-				  <execution>
-				   <phase>package</phase>
-				   <goals>
-				    <goal>single</goal>
-				   </goals>
-				  </execution>
-				 </executions>				
-			</plugin>
+
 		</plugins>
 	</build>
 

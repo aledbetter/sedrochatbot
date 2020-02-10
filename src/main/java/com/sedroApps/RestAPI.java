@@ -26,8 +26,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -64,7 +66,8 @@ public class RestAPI {
 	 */
 	/////////////////////////////////////////////////////////////////
 	//  Get service list
-	/////////////////////////////////////////////////////////////////	
+	/////////////////////////////////////////////////////////////////
+	@GET
 	@Path("/services")
     public Response servicesGET(@Context UriInfo info, 
 			@Context HttpServletRequest hsr, 
@@ -76,10 +79,24 @@ public class RestAPI {
 		return rr.ret();
 	}
 	
-	
+	@GET
 	@Path("/{service}/users")
     public Response serviceUsersGET(@Context UriInfo info, 
 			@Context HttpServletRequest hsr, 
+    		@PathParam("service") String service,
+    		@CookieParam("atok") String cookie_access_key) { 
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		//System.out.println("pool/get["+ctx+"] ");
+//FIXME
+		return rr.ret();
+	}
+	
+	@GET
+	@Path("/{service}/user/{user}")
+    public Response serviceUserGET(@Context UriInfo info, 
+			@Context HttpServletRequest hsr, 
+    		@PathParam("service") String service,
+    		@PathParam("user") String user,
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 		//System.out.println("pool/get["+ctx+"] ");
@@ -91,6 +108,7 @@ public class RestAPI {
 	@Path("/{service}/user/add")
 	public Response GetServiceUserAddPOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
+    		@PathParam("service") String service,
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
@@ -128,12 +146,14 @@ public class RestAPI {
 	@Path("/{service}/user/{user}/del")
 	public Response GetServiceUserDelPOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
+    		@PathParam("service") String service,
+    		@PathParam("user") String user,
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 
-		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
-		boolean save_usage = false, ctx_save = false, incoming = true;
+		//String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, persona = null;
+		//boolean save_usage = false, ctx_save = false, incoming = true;
 		/*
 
 		try {
@@ -160,52 +180,19 @@ public class RestAPI {
 		// add all the doc content
 		return rr.ret();
 	}
-	@POST
-	@Path("/{service}/user/{user}")
-	public Response GetServiceUserGetPOST(@Context UriInfo info, 
-			@Context HttpServletRequest hsr,
-			@CookieParam("atok") String cookie_access_key, 
-			String body) {
-		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-
-		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
-		boolean save_usage = false, ctx_save = false, incoming = true;
-		/*
-
-		try {
-			JSONObject obj = new JSONObject(body);
-			text = getJStr(obj, "text");
-			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
-			if (paramHave(scontext)) context = scontext;
-			String slanguage = getJStr(obj, "language");
-			if (paramHave(slanguage)) language = slanguage;
-			
-			String spersona = getJStr(obj, "persona");
-			if (paramHave(spersona)) persona = spersona;
-			
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-		if (text != null) text = text.trim();
-		if (text.isEmpty()) text = null;
-		if (chid == null) {
-			event = "wake";
-			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
-		}
-		*/
-		// add all the doc content
-		return rr.ret();
-	}
+	
 	@POST
 	@Path("/{service}/user/{user}")
 	public Response GetServiceUserUpdatePOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
+    		@PathParam("service") String service,
+    		@PathParam("user") String user,
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 
-		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
-		boolean save_usage = false, ctx_save = false, incoming = true;
+		//String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
+		//boolean save_usage = false, ctx_save = false, incoming = true;
 		/*
 
 		try {
