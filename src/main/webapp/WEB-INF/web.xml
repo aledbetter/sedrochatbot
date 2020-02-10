@@ -18,6 +18,12 @@
   </servlet>
   
   <servlet>
+    <servlet-name>LoadUtil</servlet-name>
+    <servlet-class>main.java.com.sedroApps.Servlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  
+  <servlet>
     <servlet-name>SedroChatBot WS</servlet-name>
     <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
     <init-param>

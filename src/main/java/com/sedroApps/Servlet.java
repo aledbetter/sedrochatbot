@@ -18,8 +18,6 @@
 package main.java.com.sedroApps;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -79,7 +77,7 @@ public class Servlet extends HttpServlet {
 
         BasicConfigurator.configure();
         logger.setLevel(Level.ERROR); // set the log level to INFO
-        System.out.println("LoadService initializing log4j Complete");           
+        System.out.println("Sedro Chatbot initializing log4j Complete");           
     }
 
 }
