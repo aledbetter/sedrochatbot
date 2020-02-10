@@ -53,7 +53,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
  * Service util class to contain generic Service functionality for use in all service objects.
  * get and del are both implemented here 
  */
-public class Gtil {
+public class Sutil {
 	static public String no_space [] = {",", ":", ";", ".", "!", "?"};
 	   public static String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";    
 	    public static String display_pattern_sec = "EEE MMM d h:mm:ss a z yyyy";
@@ -114,19 +114,19 @@ public class Gtil {
 	
 	// get the current time as a string
 	public final static String getCurrentTimeStamp() {
-		return formatTimeStamp(Gtil.getUTCTime());
+		return formatTimeStamp(Sutil.getUTCTime());
 	}
 	public final static String getCurrentDate() {
-		return formatDateString(Gtil.getUTCTime());
+		return formatDateString(Sutil.getUTCTime());
 	}
 	public final static int getBankSchedHour(String time) {
 		int i = time.indexOf(":");
-		return Gtil.toInt(time.substring(0, i));		
+		return Sutil.toInt(time.substring(0, i));		
 	}
 	public final static int getBankSchedMin(String time) {
 		int i = time.indexOf(":");
 		int e = time.indexOf("|");
-		return Gtil.toInt(time.substring((i+1), e));		
+		return Sutil.toInt(time.substring((i+1), e));		
 	}
 	public static String getBankSchedType(String time) {
 		int e = time.indexOf("|");
@@ -162,7 +162,7 @@ public class Gtil {
 		return e - s;
 	}
 	public static int getPstHour(Calendar time) {
-		String pstTime = Gtil.formatTimeString24Clock(time, "PST");
+		String pstTime = Sutil.formatTimeString24Clock(time, "PST");
 		return getBankSchedHour(pstTime);		
 	}
 	public static int getPstHourOffset(Calendar time) {
@@ -173,37 +173,37 @@ public class Gtil {
 		int off = (gmtH-pstH);
 		if (off < 0) return -((gmtH+24)-pstH);
 		return off;*/
-		return Gtil.getPstHour(time);
+		return Sutil.getPstHour(time);
 	}
 	
 	public static int getGMTHour(Calendar time) {
-		String pstTime = Gtil.formatTimeString24Clock(time);
+		String pstTime = Sutil.formatTimeString24Clock(time);
 		return getBankSchedHour(pstTime);		
 	}
 	public static int getPstHour() {
-		return getPstHour(Gtil.getUTCTime());	
+		return getPstHour(Sutil.getUTCTime());	
 	}
 	public static int getPstMinute(Calendar time) {
-		String pstTime = Gtil.formatTimeString24Clock(time, "PST");
+		String pstTime = Sutil.formatTimeString24Clock(time, "PST");
 		return getBankSchedMin(pstTime);		
 	}
 	public static int getPstMinute() {
-		return getPstMinute(Gtil.getUTCTime());	
+		return getPstMinute(Sutil.getUTCTime());	
 	}
 	public static int getPstDayOfWeek(Calendar time) {
-		String pstTime = Gtil.formatTimeString24Clock(time, "PST");
+		String pstTime = Sutil.formatTimeString24Clock(time, "PST");
 		return getBankSchedAltDay(pstTime);		
 	}
 	public static int getPstDayOfWeek() {
-		return getPstDayOfWeek(Gtil.getUTCTime());	
+		return getPstDayOfWeek(Sutil.getUTCTime());	
 	}
 	public static int getPstDayOfMonth(Calendar time) {		
-		String pstTime = Gtil.formatDob2String(time, "PST");
+		String pstTime = Sutil.formatDob2String(time, "PST");
 		pstTime = pstTime.substring(8, pstTime.length()); //"yyyy-MM-dd"
 		return toInt(pstTime);
 	}
 	public static int getPstDayOfMonth() {
-		return getPstDayOfMonth(Gtil.getUTCTime());	
+		return getPstDayOfMonth(Sutil.getUTCTime());	
 	}
 	public static int getPstDayOfYear(Calendar time) {		
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dob_pattern9);
@@ -211,7 +211,7 @@ public class Gtil {
 		return toInt(simpleDateFormat.format(time.getTime()));
 	}
 	public static int getPstDayOfYear() {
-		return getPstDayOfYear(Gtil.getUTCTime());	
+		return getPstDayOfYear(Sutil.getUTCTime());	
 	}
 	public static int getPstWeekOfYear(Calendar time) {		
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dob_pattern8);
@@ -219,23 +219,23 @@ public class Gtil {
 		return toInt(simpleDateFormat.format(time.getTime()));
 	}
 	public static int getPstWeekOfYear() {
-		return getPstWeekOfYear(Gtil.getUTCTime());	
+		return getPstWeekOfYear(Sutil.getUTCTime());	
 	}
 	public static int getPstMonth(Calendar time) {		
-		String pstTime = Gtil.formatDob2String(time, "PST");
+		String pstTime = Sutil.formatDob2String(time, "PST");
 		pstTime = pstTime.substring(5, 7); //"yyyy-MM-dd"
 		return toInt(pstTime);
 	}
 	public static int getPstMonth() {
-		return getPstMonth(Gtil.getUTCTime());	
+		return getPstMonth(Sutil.getUTCTime());	
 	}
 	public static int getPstYear(Calendar time) {
-		String pstTime = Gtil.formatDob2String(time, "PST");
+		String pstTime = Sutil.formatDob2String(time, "PST");
 		pstTime = pstTime.substring(0, 4); //"yyyy-MM-dd"
 		return toInt(pstTime);
 	}
 	public static int getPstYear() {
-		return getPstYear(Gtil.getUTCTime());	
+		return getPstYear(Sutil.getUTCTime());	
 	}
 	// format the time we want
 	public static String formatTimeStamp(Calendar time) {
@@ -387,14 +387,14 @@ public class Gtil {
     }
     // ont range
 	public static String fmtRangeName(Calendar start, Calendar end, String label) {
-		if (label != null) return Gtil.fmtOntTime(start) + "_" + Gtil.fmtOntTime(end) + "_" + label;
-		return Gtil.fmtOntTime(start) + "_" + Gtil.fmtOntTime(end);
+		if (label != null) return Sutil.fmtOntTime(start) + "_" + Sutil.fmtOntTime(end) + "_" + label;
+		return Sutil.fmtOntTime(start) + "_" + Sutil.fmtOntTime(end);
 	}
 	public static Calendar loadRangeStart(String range) {
 		if (range == null) return null;
 		int idx = range.indexOf("_");
 		if (idx < 0) return null;
-		return Gtil.loadOntTime(range.substring(0, idx));
+		return Sutil.loadOntTime(range.substring(0, idx));
 	}
 	public static Calendar loadRangeEnd(String range) {
 		if (range == null) return null;
@@ -403,7 +403,7 @@ public class Gtil {
 		String r = range.substring(idx+1, range.length());
 		idx = r.indexOf("_");
 		if (idx > 0) r = range.substring(0, idx);
-		return Gtil.loadOntTime(r);
+		return Sutil.loadOntTime(r);
 	}	
 	public static String loadRangeLabel(String range) {
 		if (range == null) return null;
@@ -1172,7 +1172,7 @@ public class Gtil {
 		return false;
 	}
 	public static String getDurration(Calendar startCal, Calendar endCa) {
-		long msec = Gtil.getMilliSecondsBetween(startCal, endCa);
+		long msec = Sutil.getMilliSecondsBetween(startCal, endCa);
 		int bmsec = ((int)msec) % 1000;
 		int sec = ((int)msec) / 1000;
 		int min = sec / 60;
@@ -1180,7 +1180,7 @@ public class Gtil {
 		return min + " min " +sec + " sec " + String.format("%03d", bmsec) + " ms";
 	}
 	public static void printTimeDiff(String lable, Calendar t1, Calendar t2) {
-		long msec = Gtil.getMilliSecondsBetween(t1, t2);
+		long msec = Sutil.getMilliSecondsBetween(t1, t2);
 		//int sec = Gtil.getSecondsBetween(t1, t2);
 		int bmsec = ((int)msec) % 1000;
 		int sec = ((int)msec) / 1000;
@@ -1266,7 +1266,7 @@ public class Gtil {
 	    return c;
 	}
 	public static Calendar getUTCTimeClear() {
-		Calendar t = Gtil.getUTCTime();	
+		Calendar t = Sutil.getUTCTime();	
 		t.set(Calendar.HOUR, 0);
 		t.set(Calendar.MINUTE, 0);
 		t.set(Calendar.SECOND, 0);
@@ -1278,47 +1278,47 @@ public class Gtil {
 	}
 	
 	public static Calendar getUTCTimePlus(int hours) {
-		Calendar t = Gtil.getUTCTime();
+		Calendar t = Sutil.getUTCTime();
 		t.add(Calendar.HOUR, hours);
 		return t;
 	}
 	public static Calendar getUTCTimePlusMinutes(int min) {
-		Calendar t = Gtil.getUTCTime();
+		Calendar t = Sutil.getUTCTime();
 		t.add(Calendar.MINUTE, min);
 		return t;
 	}
 	public static Calendar getUTCTimePlusDay(int days) {
-		Calendar t = Gtil.getUTCTime();
+		Calendar t = Sutil.getUTCTime();
 		t.add(Calendar.DATE, days);
 		return t;
 	}
 	public static Calendar getUTCTimeMinus(int hours) {
-		Calendar t = Gtil.getUTCTime();
+		Calendar t = Sutil.getUTCTime();
 		t.add(Calendar.HOUR, -hours);
 		return t;
 	}
 	public static Calendar getUTCTimeMinusMinutes(int min) {
-		Calendar t = Gtil.getUTCTime();
+		Calendar t = Sutil.getUTCTime();
 		t.add(Calendar.MINUTE, -min);
 		return t;
 	}
 	public static Calendar getUTCTimeMinusDay(int days) {
-		Calendar t = Gtil.getUTCTime();
+		Calendar t = Sutil.getUTCTime();
 		t.add(Calendar.DATE, -days);
 		return t;
 	}
 	public static Calendar getUTCTimeMinusWeek(int weeks) {
-		Calendar t = Gtil.getUTCTime();
+		Calendar t = Sutil.getUTCTime();
 		t.add(Calendar.DATE, -(weeks*7));
 		return t;
 	}
 	public static Calendar getUTCTimeMinusMonth(int Months) {
-		Calendar t = Gtil.getUTCTime();
+		Calendar t = Sutil.getUTCTime();
 		t.add(Calendar.MONTH, -Months);
 		return t;
 	}
 	public static Calendar getUTCTimeMinusYear(int years) {
-		Calendar t = Gtil.getUTCTime();
+		Calendar t = Sutil.getUTCTime();
 		t.add(Calendar.YEAR, -years);
 		return t;
 	}

@@ -37,7 +37,7 @@ import org.json.JSONObject;
  * 2. implement the JAX-RS interfaces with annotations (copy from a sample object)
  * 3. implement any special APIs or logic needed 
  */
-public class RestBase {
+public class RestUtil {
 	
 	public static boolean paramHave(String param) {
 		if (param == null || param.isEmpty() || param.equals("null")) {
@@ -89,7 +89,7 @@ public class RestBase {
 	
 	public static int toInt(String param) {
 		if (param != null) {
-			return Gtil.toInt(param);
+			return Sutil.toInt(param);
 		}
 		return 0;
 	}
@@ -104,14 +104,14 @@ public class RestBase {
 	
 	public static int toMoney_int(String param) {
 		if (param != null) {
-			return Gtil.toMoney_int(param);
+			return Sutil.toMoney_int(param);
 		}
 		return 0;
 	}
 
 	public static Calendar toTime(String param) {
 		if (param != null) {
-			return Gtil.loadTimeStamp(param);
+			return Sutil.loadTimeStamp(param);
 		}
 		return null;
 	}
@@ -129,13 +129,13 @@ public class RestBase {
 	
 	public static int getJInt(JSONObject obj, String name) {
 		try {
-		return Gtil.toInt(obj.getString(name));
+		return Sutil.toInt(obj.getString(name));
 		} catch (Throwable t) {}	
 		return -1;
 	}
 	public static double getJDouble(JSONObject obj, String name) {
 		try {
-		return Gtil.toDouble(obj.getString(name));
+		return Sutil.toDouble(obj.getString(name));
 		} catch (Throwable t) {}	
 		return -1;
 	}
