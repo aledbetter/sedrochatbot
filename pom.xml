@@ -58,17 +58,6 @@
 			<artifactId>jersey-hk2</artifactId>
 			<version>${jersey.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-multipart</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jvnet.mimepull</groupId>
-			<artifactId>mimepull</artifactId>
-			<version>1.9.6</version>
-		</dependency>
 		 
 		<!-- JSON read / convert -->
 		<dependency>
@@ -166,8 +155,7 @@
 						</goals>
 						<configuration>
 							<artifactItems>
-								<artifactItem>
-								
+								<artifactItem>		
 									<groupId>org.eclipse.jetty</groupId>
 									<artifactId>jetty-runner</artifactId>
 									<version>${jetty.version}</version>
@@ -190,13 +178,11 @@
 		              <goal>copy-resources</goal>
 		            </goals>
 		            <configuration>
-		              <outputDirectory>target/SedroChatbot-1.0.9999/w/00_DEV_00/</outputDirectory>
+		              <outputDirectory>target/SedroChatbot-1.0.9999/</outputDirectory>
 		              <resources>          
 		                <resource>
 		                  <directory>.</directory>	                  
 					        <includes>
-					          <include>STATUS</include>
-					          <include>BUGS</include>
 					          <include>LICENSE</include>		      
 					        </includes>				       
 		                </resource>
@@ -210,13 +196,11 @@
 		              <goal>copy-resources</goal>
 		            </goals>
 		            <configuration>
-		              <outputDirectory>src/main/webapp/w/00_DEV_00</outputDirectory>
+		              <outputDirectory>src/main/webapp/</outputDirectory>
 		              <resources>          
 		                <resource>
 		                  <directory>.</directory>	                  
 					        <includes>
-					          <include>STATUS</include>
-					          <include>BUGS</include>
 					          <include>LICENSE</include>		      
 					        </includes>				       
 		                </resource>
