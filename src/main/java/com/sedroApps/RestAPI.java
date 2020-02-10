@@ -34,15 +34,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.json.JSONObject;
+import main.java.com.sedroApps.util.RestResp;
 
 
-import main.java.com.sedroApps.RestBase;
-import main.java.com.sedroApps.RestResp;
 
-@Path("/1.0/test/")
+@Path("/1.0/")
 @Produces(MediaType.APPLICATION_JSON)
-public class RestAPI extends RestBase {
+public class RestAPI {
 	public static boolean debug_time = false;
 	
 	/*
@@ -62,82 +60,28 @@ public class RestAPI extends RestBase {
 	/////////////////////////////////////////////////////////////////
 	//  Get service list
 	/////////////////////////////////////////////////////////////////	
-	@POST
 	@Path("/services")
-	public Response GetServicesPOST(@Context UriInfo info, 
-			@Context HttpServletRequest hsr,
-			@CookieParam("atok") String cookie_access_key, 
-			String body) {
+    public Response servicesGET(@Context UriInfo info, 
+			@Context HttpServletRequest hsr, 
+    		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		if (!checkAuth(rr, "user")) return rr.retNoAuth();
-
-		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
-		boolean save_usage = false, ctx_save = false, incoming = true;
-		List<String> knowledge = null;
-	
-
-		try {
-			JSONObject obj = new JSONObject(body);
-			text = getJStr(obj, "text");
-			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
-			if (paramHave(scontext)) context = scontext;
-			String slanguage = getJStr(obj, "language");
-			if (paramHave(slanguage)) language = slanguage;
-			
-			String spersona = getJStr(obj, "persona");
-			if (paramHave(spersona)) persona = spersona;
-			
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-		if (text != null) text = text.trim();
-		if (text.isEmpty()) text = null;
-		if (chid == null) {
-			event = "wake";
-			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
-		}
-		
-		// add all the doc content
+		//if (!checkAuth(rr, "user")) return rr.retNoAuth();
+		//System.out.println("pool/get["+ctx+"] ");
+//FIXME
 		return rr.ret();
 	}
-	@POST
+	
+	
 	@Path("/{service}/users")
-	public Response GetServiceUsersPOST(@Context UriInfo info, 
-			@Context HttpServletRequest hsr,
-			@CookieParam("atok") String cookie_access_key, 
-			String body) {
+    public Response serviceUsersGET(@Context UriInfo info, 
+			@Context HttpServletRequest hsr, 
+    		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		if (!checkAuth(rr, "user")) return rr.retNoAuth();
-
-		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
-		boolean save_usage = false, ctx_save = false, incoming = true;
-		List<String> knowledge = null;
-	
-
-		try {
-			JSONObject obj = new JSONObject(body);
-			text = getJStr(obj, "text");
-			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
-			if (paramHave(scontext)) context = scontext;
-			String slanguage = getJStr(obj, "language");
-			if (paramHave(slanguage)) language = slanguage;
-			
-			String spersona = getJStr(obj, "persona");
-			if (paramHave(spersona)) persona = spersona;
-			
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-		if (text != null) text = text.trim();
-		if (text.isEmpty()) text = null;
-		if (chid == null) {
-			event = "wake";
-			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
-		}
-		
-		// add all the doc content
+		//System.out.println("pool/get["+ctx+"] ");
+//FIXME
 		return rr.ret();
 	}
+/*
 	@POST
 	@Path("/{service}/user/add")
 	public Response GetServiceUserAddPOST(@Context UriInfo info, 
@@ -291,5 +235,5 @@ public class RestAPI extends RestBase {
 		return rr.ret();
 	}
 
-
+*/
 }

@@ -15,7 +15,7 @@
  * from Aaron Ledbetter.
  */
 
-package main.java.com.sedroApps;
+package main.java.com.sedroApps.util;
 
 
 import java.util.ArrayList;
@@ -30,7 +30,6 @@ import org.json.JSONObject;
 
 
 
-
 /*
  * Base class for all object Services
  * This implements the base functionality for SET/GET/DEL/CREATE and objects that inherit must 
@@ -38,7 +37,7 @@ import org.json.JSONObject;
  * 2. implement the JAX-RS interfaces with annotations (copy from a sample object)
  * 3. implement any special APIs or logic needed 
  */
-public abstract class RestBase {
+public class RestBase {
 	
 	public static boolean paramHave(String param) {
 		if (param == null || param.isEmpty() || param.equals("null")) {
@@ -127,30 +126,26 @@ public abstract class RestBase {
 		return str;
 	}
 	
-	public static boolean checkAuth(RestResp rr, String type) {
-		// FIXME
-		return true;
-	}
 	
-	protected int getJInt(JSONObject obj, String name) {
+	public static int getJInt(JSONObject obj, String name) {
 		try {
 		return Gtil.toInt(obj.getString(name));
 		} catch (Throwable t) {}	
 		return -1;
 	}
-	protected double getJDouble(JSONObject obj, String name) {
+	public static double getJDouble(JSONObject obj, String name) {
 		try {
 		return Gtil.toDouble(obj.getString(name));
 		} catch (Throwable t) {}	
 		return -1;
 	}
-	protected String getJStr(JSONObject obj, String name) {
+	public static String getJStr(JSONObject obj, String name) {
 		try {
 		return obj.getString(name);
 		} catch (Throwable t) {}	
 		return null;
 	}
-	protected ArrayList<String> getJStrList(JSONObject obj, String name) {
+	public static ArrayList<String> getJStrList(JSONObject obj, String name) {
 		ArrayList<String> syl = null;
 		try {
 			JSONArray li = obj.getJSONArray(name);
@@ -161,7 +156,7 @@ public abstract class RestBase {
 			} catch (Throwable t) {}	
 		return syl;
 	}
-	protected HashMap<String, String> getJStrMap(JSONObject obj, String name) {
+	public static HashMap<String, String> getJStrMap(JSONObject obj, String name) {
 		HashMap<String, String> syl = null;
 		try {
 			JSONArray li = obj.getJSONArray(name);
@@ -175,7 +170,7 @@ public abstract class RestBase {
 			} catch (Throwable t) {}	
 		return syl;
 	}
-	protected String getJStrList(JSONObject obj, String name, int i) {
+	public static String getJStrList(JSONObject obj, String name, int i) {
 		try {
 			JSONArray li = obj.getJSONArray(name);
 			return li.getString(i);

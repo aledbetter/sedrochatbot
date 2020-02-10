@@ -15,7 +15,7 @@
  * from Aaron Ledbetter.
  */
 
-package main.java.com.sedroApps;
+package main.java.com.sedroApps.util;
 
 import java.util.*;
 

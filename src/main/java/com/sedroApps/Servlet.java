@@ -37,10 +37,8 @@ import org.apache.log4j.Logger;
  */
 public class Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
 		
 	static Logger logger = Logger.getLogger(Servlet.class);	
-	private static URL proxy_url = null;
 
 	
     /**
@@ -69,55 +67,19 @@ public class Servlet extends HttpServlet {
      * @see HttpServlet#HttpServlet()
      */
 	public static void loadService(boolean server) {
-		/*
-		 * GMT
-		 */
 		TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-			
- 	   	
+			 	   	
         ////////////
 		// Load and configure the logger
         ////////////
 		
         // Set up a simple configuration that logs on the console.
         Logger root = Logger.getRootLogger();
-        root.setLevel(Level.ERROR);
-        
-            	
-    	String pu = System.getenv("FIXIE_URL");
-    	if (pu != null){
-    		try {
-				proxy_url = new URL(pu);
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
-    	
-    	if (proxy_url != null) {
-        	System.out.println("Outgoing proxy = " + proxy_url.toString() + " [" + proxy_url.getHost() + "] " + proxy_url.getPort());
-    	}
-    	    	
+        root.setLevel(Level.ERROR);       
+
         BasicConfigurator.configure();
         logger.setLevel(Level.ERROR); // set the log level to INFO
-        System.out.println("LoadService initializing log4j Complete");      
-        
-
+        System.out.println("LoadService initializing log4j Complete");           
     }
-
-	public static URL getProxyUrl() {
-		return proxy_url;
-	}
-	public static String getProxyUser() {
-		if (proxy_url == null) return null;
-	    String userInfo = proxy_url.getUserInfo();
-	    return userInfo.substring(0, userInfo.indexOf(':'));
-	}
-	public static String getProxyPass() {
-		if (proxy_url == null) return null;
-	    String userInfo = proxy_url.getUserInfo();
-	    return userInfo.substring(userInfo.indexOf(':') + 1);
-	}
-
 
 }
