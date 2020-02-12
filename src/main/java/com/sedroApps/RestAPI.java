@@ -50,6 +50,112 @@ import main.java.com.sedroApps.util.Sutil;
 public class RestAPI {
 	public static boolean debug_time = false;
 	
+	@POST
+	@Path("/login")
+	public Response loginPOST(@Context UriInfo info, 
+			@Context HttpServletRequest hsr,
+			@CookieParam("atok") String cookie_access_key, 
+			String body) {
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		
+		ChatServer cs = ChatServer.getChatServer();
+		
+		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
+		boolean save_usage = false, ctx_save = false, incoming = true;
+		List<String> knowledge = null;
+	/*
+
+		try {
+			JSONObject obj = new JSONObject(body);
+			text = getJStr(obj, "text");
+			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
+			if (paramHave(scontext)) context = scontext;
+			String slanguage = getJStr(obj, "language");
+			if (paramHave(slanguage)) language = slanguage;
+			
+			String spersona = getJStr(obj, "persona");
+			if (paramHave(spersona)) persona = spersona;
+			
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+		if (text != null) text = text.trim();
+		if (text.isEmpty()) text = null;
+		if (chid == null) {
+			event = "wake";
+			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
+		}
+		*/
+		// add all the doc content
+		return rr.ret();
+	}
+	@GET
+	@Path("/logout")
+    public Response logoutGET(@Context UriInfo info, 
+			@Context HttpServletRequest hsr, 
+    		@CookieParam("atok") String cookie_access_key) { 
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		ChatServer cs = ChatServer.getChatServer();
+
+		//if (!checkAuth(rr, "user")) return rr.retNoAuth();
+		//System.out.println("pool/get["+ctx+"] ");
+//FIXME
+		return rr.ret();
+	}
+	
+	@GET
+	@Path("/settings")
+    public Response settingsGET(@Context UriInfo info, 
+			@Context HttpServletRequest hsr, 
+    		@CookieParam("atok") String cookie_access_key) { 
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		ChatServer cs = ChatServer.getChatServer();
+
+		//if (!checkAuth(rr, "user")) return rr.retNoAuth();
+		//System.out.println("pool/get["+ctx+"] ");
+//FIXME
+		return rr.ret();
+	}
+	@POST
+	@Path("/settings")
+	public Response settingsPOST(@Context UriInfo info, 
+			@Context HttpServletRequest hsr,
+			@CookieParam("atok") String cookie_access_key, 
+			String body) {
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		ChatServer cs = ChatServer.getChatServer();
+
+		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
+		boolean save_usage = false, ctx_save = false, incoming = true;
+		List<String> knowledge = null;
+	/*
+
+		try {
+			JSONObject obj = new JSONObject(body);
+			text = getJStr(obj, "text");
+			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
+			if (paramHave(scontext)) context = scontext;
+			String slanguage = getJStr(obj, "language");
+			if (paramHave(slanguage)) language = slanguage;
+			
+			String spersona = getJStr(obj, "persona");
+			if (paramHave(spersona)) persona = spersona;
+			
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+		if (text != null) text = text.trim();
+		if (text.isEmpty()) text = null;
+		if (chid == null) {
+			event = "wake";
+			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
+		}
+		*/
+		// add all the doc content
+		return rr.ret();
+	}
+	
+	
 	/*
 	 * List services
 	 * service/List users
@@ -68,7 +174,7 @@ public class RestAPI {
 	//  Get service list
 	/////////////////////////////////////////////////////////////////
 	@GET
-	@Path("/services")
+	@Path("/users")
     public Response servicesGET(@Context UriInfo info, 
 			@Context HttpServletRequest hsr, 
     		@CookieParam("atok") String cookie_access_key) { 
@@ -80,22 +186,9 @@ public class RestAPI {
 	}
 	
 	@GET
-	@Path("/{service}/users")
-    public Response serviceUsersGET(@Context UriInfo info, 
-			@Context HttpServletRequest hsr, 
-    		@PathParam("service") String service,
-    		@CookieParam("atok") String cookie_access_key) { 
-		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		//System.out.println("pool/get["+ctx+"] ");
-//FIXME
-		return rr.ret();
-	}
-	
-	@GET
-	@Path("/{service}/user/{user}")
+	@Path("/user/{user}")
     public Response serviceUserGET(@Context UriInfo info, 
 			@Context HttpServletRequest hsr, 
-    		@PathParam("service") String service,
     		@PathParam("user") String user,
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
@@ -105,10 +198,9 @@ public class RestAPI {
 	}
 
 	@POST
-	@Path("/{service}/user/add")
+	@Path("/user/add")
 	public Response GetServiceUserAddPOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
-    		@PathParam("service") String service,
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
@@ -143,10 +235,9 @@ public class RestAPI {
 		return rr.ret();
 	}
 	@POST
-	@Path("/{service}/user/{user}/del")
+	@Path("/user/{user}/del")
 	public Response GetServiceUserDelPOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
-    		@PathParam("service") String service,
     		@PathParam("user") String user,
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
@@ -182,10 +273,9 @@ public class RestAPI {
 	}
 	
 	@POST
-	@Path("/{service}/user/{user}")
+	@Path("/user/{user}")
 	public Response GetServiceUserUpdatePOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
-    		@PathParam("service") String service,
     		@PathParam("user") String user,
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
