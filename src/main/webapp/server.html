@@ -26,13 +26,37 @@
 			<h1>ChatBot Manager</h1>
 		</div>
 		
-		<div class="cent" style='padding-top:50px'>	
-			<div class="cent">			
-				<div class="fullPanel fadeInNow slow" style='min-height:680px'>							
-					<pre id='content'></pre>
-				</div>
+		
+		<div class="cent" style='padding-top:160px;background:#FFF;min-height:500px;'>	
+			
+			<div class='fLn' style='height:250px'>
+				<div class='fLn'>
+					<h1>Server Configuration</h1>
+					<div class='bslink' id='update_settings_bt' style='width:100px;text-align:center;font-size:16px;margin-top:-40px;margin-left:650px;background:#EEE;'>Update</div>			
+		
+					<div class='fLn' style='display:none' id='show_settings'> 
+						<div class='fLn'>Username: <span id='setting_username'></span></div>
+						<div class='fLn'>Sedro Access Key: <span id='setting_sedro_access_key'></span></div>
+						<div class='fLn'>Poll Interval: <span id='setting_poll_interval'></span></div>				
+					</div>
+					<div class='fLn' style='display:none' id='update_settings'> 
+						<b>Username:</b> <input type='text' id='set_username'/><br><br>
+						<b>Password:</b> <input type='password' id='set_password'/><br><br>
+						<b>Sedro Access Key:</b> <input type='text' id='set_sedro_access_key'/><br><br>
+					</div>		 
+			 	</div>
+				<h1 id='settingserror' style='color:red;display:none'></h1>
+			</div>
+			
+			
+			<div class='fLn'>
+				<h1>Users</h1>
+				<div class='bslink' id='add_user_bt' style='width:100px;text-align:center;font-size:16px;margin-top:-40px;margin-left:650px;background:#EEE;'>Add User</div>						
+				<h1 id='usererror' style='color:red;display:none'></h1>
+				<div class='fLn' id='userlist'></div>
 			</div>
 		</div>
+				
 				 
 		<div class="footer">	
 			<div class='cent'>

@@ -22,6 +22,9 @@ $(document).ready(function() {
 
 	$("#username, #password").removeClass("warn").val("");
 	$("#loginerror").hide().val("");
+	$("#show_settings").show();
+	$("#update_settings").hide();
+	$("#set_password").val(""); 
 
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +64,43 @@ $(document).ready(function() {
 		});
 	});
 	
+	//////////////////////////////////////////////////
+	// server page
+	$("#update_settings_bt").on('click', function (e) {
+		var v = $("#show_settings").attr("data-v");
+		if (v == "hide") {
+			// FIXME save the info here: then flip the view	
+
+			
+			$("#show_settings").show();
+			$("#update_settings").hide();	
+			$("#show_settings").attr("data-v", "show");
+			
+		} else {
+			$("#show_settings").hide();
+			$("#update_settings").show();
+			$("#show_settings").attr("data-v", "hide");
+		}
+					
+	});
 	
+	$("#add_user_bt").on('click', function (e) {
+		// FIXME get the user info
+	});
+	
+	
+	// if this is the server page
+	if (window.location.href.indexOf("server.html") > -1) {
+
+		scsGetSettings(function(data) {
+			$("#setting_poll_interval").html(data.poll_interval); 
+			$("#setting_username").html(data.username); 
+			$("#setting_sedro_access_key").html(data.sedro_access_key); 
+			$("#set_username").val(data.username); 
+			$("#set_sedro_access_key").val(data.sedro_access_key); 
+		});
+		
+	}
 	
 });
 	

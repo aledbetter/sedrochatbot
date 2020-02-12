@@ -168,7 +168,10 @@ select.error {
 select.warn {
 	border: 2px solid #F5DA81;
 }
-
+.fLn {
+	float:left;
+	width:100%;
+}
 
 /* HEADER */
 #lheader  {

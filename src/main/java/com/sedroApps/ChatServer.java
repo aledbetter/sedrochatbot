@@ -24,15 +24,13 @@ public class ChatServer {
 		return cs;
 	}
 	public void init() {
+		username = "admin";
+		password = "admin";
 		load();
 	}
 	
 	public boolean login(String username, String password) {
 		if (username == null || password == null) return false;
-		if (this.username == null) {
-			if (username.equals("admin") && password.equals("admin")) return true;
-			return false;
-		}
 		if (username.equals(this.username) && password.equals(this.password)) return true;
 		return false;
 	}
