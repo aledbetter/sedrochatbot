@@ -25,12 +25,17 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+@JsonPropertyOrder({ "code", "info"})
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RestResp {
 	
 	private int code;	
 	// alternate string for response if needed
 	private HashMap<String, Object> info; 
+	
 	
 	public RestResp(UriInfo info, 
 					HttpServletRequest hsr, 

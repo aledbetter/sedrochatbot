@@ -19,31 +19,51 @@
 ////////////////////////////////////////////////////////////////////////////////////
 // Doc open
 $(document).ready(function() {
-	// if cookie show else login
-	// FIXME
-	$(".login").show();
-	$(".session").hide();
+
+	$("#username, #password").removeClass("warn").val("");
+	$("#loginerror").hide().val("");
+
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// Add interactive message
-	$("#login").on('click', function (e) {
+	$("#login_bt").on('click', function (e) {
 		var username = $("#username").val(); 
 		var password = $("#password").val(); 
+
+		$("#username, #password").removeClass("warn");
+
+		var fail = false;
 		if (!username || username.length < 3) {
-			return;
+			$("#username").addClass("warn");
+			fail = true;
 		}
 		if (!password || password == "") {
+			$("#password").addClass("warn");
+			fail = true;
+		}
+		if (fail) {
+			$("#password").val(""); 
 			return;
 		}
-		
 		scsLogin(username, password, function(data) {
-			$(".login").hide();
-			$(".session").show();
-
+			$("#username, #password").removeClass("warn").val("");
+			if (data.code == 200) {
+				window.location.href = "/server.html";
+			} else {
+				$("#loginerror").show().val("Incorrect username or password");
+			}
 		});
 	});
-
-};
+	
+	$("#logout_bt").on('click', function (e) {
+		scsLogout(username, password, function(data) {
+			window.location.href = "/index.html";
+		});
+	});
+	
+	
+	
+});
 	
 
 
@@ -64,7 +84,7 @@ function scsLogin(username, password, cb) {
     dat += ", \"password\": \"" + password + "\"";
     dat += "}";
 	
-	$.ajax({url: "/1.0/login", type: 'POST', async: true, data: dat, contentType: 'application/json', 
+	$.ajax({url: "/api/1.0/login", type: 'POST', async: true, data: dat, contentType: 'application/json', 
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {
@@ -74,7 +94,7 @@ function scsLogin(username, password, cb) {
 }
 
 function scsLogout(cb) {
-	$.ajax({url: "/1.0/logout", type: 'GET', dataType: "json", contentType: 'application/json', 
+	$.ajax({url: "/api/1.0/logout", type: 'GET', dataType: "json", contentType: 'application/json', 
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {
@@ -84,7 +104,7 @@ function scsLogout(cb) {
 }
 
 function scsGetSettings(cb) {
-	$.ajax({url: "/1.0/settings", type: 'GET', dataType: "json", contentType: 'application/json', 
+	$.ajax({url: "/api/1.0/settings", type: 'GET', dataType: "json", contentType: 'application/json', 
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {
@@ -100,7 +120,7 @@ function scsUpdateSettings(username, password, sedro_access_key, cb) {
     if (sedro_access_key) dat += ", \"sedro_access_key\": \"" + sedro_access_key + "\"";
     dat += "}";
 	
-	$.ajax({url: "/1.0/settings", type: 'POST', async: true, data: dat, contentType: 'application/json', 
+	$.ajax({url: "/api/1.0/settings", type: 'POST', async: true, data: dat, contentType: 'application/json', 
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {
@@ -110,7 +130,7 @@ function scsUpdateSettings(username, password, sedro_access_key, cb) {
 }
 
 function scsGetUsers(cb) {
-	$.ajax({url: "/1.0/users", type: 'GET', dataType: "json", contentType: 'application/json', 
+	$.ajax({url: "/api/1.0/users", type: 'GET', dataType: "json", contentType: 'application/json', 
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {
@@ -120,7 +140,7 @@ function scsGetUsers(cb) {
 }
 
 function scsGetUser(user, cb) {
-	$.ajax({url: "/1.0/users/"+user, type: 'GET', dataType: "json", contentType: 'application/json', 
+	$.ajax({url: "/api/1.0/users/"+user, type: 'GET', dataType: "json", contentType: 'application/json', 
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {
@@ -134,7 +154,7 @@ function scsAddUser(username, cb) {
     dat += "\"username\": \"" + username + "\"";
     dat += "}";
 	
-	$.ajax({url: "/1.0/user/add", type: 'POST', async: true, data: dat, contentType: 'application/json', 
+	$.ajax({url: "/api/1.0/user/add", type: 'POST', async: true, data: dat, contentType: 'application/json', 
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {
@@ -143,7 +163,7 @@ function scsAddUser(username, cb) {
 	});
 }
 function scsDelUser(username, cb) {	
-	$.ajax({url: "/1.0/user/"+username+"/del", type: 'POST', async: true, contentType: 'application/json', 
+	$.ajax({url: "/api/1.0/user/"+username+"/del", type: 'POST', async: true, contentType: 'application/json', 
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {
@@ -166,7 +186,7 @@ function scsUpdateUser(username, service, serviceparams, cb) {
 	// ]
     dat += "}";
 	
-	$.ajax({url: "/1.0/user/"+username, type: 'POST', async: true, data: dat, contentType: 'application/json', 
+	$.ajax({url: "/api/1.0/user/"+username, type: 'POST', async: true, data: dat, contentType: 'application/json', 
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {
