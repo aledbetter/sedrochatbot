@@ -31,6 +31,16 @@ public class UserAccount {
 		if (hm == null) return null;		
 		return hm.get(element);
 	}
+	public void setServiceInfo(String service, String element, String value) {
+		if (service_info == null || service == null || element == null) return;
+		HashMap<String, String> hm = service_info.get(service);
+		if (hm == null) {
+			hm = new HashMap<>();
+			hm.put("service", service);
+			service_info.put(service, hm);
+		}
+		hm.put(element, value);
+	}
 	
 	
 	public void load() {
@@ -41,25 +51,27 @@ public class UserAccount {
 		// Load 
 // FIXME
 
-		// initiallize all the interfaces
-		for (String key:service_info.keySet()) {
-			switch (key) {
-			case "twitter":
-				ChatService cs = new ChatTwitter();
-				cs.init(this);
-				break;
-			case "facebook":
-				//ChatService cs = new ChatTwitter();
-				//cs.init(this);
-				break;
-			case "slack":
-				//ChatService cs = new ChatTwitter();
-				//cs.init(this);
-				break;
-			case "phone":
-				//ChatService cs = new ChatTwitter();
-				//cs.init(this);
-				break;
+		if (service_info.keySet().size() > 0) {
+			// initiallize all the interfaces
+			for (String key:service_info.keySet()) {
+				switch (key) {
+				case "twitter":
+					ChatService cs = new ChatTwitter();
+					cs.init(this);
+					break;
+				case "facebook":
+					//ChatService cs = new ChatTwitter();
+					//cs.init(this);
+					break;
+				case "slack":
+					//ChatService cs = new ChatTwitter();
+					//cs.init(this);
+					break;
+				case "phone":
+					//ChatService cs = new ChatTwitter();
+					//cs.init(this);
+					break;
+				}
 			}
 		}
 		

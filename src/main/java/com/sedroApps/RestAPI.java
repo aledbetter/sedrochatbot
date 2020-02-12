@@ -41,6 +41,7 @@ import org.json.JSONObject;
 
 import main.java.com.sedroApps.util.RestResp;
 import main.java.com.sedroApps.util.RestUtil;
+import main.java.com.sedroApps.util.Sutil;
 
 
 
@@ -76,11 +77,9 @@ public class RestAPI {
 		if (!resp) return rr.ret(403);
 		
 		// set cookie
-		// atok
-// FIXME
-		
+		String atok = Sutil.getGUIDString();
 		// add all the doc content
-		return rr.ret();
+		return rr.ret("atok="+atok+";Path=/");
 	}
 	@GET
 	@Path("/logout")
@@ -91,8 +90,7 @@ public class RestAPI {
 		ChatServer cs = ChatServer.getChatServer();
 		cs.logout();
 		// drop cookie
-// FIXME
-		return rr.ret();
+		return rr.ret("atok=;Path=/");
 	}
 	
 	@GET
@@ -251,8 +249,18 @@ public class RestAPI {
 				for (int i=0;i<jsl.length();i++) {
 					JSONObject srv = jsl.getJSONObject(i);
 					// get the service param info...
-// FIXME			
-					
+					String service = srv.getString("service");
+
+					String [] params = JSONObject.getNames(srv);
+					for (String p:params) {
+						if (p.equals(service)) continue;
+						String val = srv.getString(p);
+						String cur_val = ua.getServiceInfo(service, p);
+						if (!Sutil.compare(val, cur_val)) {
+							ua.setServiceInfo(service, p, val);
+						}
+						// FIXME: what about remove?
+					}
 				}
 			}
 			} catch (Throwable t) {}
@@ -260,9 +268,6 @@ public class RestAPI {
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
-		
-		
-// FIXME
 		ua.save();
 		return rr.ret();
 	}

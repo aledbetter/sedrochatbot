@@ -69,6 +69,10 @@ public class RestResp {
 	public Response ret() {
 		return Response.status(200).entity(this.done()).build(); 
 	}
+	public Response ret(String cookie) {
+		return Response.status(200).header("Set-Cookie", cookie).entity(this.done()).build(); 
+	}
+	
 	public Response ret(int code) {
 		return Response.status(200).entity(this.done(code)).build(); 
 	}	
