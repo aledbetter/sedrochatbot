@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>TSP Persona Manager</title>
+	<meta charset="utf-8">
+	<meta http-equiv="Content-Type" content="text/html">
+	<meta name="description" content="Sedro Lexicon View">	
+	<meta name="keywords" content="Sedro, Lexicon, NLP, NLU" >	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta name="google-site-verification" content="MHUFkcDN5Hdi0GiO4tJ1vu5D23rr6UdaODT_DKr3hOU" />
+
+	<link rel="stylesheet" href="/css/style.css" />
+	 
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	
+	<script type="text/javascript" src="/js/api_sedro.js?version=1"></script> 
+	<script type="text/javascript" src="/js/mgt.js?version=1"></script> 
+
+</head>
+
+<body style='background:#E5E5E5'>
+
+<div class="mainc vcard landing" id='index_page'>
+		
+	<div id='lheader'>
+		<div>
+			<h1>The Sedro Project</h1>
+			<h3>Natural Language Understanding</h3>
+			<h5>Version <span class="sedro_version"></span></h5>
+		</div>
+		<img src="/img/tsp-white-none.png" alt="{TSP}" />
+		<h1>Persona Manager</h1>
+	</div>
+	
+	<div class="segment" style='margin-top:30px' id="lex">
+		<input type='hidden' id='treename' value='english'/>
+		<div class="cent">			
+		
+			<div class="fullPanel" style='min-height:1200px'>
+
+				<input id='persona' type='hidden'>
+				
+				<div class='fLn' id='tenantchoice'>				
+					<div class='fLn' style='margin-top:30px;margin-bottom:50px'>
+						<div class='fLn' style='background:#666;color:#FFF;height:35px;position:relative;font-size:20px;padding-top:17px'>		
+							<span style='float:left'>
+								&nbsp;&nbsp;RapidAPI Key: <input type='text' id='api_key' style='width:400px;position:absolute;top:11px;left:150px'>
+							</span>	
+							<div class='bslink' id='tenant_get_bt' style='width:140px;text-align:center;float:right;font-size:16px;margin-top:-2px;background:#EEE;margin-right:15px;'>Get Personas</div>			
+						</div>						
+					</div>
+					<div class='fLn' style='padding-top:10px;padding-bottom:5px'>					
+						<div class='fLn action' style='font-weight:bold' id='xtenant_action'></div>
+					</div>	
+				</div>
+	
+				
+				<div class='fLn' id='thetenant' style='display:none;margin-top:10px;margin-bottom:10px;background:#EEE;position:relative'>
+					<div class='fLn' style='margin-bottom:10px;background:#666;color:#FFF;height:40px;font-size:18px;padding-top:12px'>		
+						<span style='float:left;padding-left:10px'>Name: <b><span class='ctxName'></span></b></span>
+						<span style='float:left;padding-left:140px'>Subscription: <b><span class='ctxSubscription'></span></b></span>
+						
+						<span style='float:right;padding-right:10px'>Tenant ID: <span class='ctx'></span></span>	
+					</div>	
+					<div class='fLn' style='padding-top:10px;padding-bottom:10px'>					
+						<div class='fLn action' style='font-weight:normal' id='xtenant_data'></div>
+					</div>					
+					<div class='fLn' id='add_form' style='display:none;z-index:1000;position:absolute;top:100px;margin-left:15px;width:97%;background:#FFF;border:solid 2px #555'>	
+						<div style='padding:15px'>
+						<h3>Add Form to Persona: <span id='persona_form_show'></span></h3>
+							Form Type: <select id='form_type' style='width:100px'>
+								<option value='load' selected>load</option>
+								<option value='action'>action</option>
+								<option value='background'>background</option>
+								<option value='object'>object</option>
+							</select>
+							&nbsp;&nbsp;Main: <select id='form_main' style='width:100px'>
+								<option value='false' selected>false</option>
+								<option value='true'>true</option>
+							</select>
+							<br><br>
+							URL: <input id='form_url' style='width:400px' type='text'>
+							<br> <b>-- OR --</b> <br>
+							Content: 
+							<textarea id='form_content' style='width:98%;min-height:80px' ></textarea>
+							<input id='form_persona' type='hidden'>
+							
+							<div class='bslink' id='form_add_bt' style='width:70px;margin-bottom:10px;text-align:center;float:right;font-size:16px;margin-top:10px;background:#EEE;margin-right:10px;'>Add</div>			
+							<div class='bslink' id='form_add_cancel_bt' style='width:70px;margin-bottom:10px;text-align:center;float:right;font-size:16px;margin-top:10px;background:#EEE;margin-right:10px;'>Cancel</div>			
+							
+						</div>
+					</div>
+					<div class='fLn' id='raw_persona' style='display:none;z-index:1000;position:absolute;top:100px;margin-left:15px;width:97%;background:#FFF;border:solid 2px #555'>	
+						<div style='padding:15px'>
+						<h3>Raw Persona: <span id='raw_persona_name'></span></h3>
+							<div class='bslink' id='raw_persona_cancel_bt' style='width:70px;text-align:center;font-size:16px;background:#EEE;position:absolute;top:10px;right:10px'>Cancel</div>			
+							<div class='fLn' style='height:600px;overflow: auto;'><pre><code id='raw_persona_data'></code></pre></div>
+						</div>
+					</div>
+				</div>
+
+							
+				<div class='fLn' style='margin-bottom:20px'>
+
+					<!-- GENERATE Persona DB -->
+					<div class='fLn' id='gen_persona' style='display:none;margin-top:30px;margin-bottom:10px;background:#EEE;padding-bottom:10px;position:relative'>
+						<div class='fLn' style='padding-top:10px'>
+							<h3>&nbsp;Add a Persona</h3>
+							<div class='bslink' id='add_persona_bt' style='width:70px;text-align:center;font-size:16px;position:absolute;top:8px;right:15px;background:#666;color:#FFF'>Add</div>								
+							
+							<div class='fLn' id='add_persona' style='display:none;padding-top:10px'>							
+								<div class='fLn'>	
+									<div>&nbsp;First Name <input id='first_name' type='text'> 
+									&nbsp;&nbsp;Last Name <input id='last_name' type='text'> 
+									&nbsp;&nbsp;email <input id='email' type='text'>
+									&nbsp;&nbsp;Sex <select id='persona' style='width:100px'><option value='female'>female</option><option value='male'>male</option></select>
+									</div>
+									<!-- phrases -->
+									<!-- forms -->
+								</div>
+								<div class='fLn' style='padding-top:10px;padding-bottom:10px'>					
+									<div class='fLn action' style='font-weight:bold' id='xpersona_action'></div>
+								</div>	
+								<div class='bslink' id='persona_generate_bt' style='width:200px;text-align:center;float:right;font-size:16px;margin-top:4px;background:#666;color:#FFF;margin-right:10px;'>Generate Persona</div>								
+							</div>
+						</div>
+					</div>	
+					
+					<!-- GENERATE Knowledge DB -->
+					<div class='fLn' id='gen_knowledge' style='display:none;margin-top:10px;margin-bottom:50px;background:#EEE;padding-bottom:10px;position:relative'>
+						<div class='fLn' style='padding-top:10px'>
+							<h3>&nbsp;Add Knowledge to <select id='persona_select' style='width:200px'></select></h3>
+							
+							<div class='bslink' id='add_knowledge_bt' style='width:70px;text-align:center;font-size:16px;position:absolute;top:8px;right:15px;background:#666;color:#FFF'>Add</div>									
+							
+							<div class='fLn' id='add_knowledge' style='display:none;padding-top:10px'>							
+								<textarea id='knowledge_text' style='width:966px;min-height:40px;margin-top:3px'></textarea>
+								<div class='bslink' id='db_generate_bt' style='width:200px;text-align:center;float:right;font-size:16px;margin-top:4px;background:#666;color:#FFF;margin-right:10px;'>Generate DB</div>			
+							</div>
+						</div>
+					</div>						
+						
+					<!-- CHAT... needed -->
+					<div class='fLn' id='chat_panel' style='display:none'>
+						<div class='fLn notwoke' style='margin-bottom:10px;margin-top:30px;background:#666;color:#FFF;height:40px;font-size:18px;padding-top:12px'>		
+								&nbsp;&nbsp;Chat with Persona: <select id='persona' style='width:160px'><option value='sedro' selected>sedro</option></select>						
+							<div class='bslink' id='wake_now_bt' style='width:70px;text-align:center;float:right;font-size:16px;margin-right:8px;margin-top:3px;background:#EEE'>Wake</div>
+						</div>									
+						<!-- INTERACT: WAKE selected persona to interact with -->			
+						<div class='fLn woke' style='display:none'>					
+							<div class='fLn' style='margin-bottom:10px;margin-top:10px;background:#666;color:#FFF;padding-bottom:5px;padding-bottom:2px'>	
+								<span style='float:left;padding-top:5px'>&nbsp;Chatting: <span class='personaName' style='font-weight:bold'>...</span></span>			
+							</div>								
+							<!-- Chat View -->
+							<div class='fLn' id='interact_msg' style='height: 250px;overflow:scroll;overflow-x:hidden'></div>	
+							<!-- Text Box --><!-- Send Button -->
+							<div class='fLn interact' id='interact_wd'>
+								<div class='fLn' style='margin-top:5px;'>
+									<textarea id='interact_text' style='width:98%;min-height:40px;margin-top:3px'></textarea>
+								</div>
+								<div class='bslink' id='send_now_bt' style='width:70px;text-align:center;float:right;font-size:16px;margin-top:8px;background:#EEE;margin-right:1px;'>Send</div>			
+								<div class='bslink' id='bye_now_bt' style='width:70px;text-align:center;float:right;font-size:16px;margin-top:8px;background:#EEE;margin-right:1px;'>Bye</div>			
+							</div>
+						</div>
+					</div>
+			
+				</div>
+			</div>
+		</div>
+	</div>			 
+	<div class="footer">	
+		<div class='cent'>
+			<div class='fLn' style='position:relative'>
+			    <div class='nav'>
+				    <a href="http://www.sedro.xyz">www.sedro.xzy</a><br/>
+				    <a href="http://www.sedro.xyz/about/">About</a><br/>
+				    <a href="http://blog.sedro.xyz">TSP Blog</a><br/>
+				</div>	
+			    <div class='nav'>
+				    <a href="analyzer">Language Analyzer</a><br/>
+				    <a href="chat">Persona Chat - test</a><br/>
+				    <a href="msg">Persona Chat</a><br/>
+				</div>	
+				<div class='nav'>   
+				    <a href="api-current">REST APIs</a><br/>
+				    <a href="status">Release Status</a><br/>   
+				    <a href="bugs">Glitches</a><br/>				    				    
+				</div>	
+				<div class='nav'>
+				    <a href="http://www.sedro.xyz/privacy-policy/">Privacy Policy</a><br/>
+				    <a href="http://www.sedro.xyz/terms">Terms of Use</a><br/> 
+				</div>	
+ 			</div>		
+			<div class="cpw">&#169; 2020 The Sedro Project</div>
+		</div>
+	</div>
+
+</div>
+</body>
+</html>
