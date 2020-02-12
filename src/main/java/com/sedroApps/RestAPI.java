@@ -18,10 +18,7 @@
 
 package main.java.com.sedroApps;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Calendar;
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +38,6 @@ import org.json.JSONObject;
 
 import main.java.com.sedroApps.util.RestResp;
 import main.java.com.sedroApps.util.RestUtil;
-import main.java.com.sedroApps.util.Sutil;
 
 
 
@@ -57,35 +53,28 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		
-		ChatServer cs = ChatServer.getChatServer();
-		
-		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
-		boolean save_usage = false, ctx_save = false, incoming = true;
-		List<String> knowledge = null;
-	/*
+		String username = null, password = null, keep = null;
 
+		ChatServer cs = ChatServer.getChatServer();		
 		try {
 			JSONObject obj = new JSONObject(body);
-			text = getJStr(obj, "text");
-			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
-			if (paramHave(scontext)) context = scontext;
-			String slanguage = getJStr(obj, "language");
-			if (paramHave(slanguage)) language = slanguage;
+			username = RestUtil.getJStr(obj, "username");
+			password = RestUtil.getJStr(obj, "password"); 
 			
-			String spersona = getJStr(obj, "persona");
-			if (paramHave(spersona)) persona = spersona;
+			String skeep = RestUtil.getJStr(obj, "keep");
+			if (RestUtil.paramHave(skeep)) keep = skeep;
 			
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
-		if (text != null) text = text.trim();
-		if (text.isEmpty()) text = null;
-		if (chid == null) {
-			event = "wake";
-			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
-		}
-		*/
+		if (!RestUtil.paramHave(username) || !RestUtil.paramHave(password)) return rr.ret(402);
+		
+		String resp = cs.login(username, password);
+		if (!resp.equals("OK")) return rr.ret(403);
+		
+		// set cookie
+// FIXME
+		
 		// add all the doc content
 		return rr.ret();
 	}
@@ -96,10 +85,9 @@ public class RestAPI {
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 		ChatServer cs = ChatServer.getChatServer();
-
-		//if (!checkAuth(rr, "user")) return rr.retNoAuth();
-		//System.out.println("pool/get["+ctx+"] ");
-//FIXME
+		cs.logout();
+		// drop cookie
+// FIXME
 		return rr.ret();
 	}
 	
@@ -111,8 +99,11 @@ public class RestAPI {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 		ChatServer cs = ChatServer.getChatServer();
 
-		//if (!checkAuth(rr, "user")) return rr.retNoAuth();
-		//System.out.println("pool/get["+ctx+"] ");
+		//cs.sedro_access_key;
+		//cs.username
+		//cs.password
+		
+
 //FIXME
 		return rr.ret();
 	}
@@ -125,32 +116,22 @@ public class RestAPI {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 		ChatServer cs = ChatServer.getChatServer();
 
-		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
-		boolean save_usage = false, ctx_save = false, incoming = true;
-		List<String> knowledge = null;
-	/*
+		String sedro_access_key = null, username = null, password = null;
 
 		try {
 			JSONObject obj = new JSONObject(body);
-			text = getJStr(obj, "text");
-			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
-			if (paramHave(scontext)) context = scontext;
-			String slanguage = getJStr(obj, "language");
-			if (paramHave(slanguage)) language = slanguage;
-			
-			String spersona = getJStr(obj, "persona");
-			if (paramHave(spersona)) persona = spersona;
-			
+			sedro_access_key = RestUtil.getJStr(obj, "sedro_access_key");
+			username = RestUtil.getJStr(obj, "username");
+			password = RestUtil.getJStr(obj, "password");			
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
-		if (text != null) text = text.trim();
-		if (text.isEmpty()) text = null;
-		if (chid == null) {
-			event = "wake";
-			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
-		}
-		*/
+		if (!RestUtil.paramHave(password)) password = null;
+		if (!RestUtil.paramHave(username)) username = null;
+		if (!RestUtil.paramHave(sedro_access_key)) sedro_access_key = null;
+
+// FIXME
+		
 		// add all the doc content
 		return rr.ret();
 	}
@@ -179,9 +160,14 @@ public class RestAPI {
 			@Context HttpServletRequest hsr, 
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		//if (!checkAuth(rr, "user")) return rr.retNoAuth();
-		//System.out.println("pool/get["+ctx+"] ");
+		ChatServer cs = ChatServer.getChatServer();
+		List<UserAccount> ual = cs.getUsers();
+		if (ual == null || ual.size() < 1) return rr.ret();
+		
+		for (UserAccount ua:ual) {
 //FIXME
+		}
+		
 		return rr.ret();
 	}
 	
@@ -192,8 +178,12 @@ public class RestAPI {
     		@PathParam("user") String user,
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		//System.out.println("pool/get["+ctx+"] ");
+		ChatServer cs = ChatServer.getChatServer();
+		UserAccount ua = cs.getUser(user);
+		if (ua == null) return rr.ret(404);
+
 //FIXME
+		
 		return rr.ret();
 	}
 
@@ -205,33 +195,29 @@ public class RestAPI {
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 
-		String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
-		boolean save_usage = false, ctx_save = false, incoming = true;
-		List<String> knowledge = null;
-	/*
+		String username = null;
 
 		try {
 			JSONObject obj = new JSONObject(body);
-			text = getJStr(obj, "text");
-			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
-			if (paramHave(scontext)) context = scontext;
-			String slanguage = getJStr(obj, "language");
-			if (paramHave(slanguage)) language = slanguage;
-			
-			String spersona = getJStr(obj, "persona");
-			if (paramHave(spersona)) persona = spersona;
+			username = RestUtil.getJStr(obj, "username");
+//FIXME settings
+			//String spersona = RestUtil.getJStr(obj, "persona");
+			//if (RestUtil.paramHave(spersona)) persona = spersona;
 			
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
-		if (text != null) text = text.trim();
-		if (text.isEmpty()) text = null;
-		if (chid == null) {
-			event = "wake";
-			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
-		}
-		*/
-		// add all the doc content
+		if (!RestUtil.paramHave(username)) return rr.ret(401);
+
+		ChatServer cs = ChatServer.getChatServer();
+		UserAccount ua = cs.getUser(username);
+		if (ua != null) return rr.ret(409);
+			
+		ua = cs.addUser(username);
+		if (ua == null) return rr.ret(500);
+
+		// FIXME
+		
 		return rr.ret();
 	}
 	@POST
@@ -243,31 +229,12 @@ public class RestAPI {
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 
-		//String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, persona = null;
-		//boolean save_usage = false, ctx_save = false, incoming = true;
-		/*
-
-		try {
-			JSONObject obj = new JSONObject(body);
-			text = getJStr(obj, "text");
-			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
-			if (paramHave(scontext)) context = scontext;
-			String slanguage = getJStr(obj, "language");
-			if (paramHave(slanguage)) language = slanguage;
-			
-			String spersona = getJStr(obj, "persona");
-			if (paramHave(spersona)) persona = spersona;
-			
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-		if (text != null) text = text.trim();
-		if (text.isEmpty()) text = null;
-		if (chid == null) {
-			event = "wake";
-			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
-		}
-		*/
+		ChatServer cs = ChatServer.getChatServer();
+		UserAccount ua = cs.getUser(user);
+		if (ua == null) return rr.ret(404);
+		
+		cs.delUser(user);
+		
 		// add all the doc content
 		return rr.ret();
 	}
@@ -281,10 +248,7 @@ public class RestAPI {
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 
-		//String text = null, context = null, language = null, channel_type = "chat", channel_id = null, caller_token = null, event = null, style = null, chid = null, user = null, persona = null;
-		//boolean save_usage = false, ctx_save = false, incoming = true;
 		/*
-
 		try {
 			JSONObject obj = new JSONObject(body);
 			text = getJStr(obj, "text");
@@ -299,323 +263,15 @@ public class RestAPI {
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
-		if (text != null) text = text.trim();
-		if (text.isEmpty()) text = null;
-		if (chid == null) {
-			event = "wake";
-			if (persona == null || persona.trim().isEmpty()) persona = "sedro"; // default persona
-		}
 		*/
-		// add all the doc content
+		ChatServer cs = ChatServer.getChatServer();
+		UserAccount ua = cs.getUser(user);
+		if (ua == null) return rr.ret(404);
+		
+		// FIXME
+		
 		return rr.ret();
 	}
 
-	@POST
-	@Path("/chat/wake")
-	public Response interactWakePOST(@Context UriInfo info, 
-			@Context HttpServletRequest hsr,
-			@CookieParam("atok") String cookie_access_key, 
-			String body) {
-		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-
-		String text = null, context = "itx", language = null, channel_type = "chat", channel_id = null, caller_token = null, style = null, user = null, persona = null;
-		boolean save_usage = false, ctx_save = false;
-		int max_qn = -1;
-
-		try {
-			JSONObject obj = new JSONObject(body);
-			String scontext = RestUtil.getJStr(obj, "context"); // the name of the context... needed to save
-			if (RestUtil.paramHave(scontext)) context = scontext;
-			String slanguage = RestUtil.getJStr(obj, "language");
-			if (RestUtil.paramHave(slanguage)) language = slanguage;
-			
-			persona = RestUtil.getJStr(obj, "persona");
-			text = RestUtil.getJStr(obj, "text");
-
-			String suser = RestUtil.getJStr(obj, "user");
-			if (RestUtil.paramHave(suser)) user = suser;
-			String scaller_token = RestUtil.getJStr(obj, "caller_token");
-			if (RestUtil.paramHave(scaller_token)) caller_token = scaller_token;
-			
-			String schannel_type = RestUtil.getJStr(obj, "channel_type");
-			if (RestUtil.paramHave(schannel_type)) channel_type = schannel_type;
-			String sstyle = RestUtil.getJStr(obj, "style");
-			if (RestUtil.paramHave(sstyle)) style = sstyle;			
-			if (RestUtil.paramTrue(RestUtil.getJStr(obj, "save"))) ctx_save = true;
-			
-			String smax_qn = RestUtil.getJStr(obj, "max_qn");
-			if (RestUtil.paramHave(smax_qn)) max_qn = Sutil.toInt(smax_qn);
-		
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-		if (text != null) text = text.trim();
-		if (!RestUtil.paramHave(persona)) {
-			// must have persona
-			return rr.ret(402);
-		}
-		/*
-		/////////////////////////
-		// get tenant
-		PTenant tenant = RestUtils.getTenant(hsr);
-		if (tenant == null) return rr.ret(402);
-		
-		// session
-		PSession sess = new PSession(tenant.getTid(), null, context, language, text, user, caller_token, persona, channel_type, "wake", channel_id, style, null, max_qn, true, ctx_save, save_usage);	
-		SDoc res = Lex.processInteraction(sess);
-		if (res == null) return rr.ret(502);
-		
-		// add all the doc content
-		makeMap(rr, res.getCtx(), res);
-		*/
-		return rr.ret();
-	}
-	
-	
-	@POST
-	@Path("/chat/msg")
-	public Response interactMsgPOST(@Context UriInfo info, 
-			@Context HttpServletRequest hsr,
-			@CookieParam("atok") String cookie_access_key, 
-			String body) {
-		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-
-		String text = null, context = "itx", channel_type = "chat", channel_id = null, event = null, style = null, chid = null;	
-		int max_qn = -1;
-		try {
-			JSONObject obj = new JSONObject(body);
-			text = RestUtil.getJStr(obj, "text");
-			String scontext = RestUtil.getJStr(obj, "context"); // the name of the context... needed to save
-			if (RestUtil.paramHave(scontext)) context = scontext;
-			
-			String schannel_type = RestUtil.getJStr(obj, "channel_type");
-			if (RestUtil.paramHave(schannel_type)) channel_type = schannel_type;
-			String sevent = RestUtil.getJStr(obj, "event");
-			if (RestUtil.paramHave(sevent)) event = sevent;
-			String sstyle = RestUtil.getJStr(obj, "style");
-			if (RestUtil.paramHave(sstyle)) style = sstyle;
-			String smax_qn = RestUtil.getJStr(obj, "max_qn");
-			if (RestUtil.paramHave(smax_qn)) max_qn = Sutil.toInt(smax_qn);
-			
-			chid = RestUtil.getJStr(obj, "chid");
-			
-					
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-		if (!RestUtil.paramHave(chid)) return rr.ret(402); // must have chid
-		if (text != null) text = text.trim();
-		/*
-		/////////////////////////
-		// get tenant
-		PTenant tenant = RestUtils.getTenant(hsr);
-		if (tenant == null) return rr.ret(402);
-		
-		// session
-		PSession sess = new PSession(tenant.getTid(), chid, context, null, text, null, null, null, channel_type, event, channel_id, style, null, max_qn, true, false, false);	
-		SDoc res = Lex.processInteraction(sess);		
-		if (res == null) return rr.ret(502);
-		
-		// add all the doc content
-		makeMap(rr, res.getCtx(), res);*/
-		return rr.ret();
-	}
-	
-	@POST
-	@Path("/chat/poll")
-	public Response interactGetMsgPOST(@Context UriInfo info, 
-			@Context HttpServletRequest hsr,
-			@CookieParam("atok") String cookie_access_key, 
-			String body) {
-		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-
-		String context = "itx", channel_type = "chat", channel_id = null, event = null, style = null, chid = null;	
-		int max_qn = -1;
-		try {
-			JSONObject obj = new JSONObject(body);
-			String scontext = RestUtil.getJStr(obj, "context"); // the name of the context... needed to save
-			if (RestUtil.paramHave(scontext)) context = scontext;
-			
-			String schannel_type = RestUtil.getJStr(obj, "channel_type");
-			if (RestUtil.paramHave(schannel_type)) channel_type = schannel_type;
-			String sevent = RestUtil.getJStr(obj, "event");
-			if (RestUtil.paramHave(sevent)) event = sevent;
-			String sstyle = RestUtil.getJStr(obj, "style");
-			if (RestUtil.paramHave(sstyle)) style = sstyle;
-			String smax_qn = RestUtil.getJStr(obj, "max_qn");
-			if (RestUtil.paramHave(smax_qn)) max_qn = Sutil.toInt(smax_qn);
-			
-			chid = RestUtil.getJStr(obj, "chid");
-					
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-		if (!RestUtil.paramHave(chid)) return rr.ret(402); // must have chid
-		/*
-		/////////////////////////
-		// get tenant
-		PTenant tenant = RestUtils.getTenant(hsr);
-		if (tenant == null) return rr.ret(402);
-		
-		// session
-		PSession sess = new PSession(tenant.getTid(), chid, context, null, null, null, null, null, channel_type, event, channel_id, style, null, max_qn, true, false, false);	
-		SDoc res = Lex.processInteraction(sess);		
-		if (res == null) return rr.ret(502);
-		
-		// add all the doc content
-		makeMap(rr, res.getCtx(), res);
-		
-		*/
-		return rr.ret();
-	}
-	@POST
-	@Path("/chat/bye")
-	public Response interactByePOST(@Context UriInfo info, 
-			@Context HttpServletRequest hsr,
-			@CookieParam("atok") String cookie_access_key, 
-			String body) {
-		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-
-		String context = "itx", channel_type = "chat", channel_id = null, style = null, chid = null;
-		int max_qn = -1;
-		try {
-			JSONObject obj = new JSONObject(body);
-			String scontext = RestUtil.getJStr(obj, "context"); // the name of the context... needed to save
-			if (RestUtil.paramHave(scontext)) context = scontext;		
-			String schannel_type = RestUtil.getJStr(obj, "channel_type");
-			if (RestUtil.paramHave(schannel_type)) channel_type = schannel_type;
-			String sstyle = RestUtil.getJStr(obj, "style");
-			if (RestUtil.paramHave(sstyle)) style = sstyle;	
-			String smax_qn = RestUtil.getJStr(obj, "max_qn");
-			if (RestUtil.paramHave(smax_qn)) max_qn = Sutil.toInt(smax_qn);
-			
-			chid = RestUtil.getJStr(obj, "chid");
-					
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-		if (!RestUtil.paramHave(chid)) return rr.ret(402); // must have chid
-		/*
-		/////////////////////////
-		// get tenant
-		PTenant tenant = RestUtils.getTenant(hsr);
-		if (tenant == null) return rr.ret(402);
-		
-		// session
-		PSession sess = new PSession(tenant.getTid(), chid, context, null, null, null, null, null, channel_type, "bye", channel_id, style, null, max_qn, true, false, false);	
-		SDoc res = Lex.processInteraction(sess);		
-		if (res == null) return rr.ret(502);
-		
-		// add all the doc content
-		makeMap(rr, res.getCtx(), res);
-		*/
-		return rr.ret();
-	}
-
-	@POST
-	@Path("/ask")
-	public Response interactAskPOST(@Context UriInfo info, 
-			@Context HttpServletRequest hsr,
-			@CookieParam("atok") String cookie_access_key, 
-			String body) {
-		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-
-		String text = null, context = "itx", language = null, channel_type = "chat", channel_id = null, caller_token = null, user = null, persona = null;			
-		int max_qn = -1;
-		try {
-			JSONObject obj = new JSONObject(body);
-			String scontext = RestUtil.getJStr(obj, "context"); // the name of the context... needed to save
-			if (RestUtil.paramHave(scontext)) context = scontext;
-			String slanguage = RestUtil.getJStr(obj, "language");
-			if (RestUtil.paramHave(slanguage)) language = slanguage;
-			
-			persona = RestUtil.getJStr(obj, "persona");
-			text = RestUtil.getJStr(obj, "text");
-
-			String suser = RestUtil.getJStr(obj, "user");
-			if (RestUtil.paramHave(suser)) user = suser;
-			String scaller_token = RestUtil.getJStr(obj, "caller_token");
-			if (RestUtil.paramHave(scaller_token)) caller_token = scaller_token;
-			
-			String schannel_type = RestUtil.getJStr(obj, "channel_type");
-			if (RestUtil.paramHave(schannel_type)) channel_type = schannel_type;	
-			String smax_qn = RestUtil.getJStr(obj, "max_qn");
-			if (RestUtil.paramHave(smax_qn)) max_qn = Sutil.toInt(smax_qn);
-			
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-		if (text != null) text = text.trim();
-		if (!RestUtil.paramHave(persona)) return rr.ret(402);	// must have persona
-			/*
-		/////////////////////////
-		// get tenant
-		PTenant tenant = RestUtils.getTenant(hsr);
-		if (tenant == null) return rr.ret(402);
-		
-		// session
-		PSession sess = new PSession(tenant.getTid(), null, context, language, text, user, caller_token, persona, channel_type, "ask", channel_id, null, null, max_qn, true, false, false);	
-		SDoc res = Lex.processInteraction(sess);
-		if (res == null) return rr.ret(502);
-		*/
-		// add all the doc content
-		//makeMap(rr, res.getCtx(), res);
-		return rr.ret();
-	}
-
-	@POST
-	@Path("/tell")
-	public Response interactTellPOST(@Context UriInfo info, 
-			@Context HttpServletRequest hsr,
-			@CookieParam("atok") String cookie_access_key, 
-			String body) {
-		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-
-		String text = null, context = "itx", language = null, channel_type = "chat", channel_id = null, caller_token = null, user = null, persona = null;	
-		int max_qn = -1;
-		try {
-			JSONObject obj = new JSONObject(body);
-			String scontext = RestUtil.getJStr(obj, "context"); // the name of the context... needed to save
-			if (RestUtil.paramHave(scontext)) context = scontext;
-			String slanguage = RestUtil.getJStr(obj, "language");
-			if (RestUtil.paramHave(slanguage)) language = slanguage;
-			
-			persona = RestUtil.getJStr(obj, "persona");
-			text = RestUtil.getJStr(obj, "text");
-
-			String suser = RestUtil.getJStr(obj, "user");
-			if (RestUtil.paramHave(suser)) user = suser;
-			String scaller_token = RestUtil.getJStr(obj, "caller_token");
-			if (RestUtil.paramHave(scaller_token)) caller_token = scaller_token;
-			
-			String schannel_type = RestUtil.getJStr(obj, "channel_type");
-			if (RestUtil.paramHave(schannel_type)) channel_type = schannel_type;		
-			String smax_qn = RestUtil.getJStr(obj, "max_qn");
-			if (RestUtil.paramHave(smax_qn)) max_qn = Sutil.toInt(smax_qn);
-			
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-		if (text != null) text = text.trim();
-		if (!RestUtil.paramHave(persona)) return rr.ret(402); // must have persona
-		/*
-		/////////////////////////
-		// get tenant
-		PTenant tenant = RestUtils.getTenant(hsr);
-		if (tenant == null) return rr.ret(402);
-	
-		// session
-		PSession sess = new PSession(tenant.getTid(), null, context, language, text, user, caller_token, persona, channel_type, "tell", channel_id, null, null, max_qn, true, true, false);	
-		SDoc res = Lex.processInteraction(sess);
-		if (res == null) return rr.ret(502);
-		
-		// refresh the content
-		tenant.refresh(persona);
-		
-		// add all the doc content
-		makeMap(rr, res.getCtx(), res);
-		*/
-		return rr.ret();
-	}
 
 }

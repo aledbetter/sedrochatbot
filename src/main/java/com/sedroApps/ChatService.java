@@ -5,6 +5,9 @@ import java.util.List;
 
 public class ChatService {
 
+	public String getName() {
+		return "none";	
+	}
 	
 	public int init(UserAccount ua) {
 		// over-ride for each service to set info needed

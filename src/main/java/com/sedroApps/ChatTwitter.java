@@ -46,6 +46,9 @@ public class ChatTwitter extends ChatService {
 	
 	}
 	
+	public String getName() {
+		return "twitter";	
+	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// EXTERNAL calls: init & processing
@@ -53,10 +56,10 @@ public class ChatTwitter extends ChatService {
 	public int init(UserAccount ua) {
     	ConfigurationBuilder cb = new ConfigurationBuilder();
     	cb.setDebugEnabled(true);
-    	cb.setOAuthConsumerKey(ua.consumer_key);
-    	cb.setOAuthConsumerSecret(ua.consumer_secret);
-    	cb.setOAuthAccessToken(ua.access_token);
-    	cb.setOAuthAccessTokenSecret(ua.access_token_secret);
+    	cb.setOAuthConsumerKey(ua.getServiceInfo(getName(), "consumer_key"));
+    	cb.setOAuthConsumerSecret(ua.getServiceInfo(getName(), "consumer_secret"));
+    	cb.setOAuthAccessToken(ua.getServiceInfo(getName(), "access_token"));
+    	cb.setOAuthAccessTokenSecret(ua.getServiceInfo(getName(), "access_token_secret"));
     	twitterfactory = new TwitterFactory(cb.build());
     	return 0;
 	}
