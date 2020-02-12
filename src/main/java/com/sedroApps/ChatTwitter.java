@@ -36,12 +36,11 @@ import twitter4j.TwitterStreamFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
 
-public class ChatTwitter { 
+public class ChatTwitter extends ChatService { 
 
 	// this is per user?
 	private static TwitterFactory twitterfactory = null;
 		
-	
 	
 	ChatTwitter() {
 	
@@ -50,42 +49,58 @@ public class ChatTwitter {
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// EXTERNAL calls: init & processing
-	protected void init() {
-
-    	// TWITTER
+	@Override
+	public int init(UserAccount ua) {
     	ConfigurationBuilder cb = new ConfigurationBuilder();
     	cb.setDebugEnabled(true);
-    	cb.setOAuthConsumerKey("your consumer key");
-    	cb.setOAuthConsumerSecret("your consumer secret");
-    	cb.setOAuthAccessToken("your access token");
-    	cb.setOAuthAccessTokenSecret("your access token secret");
+    	cb.setOAuthConsumerKey(ua.consumer_key);
+    	cb.setOAuthConsumerSecret(ua.consumer_secret);
+    	cb.setOAuthAccessToken(ua.access_token);
+    	cb.setOAuthAccessTokenSecret(ua.access_token_secret);
     	twitterfactory = new TwitterFactory(cb.build());
-    	
+    	return 0;
 	}
-	private Twitter getTwitterinstance(String user) {
+	
+	@Override
+	public String postMessage(String msg) {
+		try {
+			Twitter twitter = getTwitterinstance();
+			Status status = twitter.updateStatus(msg);
+			return status.getText();
+		} catch (Throwable t) { }
+		return "ERROR";	
+	}
+
+	@Override
+	public String sendDirectMessage(String touser, String msg) {
+		try {
+		    Twitter twitter = getTwitterinstance();
+		    DirectMessage message = twitter.sendDirectMessage(touser, msg);
+		    return message.getText();
+		} catch (Throwable t) { }
+		return "ERROR";			
+	}
+	
+	@Override
+	public List<String> getTimeLine() {
+		try {
+		    Twitter twitter = getTwitterinstance();	     
+		    return twitter.getHomeTimeline().stream().map(item -> item.getText()).collect(Collectors.toList());
+		} catch (Throwable t) { }
+		return null;			
+	}
+	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////
+	// internal
+	private Twitter getTwitterinstance() {
 		Twitter twitter = twitterfactory.getInstance();
-		// FIXME
 		return twitter;
 	}
 	
-	public String twitterPostMessage(String user, String msg) throws TwitterException {
-	    Twitter twitter = getTwitterinstance(user);
-	    Status status = twitter.updateStatus(msg);
-	    return status.getText();
-	}
-	public String twitterSendDirectMessage(String user, String touser, String msg) throws TwitterException {
-	    Twitter twitter = getTwitterinstance(user);
-	    DirectMessage message = twitter.sendDirectMessage(touser, msg);
-	    return message.getText();
-	}
 	
-	public List<String> twitterGetTimeLine(String user) throws TwitterException {
-	    Twitter twitter = getTwitterinstance(user);	     
-	    return twitter.getHomeTimeline().stream().map(item -> item.getText()).collect(Collectors.toList());
-	}
-
 	/*
-	public List<String> twitterSearchMessages(String user, String text) throws TwitterException {		  
+	private List<String> twitterSearchMessages(String user, String text) throws TwitterException {		  
 	    Twitter twitter = getTwitterinstance(user);
 	    Query query = new Query("source:twitter4j " + text);
 	    QueryResult result = twitter.search(query);
