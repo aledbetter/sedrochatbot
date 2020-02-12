@@ -20,72 +20,71 @@
 
 <body style='background:#E5E5E5'>
 
-<div class="mainc vcard landing" id='index_page'>
-		
-	<div id='lheader'>
-		<div>
-			<h1>The Sedro Project</h1>
-			<h3>Natural Language Understanding</h3>
-			<h5>Version <span class="sedro_version"></span></h5>
+	<div>		
+		<div id='lheader'>
+			<div>
+				<h1>The Sedro Project</h1>
+				<h3>Natural Language Understanding</h3>
+				<h5>Version <span class="sedro_version"></span></h5>
+			</div>
+			<img src="/img/tsp-white-none.png" alt="{TSP}" />
+			<h1>Chat</h1>
 		</div>
-		<img src="/img/tsp-white-none.png" alt="{TSP}" />
-		<h1>Chat</h1>
-	</div>
-	
-	<div class="segment" style='margin-top:30px' id="lex">
-		<input type='hidden' id='treename' value='english'/>
-		<div class="cent">			
-		
-		
-			<div class="fullPanel" id='msg_panel' style='min-height:680px'>								
-				<div class='fLn'>
-					<div class='fLn notwoke' style='margin-bottom:10px;margin-top:30px;background:#666;color:#FFF;height:40px;font-size:18px;padding-top:12px'>		
-							&nbsp;&nbsp;Chat with Persona: <select id='persona' style='width:160px'><option value='sedro' selected>sedro</option></select>						
-						<div class='bslink' id='wake_now_bt' style='width:70px;text-align:center;float:right;font-size:16px;margin-right:8px;margin-top:3px;background:#EEE'>Wake</div>
-					</div>									
-					<!-- INTERACT: WAKE selected persona to interact with -->			
-					<div class='fLn woke' style='display:none'>					
-						<div class='fLn' style='margin-bottom:10px;margin-top:10px;background:#666;color:#FFF;padding-bottom:5px;padding-bottom:2px'>	
-							<span style='float:left;padding-top:5px'>&nbsp;Chatting: <span class='personaName' style='font-weight:bold'>...</span> {<span class='personaFullName' style='font-weight:bold'>...</span>}</span>			
-						</div>								
-						<!-- Chat View -->
-						<div class='fLn' id='interact_msg' style='height: 250px;overflow:scroll;overflow-x:hidden'></div>	
-						<!-- Text Box --><!-- Send Button -->
-						<div class='fLn interact' id='interact_wd'>
-							<div class='fLn' style='margin-top:5px;'>
-								<textarea id='interact_text' style='width:98%;min-height:40px;margin-top:3px'></textarea>
+
+		<div class="segment" style='margin-top:30px' id="lex">
+			<input type='hidden' id='treename' value='english'/>
+			<div class="cent">			
+			
+			
+				<div class="fullPanel" id='msg_panel' style='min-height:680px'>								
+					<div class='fLn'>
+						<div class='fLn notwoke' style='margin-bottom:10px;margin-top:30px;background:#666;color:#FFF;height:40px;font-size:18px;padding-top:12px'>		
+								&nbsp;&nbsp;Chat with Persona: <select id='persona' style='width:160px'><option value='sedro' selected>sedro</option></select>						
+							<div class='bslink' id='wake_now_bt' style='width:70px;text-align:center;float:right;font-size:16px;margin-right:8px;margin-top:3px;background:#EEE'>Wake</div>
+						</div>									
+						<!-- INTERACT: WAKE selected persona to interact with -->			
+						<div class='fLn woke' style='display:none'>					
+							<div class='fLn' style='margin-bottom:10px;margin-top:10px;background:#666;color:#FFF;padding-bottom:5px;padding-bottom:2px'>	
+								<span style='float:left;padding-top:5px'>&nbsp;Chatting: <span class='personaName' style='font-weight:bold'>...</span> {<span class='personaFullName' style='font-weight:bold'>...</span>}</span>			
+							</div>								
+							<!-- Chat View -->
+							<div class='fLn' id='interact_msg' style='height: 250px;overflow:scroll;overflow-x:hidden'></div>	
+							<!-- Text Box --><!-- Send Button -->
+							<div class='fLn interact' id='interact_wd'>
+								<div class='fLn' style='margin-top:5px;'>
+									<textarea id='interact_text' style='width:98%;min-height:40px;margin-top:3px'></textarea>
+								</div>
+								<div class='bslink' id='send_now_bt' style='width:70px;text-align:center;float:right;font-size:16px;margin-top:8px;background:#EEE;margin-right:1px;'>Send</div>			
+								<div class='bslink' id='bye_now_bt' style='width:70px;text-align:center;float:right;font-size:16px;margin-top:8px;background:#EEE;margin-right:1px;'>Bye</div>			
 							</div>
-							<div class='bslink' id='send_now_bt' style='width:70px;text-align:center;float:right;font-size:16px;margin-top:8px;background:#EEE;margin-right:1px;'>Send</div>			
-							<div class='bslink' id='bye_now_bt' style='width:70px;text-align:center;float:right;font-size:16px;margin-top:8px;background:#EEE;margin-right:1px;'>Bye</div>			
 						</div>
 					</div>
 				</div>
+				
 			</div>
-			
 		</div>
-	</div>
-			 
-	<div class="footer">	
-		<div class='cent'>
-			<div class='fLn' style='position:relative'>
-			    <div class='nav'>
-				    <a href="http://www.sedro.xyz">www.sedro.xzy</a><br/>
-				    <a href="http://blog.sedro.xyz">TSP Blog</a><br/>
-				</div>	
-			    <div class='nav'>
-				    <a href="/mgt.html">Persona Manager</a><br/>
-				    <a href="/msg.html">Persona Chat</a><br/>
-				</div>	
-				<div class='nav'>   
-				    <a href="/server.html">Chatbot Manager</a><br/>
-				    <a href="/index.html">Login</a><br/>
-				    <a href="/license.html">License</a><br/>				    				    
-				</div>	
- 			</div>		
-			<div class="cpw">&#169; 2020 The Sedro Project</div>
+				 
+		<div class="footer">	
+			<div class='cent'>
+				<div class='fLn' style='position:relative'>
+				    <div class='nav'>
+					    <a href="http://www.sedro.xyz">www.sedro.xzy</a><br/>
+					    <a href="http://blog.sedro.xyz">TSP Blog</a><br/>
+					</div>	
+				    <div class='nav'>
+					    <a href="/mgt.html">Persona Manager</a><br/>
+					    <a href="/msg.html">Persona Chat</a><br/>
+					</div>	
+					<div class='nav'>   
+					    <a href="/server.html">Chatbot Manager</a><br/>
+					    <a href="/index.html">Login</a><br/>
+					    <a href="/license.html">License</a><br/>				    				    
+					</div>	
+	 			</div>		
+				<div class="cpw">&#169; 2020 The Sedro Project</div>
+			</div>
 		</div>
+	
 	</div>
-
-</div>
 </body>
 </html>

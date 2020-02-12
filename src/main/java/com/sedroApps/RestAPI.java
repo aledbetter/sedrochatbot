@@ -19,6 +19,8 @@
 package main.java.com.sedroApps;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +35,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 
@@ -69,10 +72,11 @@ public class RestAPI {
 		}	
 		if (!RestUtil.paramHave(username) || !RestUtil.paramHave(password)) return rr.ret(402);
 		
-		String resp = cs.login(username, password);
-		if (!resp.equals("OK")) return rr.ret(403);
+		boolean resp = cs.login(username, password);
+		if (!resp) return rr.ret(403);
 		
 		// set cookie
+		// atok
 // FIXME
 		
 		// add all the doc content
@@ -98,13 +102,7 @@ public class RestAPI {
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 		ChatServer cs = ChatServer.getChatServer();
-
-		//cs.sedro_access_key;
-		//cs.username
-		//cs.password
-		
-
-//FIXME
+		rr.setInfo(cs.getMap());
 		return rr.ret();
 	}
 	@POST
@@ -129,9 +127,10 @@ public class RestAPI {
 		if (!RestUtil.paramHave(password)) password = null;
 		if (!RestUtil.paramHave(username)) username = null;
 		if (!RestUtil.paramHave(sedro_access_key)) sedro_access_key = null;
-
-// FIXME
-		
+		if (password != null) cs.password = password;
+		if (username != null) cs.username = username;
+		if (sedro_access_key != null) cs.sedro_access_key = sedro_access_key;
+		cs.save();
 		// add all the doc content
 		return rr.ret();
 	}
@@ -164,10 +163,9 @@ public class RestAPI {
 		List<UserAccount> ual = cs.getUsers();
 		if (ual == null || ual.size() < 1) return rr.ret();
 		
-		for (UserAccount ua:ual) {
-//FIXME
-		}
-		
+		List<HashMap<String, Object>> sl = new ArrayList<>();
+		for (UserAccount ua:ual) sl.add(ua.getMap());
+		rr.addInfo("users", sl);
 		return rr.ret();
 	}
 	
@@ -181,9 +179,7 @@ public class RestAPI {
 		ChatServer cs = ChatServer.getChatServer();
 		UserAccount ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
-
-//FIXME
-		
+		rr.setInfo(ua.getMap());
 		return rr.ret();
 	}
 
@@ -200,10 +196,6 @@ public class RestAPI {
 		try {
 			JSONObject obj = new JSONObject(body);
 			username = RestUtil.getJStr(obj, "username");
-//FIXME settings
-			//String spersona = RestUtil.getJStr(obj, "persona");
-			//if (RestUtil.paramHave(spersona)) persona = spersona;
-			
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
@@ -216,7 +208,7 @@ public class RestAPI {
 		ua = cs.addUser(username);
 		if (ua == null) return rr.ret(500);
 
-		// FIXME
+		rr.setInfo(ua.getMap());
 		
 		return rr.ret();
 	}
@@ -247,29 +239,31 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-
-		/*
-		try {
-			JSONObject obj = new JSONObject(body);
-			text = getJStr(obj, "text");
-			String scontext = getJStr(obj, "context"); // the name of the context... needed to save
-			if (paramHave(scontext)) context = scontext;
-			String slanguage = getJStr(obj, "language");
-			if (paramHave(slanguage)) language = slanguage;
-			
-			String spersona = getJStr(obj, "persona");
-			if (paramHave(spersona)) persona = spersona;
-			
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-		*/
 		ChatServer cs = ChatServer.getChatServer();
 		UserAccount ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
 		
-		// FIXME
+		try {
+			JSONObject obj = new JSONObject(body);			
+			try {
+			JSONArray jsl = obj.getJSONArray("services");
+			if (jsl != null) {
+				for (int i=0;i<jsl.length();i++) {
+					JSONObject srv = jsl.getJSONObject(i);
+					// get the service param info...
+// FIXME			
+					
+				}
+			}
+			} catch (Throwable t) {}
+			
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
 		
+		
+// FIXME
+		ua.save();
 		return rr.ret();
 	}
 

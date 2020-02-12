@@ -35,7 +35,8 @@ import org.apache.log4j.Logger;
  */
 public class Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-		
+	
+	private static ChatServer chats = null;
 	static Logger logger = Logger.getLogger(Servlet.class);	
 
 	
@@ -77,7 +78,14 @@ public class Servlet extends HttpServlet {
 
         BasicConfigurator.configure();
         logger.setLevel(Level.ERROR); // set the log level to INFO
-        System.out.println("Sedro Chatbot initializing log4j Complete");           
+        System.out.println("Sedro Chatbot initializing log4j Complete");   
+        
+        // init the server
+        chats = ChatServer.getChatServer();
+        chats.init();
+        
+        // load the users
+        // FIXME
     }
 
 }

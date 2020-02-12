@@ -15,13 +15,36 @@
  * from Aaron Ledbetter.
  */
 
-// login / logout
 
+////////////////////////////////////////////////////////////////////////////////////
+// Doc open
+$(document).ready(function() {
+	// if cookie show else login
+	// FIXME
+	$(".login").show();
+	$(".session").hide();
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	// Add interactive message
+	$("#login").on('click', function (e) {
+		var username = $("#username").val(); 
+		var password = $("#password").val(); 
+		if (!username || username.length < 3) {
+			return;
+		}
+		if (!password || password == "") {
+			return;
+		}
+		
+		scsLogin(username, password, function(data) {
+			$(".login").hide();
+			$(".session").show();
 
-// get server page / interact
+		});
+	});
 
-
-
+};
+	
 
 
 
@@ -119,13 +142,8 @@ function scsAddUser(username, cb) {
 	  }
 	});
 }
-
-function scsUpdateUser(username, cb) {	
-	var dat = "{ "; 
-   // dat += "\"username\": \"" + username + "\"";
-    dat += "}";
-	
-	$.ajax({url: "/1.0/user/"+username, type: 'POST', async: true, data: dat, contentType: 'application/json', 
+function scsDelUser(username, cb) {	
+	$.ajax({url: "/1.0/user/"+username+"/del", type: 'POST', async: true, contentType: 'application/json', 
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {
@@ -133,12 +151,22 @@ function scsUpdateUser(username, cb) {
 	  }
 	});
 }
-function scsDelUser(username, cb) {	
+
+
+function scsUpdateUser(username, service, serviceparams, cb) {	
+	if (!service) return;
 	var dat = "{ "; 
-   // dat += "\"username\": \"" + username + "\"";
+// FIXME allow add / update / del service info	
+	//services [ 
+	   // dat += "{ \"name\": \"" + servicename + "\"";
+	   // dat += "\"username\": \"" + username + "\"";
+	   // dat += "\"username\": \"" + username + "\"";
+	   // dat += "\"username\": \"" + username + "\"";
+	// dat += "}";
+	// ]
     dat += "}";
 	
-	$.ajax({url: "/1.0/user/"+username+"/del", type: 'POST', async: true, data: dat, contentType: 'application/json', 
+	$.ajax({url: "/1.0/user/"+username, type: 'POST', async: true, data: dat, contentType: 'application/json', 
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {

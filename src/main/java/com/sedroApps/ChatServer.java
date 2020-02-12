@@ -1,6 +1,7 @@
 package main.java.com.sedroApps;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ChatServer {
@@ -8,7 +9,7 @@ public class ChatServer {
 	String username;
 	String password;	
 	int poll_interval = 360;
-
+	boolean init = false;
 	String sedro_access_key;
 
 	List<UserAccount> uaList;
@@ -22,14 +23,22 @@ public class ChatServer {
 	public static ChatServer getChatServer() {
 		return cs;
 	}
+	public void init() {
+		load();
+	}
 	
-	public String login(String username, String password) {
-		
-		return "ok";
+	public boolean login(String username, String password) {
+		if (username == null || password == null) return false;
+		if (this.username == null) {
+			if (username.equals("admin") && password.equals("admin")) return true;
+			return false;
+		}
+		if (username.equals(this.username) && password.equals(this.password)) return true;
+		return false;
 	}
 	
 	public void logout() {
-		
+		// sure..
 
 	}
 	
@@ -62,4 +71,20 @@ public class ChatServer {
 		return false;
 	}
 	
+	public void save() {
+		// Save the data
+	}
+	public void load() {
+		// Load the data
+	}
+	
+	// get al lthe user info as a map..
+	public HashMap<String, Object> getMap() {
+		HashMap<String, Object> m = new HashMap<>();
+		m.put("username", this.username);
+		m.put("poll_interval", this.poll_interval);
+		m.put("sedro_access_key", this.sedro_access_key);
+
+		return m;
+	}
 }

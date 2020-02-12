@@ -75,4 +75,24 @@ public class UserAccount {
 		}
 	}
 	
+	// get al lthe user info as a map..
+	public HashMap<String, Object> getMap() {
+		HashMap<String, Object> m = new HashMap<>();
+		m.put("username", this.username);
+		if (service_info != null && service_info.keySet().size() > 0) {
+			List<HashMap<String, Object>> sl = new ArrayList<>();
+			for (String key:service_info.keySet()) {
+				HashMap<String, String> sconfig = service_info.get(key);
+				HashMap<String, Object> sm = new HashMap<>();
+				sm.put("service", key);
+				for (String param:sconfig.keySet()) {
+					sm.put(param, sconfig.get(param));
+				}
+				sl.add(sm);
+			}
+			m.put("services", sl);
+		}
+		return m;
+	}
+	
 }
