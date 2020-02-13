@@ -31,6 +31,7 @@ $(document).ready(function() {
 	$("#add_user_bt").html("Add User");
 	$("#add_username").val("");
 	$("#userInfo").hide();
+	$("#set_password2, #set_password").removeClass("error");
 
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,9 +89,16 @@ $(document).ready(function() {
 		}		
 	});
 	$("#save_settings_bt").on('click', function (e) {
+		$("#set_password2, #set_password").removeClass("error");
+
 		var sak = $("#set_sedro_access_key").val();
 		var u = $("#set_username").val();
 		var p = $("#set_password").val();
+		var p2 = $("#set_password2").val();
+		if ((p || p2) && p != p2) {
+			$("#set_password2, #set_password").addClass("error");
+			return;
+		}
 		scsUpdateSettings(u, p, sak, function(data) {
 			getSettings();
 			$("#update_settings_bt").click();

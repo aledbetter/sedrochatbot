@@ -133,6 +133,12 @@
 	       <version>1.7.5</version>
 	   </dependency>
 		
+		<!-- https://mvnrepository.com/artifact/org.mindrot/jbcrypt -->
+		<dependency>
+		    <groupId>org.mindrot</groupId>
+		    <artifactId>jbcrypt</artifactId>
+		    <version>0.3m</version>
+		</dependency>
 		
 		<!-- DB https://mvnrepository.com/artifact/org.postgresql/postgresql -->
 		<dependency>
@@ -147,6 +153,9 @@
 		    <artifactId>twitter4j-stream</artifactId>
 		    <version>4.0.7</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.mindrot.bcrypt/bcrypt -->
+
+		
 		
 	</dependencies>
 

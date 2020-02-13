@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import main.java.com.sedroApps.util.HttpUtil;
+import main.java.com.sedroApps.util.Sutil;
 
 
 public class Sedro {
@@ -23,7 +24,8 @@ public class Sedro {
 	String chid;
 	String key;
 	
-	int msg_num;	
+	int msg_num_last = 0;	
+	int msg_num = 0;	
 	List<HashMap<String, Object>> msg = null;
 	
 	private String status = "wake";
@@ -148,28 +150,29 @@ public class Sedro {
 	private List<HashMap<String, Object>> chatRespParse(String resp) {
 		if (resp == null) return null;
 
+		msg_num_last = msg_num;
+		
 		List<HashMap<String, Object>> rl = null;
 		try {
 			JSONObject obj = new JSONObject(resp);
 			JSONObject info = obj.getJSONObject("info");
 			try {
-			String chid = info.getString("chid");
-			this.chid = chid;
+				String chid = info.getString("chid");
+				this.chid = chid;
 			} catch (Throwable t) {}
 			try {
-			String persona_full_name = info.getString("persona_full_name");
-			this.persona_full_name = persona_full_name;
+				String persona_full_name = info.getString("persona_full_name");
+				this.persona_full_name = persona_full_name;
 			} catch (Throwable t) {}
 			try {
-			String persona = info.getString("persona");
-			this.persona = persona;
+				String persona = info.getString("persona");
+				this.persona = persona;
 			} catch (Throwable t) {}
 			try {
-			String persona_email = info.getString("persona_email");
-			this.persona_email = persona_email;
+				String persona_email = info.getString("persona_email");
+				this.persona_email = persona_email;
 			} catch (Throwable t) {}
 	
-			
 			try {
 				JSONArray list = obj.getJSONArray("list");
 				if (list != null && list.length() > 0) {
@@ -178,27 +181,40 @@ public class Sedro {
 						// the messages .... 
 				//		if (resp.list[i].r == "false" || !resp.list[i].msg) continue; // only if remote add..
 						status = "msg";
-// FIXME						
+						HashMap<String, Object> mm = new HashMap<>();
+						JSONObject msg = list.getJSONObject(i);
+						String nms [] = JSONObject.getNames(msg);
+						for (String n:nms) {
+							String val = null;
+							try {
+								val = msg.getString(n);
+							} catch (Throwable t) {
+								val = ""+msg.getInt(n);
+							}
+							//System.out.println(" NAME["+n+"] val: " + val);
+							mm.put(n, val);
+						}
 						
-						/*
-						msg.num
-						msg.msg
-						msg.event
-						msg.time
-						msg.from
-						msg.rply_type
-						msg.qn
-						msg.req_base
-						.. others dependent
-						*/
-				//		if (resp.list[i].event == 'bye') bye = true;
+						String remote = (String)mm.get("r");
+						if (Sutil.compare(remote, "true")) {
+							// is remote message
+							// FIXME save or not..
+						}
 
+						String ev = (String)mm.get("event");
+						if (Sutil.compare(ev, "bye")) {
+							status = "msg";
+						}
+						int mnum = Sutil.toInt((String)mm.get("num"));
+						if (mnum > msg_num) msg_num = mnum;
+						
+						System.out.println(" MSG["+mnum+"] txt: " + mm.get("msg"));
+
+						if (rl == null) rl = new ArrayList<>();
+						rl.add(mm);
 					}
 				}
 			} catch (Throwable t) {}
-
-
-	// FIXME
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

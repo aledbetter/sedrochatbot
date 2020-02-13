@@ -34,7 +34,17 @@ public class Orator {
 					user.getCBUsername(), ctok, null, null, null, -1);
 			procCnt++;
 		}
-			
+						
+		/*
+		msg.num
+		msg.msg
+		msg.event
+		msg.time
+		msg.from
+		msg.req_base
+		msg.rply_type
+		msg.qn
+		*/			
 		List<String> dml = service.getDirectMessages();
 		if (dml != null) {
 			for (String msg:dml) {

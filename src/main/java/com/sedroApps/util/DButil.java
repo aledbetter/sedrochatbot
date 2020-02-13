@@ -61,13 +61,21 @@ public class DButil {
     }
     
     public static void setupDB() {
-    	String RDS_HOSTNAME = System.getenv("RDS_HOSTNAME"); // The hostname of the DB instance.
-    	String RDS_PORT = System.getenv("RDS_PORT"); // The port on which the DB instance accepts connections. The default value varies among DB engines.
-    	String prod_db = System.getenv("RDS_DB_NAME"); // The database name, ebdb.
-    	if (RDS_HOSTNAME != null && RDS_PORT != null) {
-	    	prod_DB = "jdbc:postgresql://" + RDS_HOSTNAME + ":"+RDS_PORT+"/"+prod_db;    	
-	    	System.out.println("SETUP AmazonDB: " + prod_DB);
+    	String RDS_DB_URL = System.getenv("RDS_DB_URL"); // The hostname of the DB instance.
+    	if (RDS_DB_URL == null) {
+	    	String RDS_HOSTNAME = System.getenv("RDS_HOSTNAME"); // The hostname of the DB instance.
+	    	String RDS_PORT = System.getenv("RDS_PORT"); // The port on which the DB instance accepts connections. The default value varies among DB engines.
+	    	String prod_db = System.getenv("RDS_DB_NAME"); // The database name, ebdb.
+	    	if (RDS_HOSTNAME != null && RDS_PORT != null) {
+		    	prod_DB = "jdbc:postgresql://" + RDS_HOSTNAME + ":"+RDS_PORT+"/"+prod_db;    	
+		    	System.out.println("SETUP DB: " + prod_DB);
+	    	}
+    	} else {
+	    	prod_DB = RDS_DB_URL;    	
+	    	System.out.println("SETUP DBurl: " + prod_DB);
+   		
     	}
+    	
     	// user/pass
     	prod_user = System.getenv("RDS_USERNAME"); // The user name that you configured for your database..
     	prod_pass = System.getenv("RDS_PASSWORD"); // The password that you configured for your database.
@@ -134,9 +142,10 @@ public class DButil {
     	}
     	return true;
     }
-	public static boolean createDataTable(Connection conn) {
+	public static boolean createDataTable() {
 		String sql = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" (key VARCHAR(64) PRIMARY KEY, data bytea);";
-  		if (conn == null) {
+  		Connection conn = DButil.getConnection();
+		if (conn == null) {
   			System.out.println("ERROR createDirTable["+TABLE_NAME+"] connect fail");
   			return false;
   		}
@@ -150,7 +159,7 @@ public class DButil {
 		//System.out.println("createDirTable["+DIR_NAME+"] Complete");
 		return true;
 	}
-	private static InputStream getDBDataStream(String key) {
+	private static InputStream getDBDataStream(String key, boolean confail) {
   		Connection conn = DButil.getConnection();
   		if (conn == null) return null;
   		String sql = "SELECT * FROM "+TABLE_NAME + " WHERE key = '" + key+"'";
@@ -165,10 +174,16 @@ public class DButil {
 		    	} catch (Throwable t) {}
 			    rs.close();	
 		    }
+	  		DButil.closeConnection(conn); 		
 		} catch (SQLException e) { 
-			e.printStackTrace();
+	  		DButil.closeConnection(conn); 		
+			if (confail) {
+				createDataTable();
+				return getDBDataStream(key, false);
+			} else {
+				e.printStackTrace();
+			}
 		}
-  		DButil.closeConnection(conn); 		
 		return data;
 	}
 	private static int saveDBData(String key, byte [] data) {
@@ -176,15 +191,13 @@ public class DButil {
 		int cnt = 0;
 		
 		String sql = "INSERT INTO " + TABLE_NAME + " (key, data) VALUES(?, ?) "
-		+ " ON CONFLICT (name) DO UPDATE SET data = ?";
+		+ " ON CONFLICT (key) DO UPDATE SET data = ?";
 		
   		Connection conn = DButil.getConnection();
   		if (conn == null) {
   			System.out.println("ERROR: saveTreeDescDynDB() no db connected");
   			return 0;
   		}
-  		// create tables for ont
-  		createDataTable(conn);
   		try {
   			PreparedStatement pstmt = conn.prepareStatement(sql);
   			conn.setAutoCommit(false);
@@ -215,7 +228,7 @@ public class DButil {
     	if (key == null) return null;
     	if (!haveDB()) return null;
 
-    	InputStream data = getDBDataStream(key);
+    	InputStream data = getDBDataStream(key, true);
     	if (data == null) return null;
 
 		@SuppressWarnings({ "unchecked", "unused" })

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import main.java.com.sedroApps.util.DButil;
 
 public class ChatServer {
@@ -57,7 +59,8 @@ public class ChatServer {
 		
 		// load if persistance
 		load();
-		
+		setPassword("admin");
+
 		// setup processing timers to run
 		proc_timer = new Timer();
 		proc_timer.scheduleAtFixedRate(new TimerTask() {
@@ -67,18 +70,30 @@ public class ChatServer {
 	        }, DEFAULT_INTERVAL, DEFAULT_INTERVAL);
 		init = true;
 	}
-	private String hashPassword(String password) {
-		return ""+password.hashCode();
+
+	public static String hashPassword(String password_plaintext) {
+		String salt = BCrypt.gensalt(12);
+		String hashed_password = BCrypt.hashpw(password_plaintext, salt);
+
+		return(hashed_password);
+	}
+	public static boolean checkPassword(String password_plaintext, String stored_hash) {
+		boolean password_verified = false;
+	//	if(null == stored_hash || !stored_hash.startsWith("$2a$"))
+	//		throw new java.lang.IllegalArgumentException("Invalid hash provided for comparison");
+		password_verified = BCrypt.checkpw(password_plaintext, stored_hash);
+
+		return(password_verified);
 	}
 	public void setPassword(String password) {
-		password = hashPassword(password);
+		this.password = hashPassword(password);
+		//System.out.println("Passxxxx["+password+"]: " + this.password);
 	}
 	
 	public boolean login(String username, String password) {
 		if (username == null || password == null) return false;
 		if (!username.equals(this.username)) return false;
-		String hp = hashPassword(password);
-		if (hp.equals(this.password)) return true;
+		if (checkPassword(password, this.password)) return true;
 		return false;
 	}
 	
