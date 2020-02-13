@@ -265,10 +265,12 @@ public class RestAPI {
 					for (String p:params) {
 						String val = svrcfg.getString(p);
 						String cur_val = ua.getServiceInfo(service, p);
-						//System.out.println("     params["+p+"] " + val);
+					//	System.out.println("     params["+p+"] " + val);
 
 						if (!Sutil.compare(val, cur_val)) {
 							ua.setServiceInfo(service, p, val);
+							//System.out.println("     params["+service+"]["+p+"] " + val);
+
 						}
 						// FIXME: what about remove?
 					}

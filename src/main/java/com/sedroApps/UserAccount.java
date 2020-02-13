@@ -32,14 +32,16 @@ public class UserAccount {
 		return hm.get(element);
 	}
 	public void setServiceInfo(String service, String element, String value) {
-		if (service_info == null || service == null || element == null) return;
+		if (service == null || element == null) return;
+		if (service_info == null) service_info = new HashMap<>();
+
 		HashMap<String, String> hm = service_info.get(service);
 		if (hm == null) {
 			hm = new HashMap<>();
 			hm.put("service", service);
-			service_info.put(service, hm);
 		}
 		hm.put(element, value);
+		service_info.put(service, hm);
 	}
 	
 	
@@ -94,6 +96,8 @@ public class UserAccount {
 		if (service_info != null && service_info.keySet().size() > 0) {
 			List<HashMap<String, Object>> sl = new ArrayList<>();
 			for (String key:service_info.keySet()) {
+				//System.out.println("     get["+key+"]");
+
 				HashMap<String, String> sconfig = service_info.get(key);
 				HashMap<String, Object> sm = new HashMap<>();
 				sm.put("service", key);

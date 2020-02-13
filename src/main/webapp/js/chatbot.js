@@ -148,26 +148,44 @@ function getUsers() {
 		var usr = "";
 		if (data.info && data.info.users) {
 			for (var i=0;i<data.info.users.length;i++) {
-				usr += "<div class'fLn' id='ua_"+data.info.users[i].username+"' style='padding-top:10px;padding-bottom:10px;border-bottom:1px solid #555;position:relative'>";				
-				usr += "<div class='bslink' onClick='delUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:100px;background:#EEE;'>Del</div>";	
-				usr += "<div class='bslink' onClick='editUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:180px;background:#EEE;'>Edit</div>";	
-				usr += "<div class'fLn'><b>Username: " + data.info.users[i].username +"</b></div>";
-				usr += "<div id='show_ua'>";
+				usr += "<div class='fLn' id='ua_"+data.info.users[i].username+"' style='padding-top:10px;padding-bottom:10px;border-bottom:1px solid #555;position:relative;background:#FFF'>";				
+					usr += "<div class='bslink' onClick='delUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:100px;background:#EEE;'>Del</div>";	
+					usr += "<div class='bslink' onClick='editUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:180px;background:#EEE;'>Edit</div>";	
+					usr += "<div class'fLn'><b>Username: " + data.info.users[i].username +"</b></div>";
+					usr += "<div id='show_ua'>";
+	
+					// all the serviecs
+					if (data.info.users[i].services) {
+						for (var k=0;k<data.info.users[i].services.length;k++) {
+							usr += "<h2 class='fLn'><b>Service: " + data.info.users[i].services[k].service + "</b></h2>";
+							for (const property in data.info.users[i].services[k]) {
+								if (property == "service") continue;
+								usr += "<div class='fLn'><b>" + property + "</b>: "+data.info.users[i].services[k][property]+"</div>";
 
-				// all the serviecs
-				if (data.info.users[i].services) {
-					for (var k=0;k<data.info.users[i].services.length;k++) {
-// FIXME
+							}
+						}
 					}
-				}
-				usr += "</div>";
-				usr += "<div id='edit_ua' style='display:none'>";
-// EDIT FIXME
-				usr += "<div class='bslink' onClick='saveUser(\""+data.info.users[i].username+"\");' style='width:100px;text-align:center;font-size:16px;margin-left:440px;background:#EEE;'>Save</div>";	
-				usr += "</div></div>";
+					usr += "</div>";
+					
+					usr += "<div class='fLn' id='edit_ua' style='display:none'>";
+						usr += "<div class='fLn'><b>Service:</b> <select id='ua_service' style='width:120px'><option val='twitter'>twitter</option></select></div>";
+						usr += "<div class='fLn'>";
+							// twitter
+							usr += "<b>consumer_key:</b> <input type='text' id='consumer_key'/><br>";
+							usr += "<b>consumer_secret:</b> <input type='text' id='consumer_secret'/><br>";
+							usr += "<b>access_token:</b> <input type='text' id='access_token'/><br>";
+							usr += "<b>access_token_secret:</b> <input type='text' id='access_token_secret'/><br>";
+						usr += "</div>";
+						
+		// EDIT FIXME
+						usr += "<div class='fLn' style='padding-top:10px'>";
+							usr += "<div class='bslink' onClick='saveUser(\""+data.info.users[i].username+"\");' style='width:100px;text-align:center;font-size:16px;margin-left:440px;background:#EEE;'>Save</div>";	
+						usr += "</div>";				
+					usr += "</div>";				
+				usr += "</div>";				
 			}
 		}
-		
+		//alert(usr);
 		if (usr != "") $("#userlist").html(usr); 
 	});
 	
@@ -176,7 +194,12 @@ function getUsers() {
 function saveUser(username) {
 	// FIXME get the values
 	var service = "twitter";
-	var serviceparams = {consumer_key:"xxxyyy", consumer_secret:"xxxyyy", access_token:"xxxyyy", access_token_secret:"xxxyyy"};
+	var serviceparams = {
+			consumer_key:"xxxyyy", 
+			consumer_secret:"xxxyyy", 
+			access_token:"xxxyyy", 
+			access_token_secret:"xxxyyy"
+				};
 
 	scsUpdateUser(username, service, serviceparams, function(data) {
 		glob_edit_u = null;
