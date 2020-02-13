@@ -22,9 +22,14 @@ public class UserAccount {
 		return username;
 	}
 	
+	////////////////////////////////////////
+	// Manage configuration
 	public String getUsername(String service) {
 		return getServiceInfo(service, "username");
 	}
+	public String getSedroPersona(String service) {
+		return getServiceInfo(service, "sedro_persona");
+	}		
 	public String getServiceInfo(String service, String element) {
 		if (service_info == null) return null;
 		HashMap<String, String> hm = service_info.get(service);
@@ -40,11 +45,43 @@ public class UserAccount {
 			hm = new HashMap<>();
 			hm.put("service", service);
 		}
-		hm.put(element, value);
+		if (value.isEmpty()) {
+			hm.remove(element);
+		} else {
+			hm.put(element, value);
+		}
 		service_info.put(service, hm);
 	}
 	
+	////////////////////////////////////////
+	// Manage the services
+	public ChatService findChatService(String service) {
+		if (services == null) return null;
+		for (ChatService cs:services) {
+			if (cs.getName().equals(service)) return cs;
+		}
+		return null;
+	}
+	public void addChatService(ChatService cs) {
+		if (services == null) services = new ArrayList<>();
+		if (!services.contains(cs)) services.add(cs);
+	}
+	public void removeChatService(String service) {
+		if (services == null) return;
+		ChatService cs = findChatService(service);
+		if (cs == null) return;
+		cs.disconnnect(this);
+		services.remove(cs);
+	}
 	
+	
+	////////////////////////////////////////
+	// Manage Sedro instances
+// FIXME
+	
+	
+	////////////////////////////////////////
+	// Functionality
 	public void load() {
 		// load user info from DB
 		if (service_info == null) service_info = new HashMap<>();
@@ -52,14 +89,25 @@ public class UserAccount {
 		
 		// Load 
 // FIXME
-
+		
+		// initialize Services
+		initializeServices();
+	}
+	
+	// initialize OR Reinitialize all the servies
+	public void initializeServices() {
 		if (service_info.keySet().size() > 0) {
 			// initiallize all the interfaces
 			for (String key:service_info.keySet()) {
+				ChatService cs = findChatService(key);
 				switch (key) {
 				case "twitter":
-					ChatService cs = new ChatTwitter();
-					cs.init(this);
+					if (cs == null) cs = new ChatTwitter();
+					if (cs.init(this) == 0) {
+						addChatService(cs);
+					} else {
+						removeChatService(key);
+					}
 					break;
 				case "facebook":
 					//ChatService cs = new ChatTwitter();

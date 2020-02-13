@@ -61,9 +61,30 @@
 					<b>Username:</b> <input type='text' id='add_username'/><br><br>									
 					<div class='bslink' id='save_add_user_bt' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:440px;background:#EEE;'>Add</div>			
 				</div>
-			 	
+				
+			 	<!-- EDIT info for each service -->
+				<div class='fLn' id='userInfo' style='display:none;background:#FFF;padding-bottom:20px;font-size:16px;padding-top:15px;border-bottom:1px solid #333;border-top:1px solid #333;margin-top:10px; margin-bottom:10px'>					
+					<h1>Edit info: <span class='username'>...</span></h1>
+					<div class='fLn'> 
+						<h2>Twitter Configuration:</h2>
+						<div class='fLn' style='margin-top:5px'> <b>consumer_key:</b> <input class='inform' style='width:300px' type='text' id='twitter_consumer_key'/> </div>
+						<div class='fLn' style='margin-top:5px'><b>consumer_secret:</b> <input class='inform' style='width:300px' type='text' id='twitter_consumer_secret'/> </div>
+						<div class='fLn' style='margin-top:5px'><b>access_token:</b> <input class='inform' style='width:300px' type='text' id='twitter_access_token'/> </div>
+						<div class='fLn' style='margin-top:5px'><b>access_token_secret:</b> <input class='inform' style='width:300px' type='text' id='twitter_access_token_secret'/> </div>					
+					</div>	
+					<div class='fLn' style='margin-top:15px'>
+						<h2 >Sedro Linkage:</h2>
+						<div class='fLn'><b>Sedro Persona:</b> <input class='inform' type='text' id='twitter_sedro_persona'/> </div>
+					</div>
+				
+					<div class='fLn' style='margin-top:15px'> 	
+						<div class='bslink' id='save_user_cancel_bt' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:375px;float:left;background:#EEE;'>Cancel</div>			
+						<div class='bslink' id='save_user_bt' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:10px;float:left;background:#EEE;'>Save</div>			
+					</div>
+				</div>	
+				
 				<div class='fLn' style='font-size:16px;padding-top:15px;line-height:2em;padding-bottom:50px' id='userlist'></div>
-		
+				
 			</div>
 		</div>
 				

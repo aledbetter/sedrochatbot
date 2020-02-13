@@ -25,13 +25,21 @@ public class ChatServer {
 	}
 	public void init() {
 		username = "admin";
-		password = "admin";
+		setPassword("admin");
 		load();
+	}
+	private String hashPassword(String password) {
+		return ""+password.hashCode();
+	}
+	public void setPassword(String password) {
+		password = hashPassword(password);
 	}
 	
 	public boolean login(String username, String password) {
 		if (username == null || password == null) return false;
-		if (username.equals(this.username) && password.equals(this.password)) return true;
+		if (!username.equals(this.username)) return false;
+		String hp = hashPassword(password);
+		if (hp.equals(this.password)) return true;
 		return false;
 	}
 	

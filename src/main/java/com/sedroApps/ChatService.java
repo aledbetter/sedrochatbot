@@ -14,6 +14,11 @@ public class ChatService {
 		return 0;
 	}
 	
+	public int disconnnect(UserAccount ua) {
+		// over-ride for each service to set info needed
+		return 0;
+	}
+	
 	public String postMessage(String msg) {
 		return "NOP";	
 	}

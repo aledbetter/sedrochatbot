@@ -125,7 +125,7 @@ public class RestAPI {
 		if (!RestUtil.paramHave(password)) password = null;
 		if (!RestUtil.paramHave(username)) username = null;
 		if (!RestUtil.paramHave(sedro_access_key)) sedro_access_key = null;
-		if (password != null) cs.password = password;
+		if (password != null) cs.setPassword(password);
 		if (username != null) cs.username = username;
 		if (sedro_access_key != null) cs.sedro_access_key = sedro_access_key;
 		cs.save();
@@ -282,6 +282,7 @@ public class RestAPI {
 			t.printStackTrace();
 		}	
 		ua.save();
+		ua.initializeServices();
 		return rr.ret();
 	}
 

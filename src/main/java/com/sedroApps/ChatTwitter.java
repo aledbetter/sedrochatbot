@@ -39,8 +39,11 @@ import twitter4j.conf.ConfigurationBuilder;
 public class ChatTwitter extends ChatService { 
 
 	// this is per user?
-	private static TwitterFactory twitterfactory = null;
-		
+	private TwitterFactory twitterfactory = null;
+	private String pconsumer_key = null;
+	private String pconsumer_secret = null;
+	private String paccess_token = null;
+	private String paccess_token_secret = null;
 	
 	ChatTwitter() {
 	
@@ -54,13 +57,35 @@ public class ChatTwitter extends ChatService {
 	// EXTERNAL calls: init & processing
 	@Override
 	public int init(UserAccount ua) {
+		String consumer_key = ua.getServiceInfo(getName(), "consumer_key");
+		String consumer_secret = ua.getServiceInfo(getName(), "consumer_secret");
+		String access_token = ua.getServiceInfo(getName(), "access_token");
+		String access_token_secret = ua.getServiceInfo(getName(), "access_token_secret");
+		if (consumer_key == null || consumer_secret == null || access_token == null || access_token_secret == null) {
+			return -1; // not configured... remove
+		}
+		if (twitterfactory != null) {
+			// check for updates..
+			boolean change = false;
+			if (!pconsumer_key.equals(consumer_key)) change = true;
+			if (!pconsumer_secret.equals(consumer_secret)) change = true;
+			if (!paccess_token.equals(access_token)) change = true;
+			if (!paccess_token_secret.equals(access_token_secret)) change = true;
+			if (!change) return 0;
+		}
     	ConfigurationBuilder cb = new ConfigurationBuilder();
     	cb.setDebugEnabled(true);
-    	cb.setOAuthConsumerKey(ua.getServiceInfo(getName(), "consumer_key"));
-    	cb.setOAuthConsumerSecret(ua.getServiceInfo(getName(), "consumer_secret"));
-    	cb.setOAuthAccessToken(ua.getServiceInfo(getName(), "access_token"));
-    	cb.setOAuthAccessTokenSecret(ua.getServiceInfo(getName(), "access_token_secret"));
+    	cb.setOAuthConsumerKey(consumer_key);
+    	cb.setOAuthConsumerSecret(consumer_secret);
+    	cb.setOAuthAccessToken(access_token);
+    	cb.setOAuthAccessTokenSecret(access_token_secret);
     	twitterfactory = new TwitterFactory(cb.build());
+    	
+    	// retain config
+    	pconsumer_key = consumer_key;
+    	pconsumer_secret = consumer_secret;
+    	paccess_token = access_token;
+    	paccess_token_secret = access_token_secret;
     	return 0;
 	}
 	
