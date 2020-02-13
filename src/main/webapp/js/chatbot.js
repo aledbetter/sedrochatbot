@@ -173,6 +173,18 @@ function getUsers() {
 	
 }
 
+function saveUser(username) {
+	// FIXME get the values
+	var service = "twitter";
+	var serviceparams = {consumer_key:"xxxyyy", consumer_secret:"xxxyyy", access_token:"xxxyyy", access_token_secret:"xxxyyy"};
+
+	scsUpdateUser(username, service, serviceparams, function(data) {
+		glob_edit_u = null;
+		getUsers();
+	});
+
+}
+
 var glob_edit_u = null; 
 function editUser(username) {
 	if (glob_edit_u) {
@@ -189,14 +201,11 @@ function editUser(username) {
 	glob_edit_u = username;	
 	
 }
-function saveUser(username) {
-	// FIXME
-}
 
 
 function delUser(username) {
 	scsDelUser(username, function(data) {
-		getUsers()
+		getUsers();
 	});
 }
 
@@ -307,15 +316,22 @@ function scsDelUser(username, cb) {
 
 function scsUpdateUser(username, service, serviceparams, cb) {	
 	if (!service) return;
-	var dat = "{ "; 
+	var dat = "{"; 
 // FIXME allow add / update / del service info	
-	//services [ 
-	   // dat += "{ \"name\": \"" + servicename + "\"";
-	   // dat += "\"username\": \"" + username + "\"";
-	   // dat += "\"username\": \"" + username + "\"";
-	   // dat += "\"username\": \"" + username + "\"";
-	// dat += "}";
-	// ]
+	dat += "\"services\": ["
+	dat += "{";
+
+	dat += "\"" + service + "\":{";
+	var first = true;
+	if (serviceparams) {
+		for (const property in serviceparams) {
+			if (!first) dat += ", ";
+			else first = false;
+			dat += "\""+property+"\": \"" + serviceparams[property] + "\"";
+		}
+	}
+	dat += "}}";
+	dat += "]";
     dat += "}";
 	
 	$.ajax({url: "/api/1.0/user/"+username, type: 'POST', async: true, data: dat, contentType: 'application/json', 

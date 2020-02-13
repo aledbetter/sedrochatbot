@@ -241,21 +241,32 @@ public class RestAPI {
 		UserAccount ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
 		
+		//System.out.println("RESP: " + body);
 		try {
 			JSONObject obj = new JSONObject(body);			
 			try {
 			JSONArray jsl = obj.getJSONArray("services");
 			if (jsl != null) {
+				//System.out.println("SERVICES " + jsl.length());
 				for (int i=0;i<jsl.length();i++) {
 					JSONObject srv = jsl.getJSONObject(i);
-					// get the service param info...
-					String service = srv.getString("service");
+					//System.out.println("SERVICES x " + jsl.length());
 
-					String [] params = JSONObject.getNames(srv);
+					// get the service param info...
+
+					String [] services = JSONObject.getNames(srv);
+					String service = services[0];
+					
+					JSONObject svrcfg = srv.getJSONObject(service);
+					String [] params = JSONObject.getNames(svrcfg);
+
+					//System.out.println("SERVICES params["+service+"] " + params.length);
+
 					for (String p:params) {
-						if (p.equals(service)) continue;
-						String val = srv.getString(p);
+						String val = svrcfg.getString(p);
 						String cur_val = ua.getServiceInfo(service, p);
+						//System.out.println("     params["+p+"] " + val);
+
 						if (!Sutil.compare(val, cur_val)) {
 							ua.setServiceInfo(service, p, val);
 						}
