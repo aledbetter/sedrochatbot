@@ -126,8 +126,8 @@ public class RestAPI {
 		if (!RestUtil.paramHave(username)) username = null;
 		if (!RestUtil.paramHave(sedro_access_key)) sedro_access_key = null;
 		if (password != null) cs.setPassword(password);
-		if (username != null) cs.username = username;
-		if (sedro_access_key != null) cs.sedro_access_key = sedro_access_key;
+		if (username != null) cs.setUsername(username);
+		if (sedro_access_key != null) cs.setSedro_access_key(sedro_access_key);
 		cs.save();
 		// add all the doc content
 		return rr.ret();

@@ -40,8 +40,8 @@ public class ChatTwitter extends ChatService {
 
 	// this is per user?
 	private TwitterFactory twitterfactory = null;
-	private String pconsumer_key = null;
-	private String pconsumer_secret = null;
+	private String pconsumer_key = null;  	// api_key
+	private String pconsumer_secret = null; // api_secret
 	private String paccess_token = null;
 	private String paccess_token_secret = null;
 	

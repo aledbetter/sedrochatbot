@@ -28,6 +28,10 @@ public class Sedro {
 	
 	private String status = "wake";
 	
+	Sedro() {
+		status = "wake";
+	}
+	
 	public String getStatus() {
 		return status;
 	}

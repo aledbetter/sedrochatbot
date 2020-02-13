@@ -25,9 +25,11 @@ public class Orator {
 	// process the conversation
 	public void process() {
 		int procCnt = 0;
+		System.out.println("OProc["+processor.getStatus()+"]["+processor.persona+"]");
+		
 		// wake the persona
 		if (processor.getStatus().equals("wake")) {
-			List<HashMap<String, Object>> msg = processor.chatWake(server.sedro_access_key, 
+			List<HashMap<String, Object>> msg = processor.chatWake(server.getSedro_access_key(), 
 					user.getSedroPersona(service.getName()), 
 					user.getCBUsername(), ctok, null, null, null, -1);
 			procCnt++;

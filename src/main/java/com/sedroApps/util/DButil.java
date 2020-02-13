@@ -18,7 +18,11 @@
 package main.java.com.sedroApps.util;
 
 
+import java.io.InputStream;
 import java.sql.*;
+import java.util.HashMap;
+
+import org.apache.commons.lang3.SerializationUtils;
 
 
 /*
@@ -133,5 +137,27 @@ public class DButil {
     	}
     	return true;
     }
+    
+    
+    public static void save(String key, HashMap<String, Object> data) {
+    	if (data == null || key == null) return;
+    	byte[] dataFlat = SerializationUtils.serialize(data);
+
+    	// FIXME 
+    	
+    }
+    public static HashMap<String, Object> load(String key) {
+    	if (key == null) return null;
+
+    
+    	InputStream data = null;
+    	// FIXME get daa
+    	if (data == null) return null;
+
+		@SuppressWarnings({ "unchecked", "unused" })
+		HashMap<String, Object> obj = (HashMap<String, Object>)SerializationUtils.deserialize(data);
+    	return obj;
+    }
+    
 }
 

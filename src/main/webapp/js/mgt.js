@@ -353,7 +353,7 @@ function showChat(persona) {
 	clearErrors();
 	var ctx = $("#ctx").val();
 //	alert("start Chat: " + persona);
-	window.open("/extern/msg?persona="+persona+"&tenant="+ctx, "_blank");
+	window.open("/msg.html?persona="+persona+"&tenant="+ctx, "_blank");
 	
 }
 function showPresonaForm(persona) {

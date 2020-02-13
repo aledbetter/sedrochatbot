@@ -11,7 +11,6 @@ public class UserAccount {
 	// service info
 	HashMap<String, HashMap<String, String>> service_info = null;
 	List<ChatService> services = null;
-	List<Sedro> sedros = null; // FIXME one per service Or accross... 
 	List<Orator> orators = null;
 	
 	
@@ -72,17 +71,10 @@ public class UserAccount {
 		ChatService cs = findChatService(service);
 		if (cs == null) return;
 		cs.disconnnect(this);
+		// remove any orator associated
+		removeOrator(findOratorForChatService(cs));
 		services.remove(cs);
 	}
-	
-	
-	////////////////////////////////////////
-	// Manage Sedro instances
-	public void addSedro(Sedro sedro) {
-		if (sedros == null) sedros = new ArrayList<>();
-		if (!sedros.contains(sedro)) sedros.add(sedro);
-	}
-// FIXME
 	
 	
 	////////////////////////////////////////
@@ -91,9 +83,36 @@ public class UserAccount {
 		if (orators == null) orators = new ArrayList<>();
 		if (!orators.contains(orator)) orators.add(orator);
 	}
-// FIXME
+	public Orator findOratorForChatService(ChatService cs) {
+		if (orators == null || cs == null) return null;
+		for (Orator orat:orators) {
+			if (orat.service.equals(cs)) return orat;
+		}
+		return null;
+	}
+	public void removeOrator(Orator orat) {
+		if (orators == null || orat == null) return;
+		orat.close();
+		orators.remove(orat);
+	}
+
 	
 	
+	//////////////////////////////////////////////////////
+	// process the Ortors
+	public void process() {
+		// process the orators
+		System.out.println("Process User: " + this.getCBUsername());
+
+		if (orators != null && orators.size() > 0) {
+			for (Orator orat:orators) {
+				orat.process();
+			}
+		}
+	}
+	
+		
+	//////////////////////////////////////////////////////
 	// initialize OR Reinitialize all the servies
 	public void initializeServices() {
 		if (service_info.keySet().size() > 0) {
@@ -105,9 +124,12 @@ public class UserAccount {
 					if (cs == null) cs = new ChatTwitter();
 					if (cs.init(this) == 0) {
 						addChatService(cs);
+						Orator orat = new Orator(ChatServer.getChatServer(), cs, new Sedro(), this);
+						this.addOrator(orat);
 					} else {
 						removeChatService(key);
 					}
+
 					break;
 				case "facebook":
 					//ChatService cs = new ChatTwitter();
@@ -129,7 +151,12 @@ public class UserAccount {
 	
 	////////////////////////////////////////
 	// Functionality
-	public void load() {
+	public void save() {
+		// always save all
+		ChatServer.getChatServer().save();
+	}
+	
+	public void load(HashMap<String, Object> um) {
 		// load user info from DB
 		if (service_info == null) service_info = new HashMap<>();
 		if (services == null) services = new ArrayList<>();
@@ -140,16 +167,7 @@ public class UserAccount {
 		// initialize Services
 		initializeServices();
 	}
-	public void save() {
-		// save user info to DB
-		if (service_info == null || service_info.keySet().size() < 1) return;
-		for (String key:service_info.keySet()) {
-			// save this info...
-			// FIXME
 
-		}
-	}
-	
 	// get al lthe user info as a map..
 	public HashMap<String, Object> getMap() {
 		HashMap<String, Object> m = new HashMap<>();
