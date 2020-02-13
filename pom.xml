@@ -102,7 +102,12 @@
 			<version>4.5.9</version>
 			<scope>compile</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>net.oauth.core</groupId>
+			<artifactId>oauth-httpclient3</artifactId>
+			<version>20090617</version>
+		</dependency>
+		
 		<dependency>
 		    <groupId>org.apache.logging.log4j</groupId>
 		    <artifactId>log4j-core</artifactId>

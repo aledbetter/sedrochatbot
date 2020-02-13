@@ -11,8 +11,9 @@ public class UserAccount {
 	// service info
 	HashMap<String, HashMap<String, String>> service_info = null;
 	List<ChatService> services = null;
-	List<SedroInstance> sedros = null; // FIXME one per service Or accross... 
-
+	List<Sedro> sedros = null; // FIXME one per service Or accross... 
+	List<Orator> orators = null;
+	
 	
 	UserAccount(String username) {
 		this.username = username;
@@ -77,22 +78,21 @@ public class UserAccount {
 	
 	////////////////////////////////////////
 	// Manage Sedro instances
+	public void addSedro(Sedro sedro) {
+		if (sedros == null) sedros = new ArrayList<>();
+		if (!sedros.contains(sedro)) sedros.add(sedro);
+	}
 // FIXME
 	
 	
 	////////////////////////////////////////
-	// Functionality
-	public void load() {
-		// load user info from DB
-		if (service_info == null) service_info = new HashMap<>();
-		if (services == null) services = new ArrayList<>();
-		
-		// Load 
-// FIXME
-		
-		// initialize Services
-		initializeServices();
+	// Manage Orators
+	public void addOrator(Orator orator) {
+		if (orators == null) orators = new ArrayList<>();
+		if (!orators.contains(orator)) orators.add(orator);
 	}
+// FIXME
+	
 	
 	// initialize OR Reinitialize all the servies
 	public void initializeServices() {
@@ -127,6 +127,19 @@ public class UserAccount {
 		
 	}
 	
+	////////////////////////////////////////
+	// Functionality
+	public void load() {
+		// load user info from DB
+		if (service_info == null) service_info = new HashMap<>();
+		if (services == null) services = new ArrayList<>();
+		
+		// Load 
+// FIXME
+		
+		// initialize Services
+		initializeServices();
+	}
 	public void save() {
 		// save user info to DB
 		if (service_info == null || service_info.keySet().size() < 1) return;

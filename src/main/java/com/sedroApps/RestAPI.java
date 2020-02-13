@@ -92,7 +92,7 @@ public class RestAPI {
 		// drop cookie
 		return rr.ret("atok=;Path=/");
 	}
-	
+
 	@GET
 	@Path("/settings")
     public Response settingsGET(@Context UriInfo info, 

@@ -30,4 +30,7 @@ public class ChatService {
 	public List<String> getTimeLine() {
 		return null;
 	}
+	public List<String> getDirectMessages() {
+		return null;
+	}
 }
