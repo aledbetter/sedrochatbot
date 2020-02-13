@@ -31,18 +31,19 @@
 			
 			<div class='fLn' style='height:250px'>
 				<div class='fLn'>
-					<h1>Server Configuration</h1>
-					<div class='bslink' id='update_settings_bt' style='width:100px;text-align:center;font-size:16px;margin-top:-40px;margin-left:650px;background:#EEE;'>Update</div>			
+					<h1 style='padding-bottom:10px;border-bottom:1px solid #333'>Server Configuration</h1>
+					<div class='bslink' id='update_settings_bt' style='width:100px;text-align:center;font-size:16px;margin-top:-50px;margin-left:650px;background:#EEE;'>Update</div>			
 		
-					<div class='fLn' style='display:none' id='show_settings'> 
-						<div class='fLn'>Username: <span id='setting_username'></span></div>
-						<div class='fLn'>Sedro Access Key: <span id='setting_sedro_access_key'></span></div>
-						<div class='fLn'>Poll Interval: <span id='setting_poll_interval'></span></div>				
+					<div class='fLn' style='display:none;font-size:16px;padding-top:15px;line-height:2em' id='show_settings'> 
+						<div class='fLn'><b>Username:</b> <span id='setting_username'></span></div>
+						<div class='fLn'><b>Sedro Access Key:</b> <span id='setting_sedro_access_key'></span></div>
+						<div class='fLn'><b>Poll Interval:</b> <span id='setting_poll_interval'></span></div>				
 					</div>
-					<div class='fLn' style='display:none' id='update_settings'> 
+					<div class='fLn' style='display:none;font-size:16px;padding-top:15px;' id='update_settings'> 
 						<b>Username:</b> <input type='text' id='set_username'/><br><br>
 						<b>Password:</b> <input type='password' id='set_password'/><br><br>
 						<b>Sedro Access Key:</b> <input type='text' id='set_sedro_access_key'/><br><br>
+						<div class='bslink' id='save_settings_bt' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:440px;background:#EEE;'>Save</div>			
 					</div>		 
 			 	</div>
 				<h1 id='settingserror' style='color:red;display:none'></h1>
@@ -50,10 +51,16 @@
 			
 			
 			<div class='fLn'>
-				<h1>Users</h1>
-				<div class='bslink' id='add_user_bt' style='width:100px;text-align:center;font-size:16px;margin-top:-40px;margin-left:650px;background:#EEE;'>Add User</div>						
+				<h1 style='padding-bottom:10px;border-bottom:1px solid #333'>Users</h1>
+				<div class='bslink' id='add_user_bt' style='width:100px;text-align:center;font-size:16px;margin-top:-50px;margin-left:650px;background:#EEE;'>Add User</div>						
 				<h1 id='usererror' style='color:red;display:none'></h1>
-				<div class='fLn' id='userlist'></div>
+				
+				<div class='fLn' style='display:none;font-size:16px;padding-top:15px;' id='user_add'>
+					<b>Username:</b> <input type='text' id='add_username'/><br><br>				
+					<div class='bslink' id='save_add_user_bt' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:440px;background:#EEE;'>Add</div>			
+				</div>
+				
+				<div class='fLn' style='font-size:16px;padding-top:15px;line-height:2em' id='userlist'></div>
 			</div>
 		</div>
 				

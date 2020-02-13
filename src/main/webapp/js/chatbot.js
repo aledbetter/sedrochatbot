@@ -25,6 +25,9 @@ $(document).ready(function() {
 	$("#show_settings").show();
 	$("#update_settings").hide();
 	$("#set_password").val(""); 
+	$("#update_settings_bt").html("Update");
+	$("#add_user_bt").html("Add User");
+	$("#add_username").val("");
 
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,48 +67,138 @@ $(document).ready(function() {
 		});
 	});
 	
+	
 	//////////////////////////////////////////////////
 	// server page
 	$("#update_settings_bt").on('click', function (e) {
 		var v = $("#show_settings").attr("data-v");
 		if (v == "hide") {
-			// FIXME save the info here: then flip the view	
-
-			
 			$("#show_settings").show();
 			$("#update_settings").hide();	
 			$("#show_settings").attr("data-v", "show");
-			
+			$("#update_settings_bt").html("Update");
 		} else {
 			$("#show_settings").hide();
 			$("#update_settings").show();
 			$("#show_settings").attr("data-v", "hide");
-		}
-					
+			$("#update_settings_bt").html("Cancel");
+		}		
+	});
+	$("#save_settings_bt").on('click', function (e) {
+		var sak = $("#set_sedro_access_key").val();
+		var u = $("#set_username").val();
+		var p = $("#set_password").val();
+		scsUpdateSettings(u, p, sak, function(data) {
+			getSettings();
+			$("#update_settings_bt").click();
+		});
 	});
 	
 	$("#add_user_bt").on('click', function (e) {
-		// FIXME get the user info
+		var v = $("#user_add").attr("data-v");
+		if (v == "hide") {
+			$("#user_add").hide();
+			$("#user_add").attr("data-v", "show");
+			$("#add_user_bt").html("Add User");
+		} else {
+			$("#user_add").show();
+			$("#user_add").attr("data-v", "hide");
+			$("#add_user_bt").html("Cancel");
+		}
 	});
+	$("#save_add_user_bt").on('click', function (e) {
+		var u = $("#add_username").val();
+		if (!u) return;
+		scsAddUser(u, function(data) {
+			getUsers();
+			$("#add_user_bt").click();
+			$("#add_username").val("");
+		});
+	});
+	
 	
 	
 	// if this is the server page
 	if (window.location.href.indexOf("server.html") > -1) {
-
-		scsGetSettings(function(data) {
-			$("#setting_poll_interval").html(data.poll_interval); 
-			$("#setting_username").html(data.username); 
-			$("#setting_sedro_access_key").html(data.sedro_access_key); 
-			$("#set_username").val(data.username); 
-			$("#set_sedro_access_key").val(data.sedro_access_key); 
-		});
-		
+		getSettings();
+		getUsers();
 	}
 	
 });
 	
+function getSettings() {
+	scsGetSettings(function(data) {
+		$("#setting_poll_interval").html(data.info.poll_interval); 
+		$("#setting_username").html(data.info.username); 
+		$("#set_username").val(data.info.username); 
+		if (data.info.sedro_access_key) {
+			$("#set_sedro_access_key").val(data.info.sedro_access_key); 
+			$("#setting_sedro_access_key").html(data.info.sedro_access_key); 
+		} else {
+			$("#set_sedro_access_key").val(""); 
+			$("#setting_sedro_access_key").html("none"); 
+		}
+
+	});
+}
+
+function getUsers() {
+	$("#userlist").html("No Users"); 
+	scsGetUsers(function(data) {
+		var usr = "";
+		if (data.info && data.info.users) {
+			for (var i=0;i<data.info.users.length;i++) {
+				usr += "<div class'fLn' id='ua_"+data.info.users[i].username+"' style='padding-top:10px;padding-bottom:10px;border-bottom:1px solid #555;position:relative'>";				
+				usr += "<div class='bslink' onClick='delUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:100px;background:#EEE;'>Del</div>";	
+				usr += "<div class='bslink' onClick='editUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:180px;background:#EEE;'>Edit</div>";	
+				usr += "<div class'fLn'><b>Username: " + data.info.users[i].username +"</b></div>";
+				usr += "<div id='show_ua'>";
+
+				// all the serviecs
+				if (data.info.users[i].services) {
+					for (var k=0;k<data.info.users[i].services.length;k++) {
+// FIXME
+					}
+				}
+				usr += "</div>";
+				usr += "<div id='edit_ua' style='display:none'>";
+// EDIT FIXME
+				usr += "<div class='bslink' onClick='saveUser(\""+data.info.users[i].username+"\");' style='width:100px;text-align:center;font-size:16px;margin-left:440px;background:#EEE;'>Save</div>";	
+				usr += "</div></div>";
+			}
+		}
+		
+		if (usr != "") $("#userlist").html(usr); 
+	});
+	
+}
+
+var glob_edit_u = null; 
+function editUser(username) {
+	if (glob_edit_u) {
+		// one at a time only
+		$("#ua_"+glob_edit_u+" #edit_ua").hide();
+		$("#ua_"+glob_edit_u+" #show_ua").show();	
+		if (glob_edit_u == username) {
+			glob_edit_u = null;
+			return;
+		}
+	}
+	$("#ua_"+username+" #edit_ua").show();
+	$("#ua_"+username+" #show_ua").hide();
+	glob_edit_u = username;	
+	
+}
+function saveUser(username) {
+	// FIXME
+}
 
 
+function delUser(username) {
+	scsDelUser(username, function(data) {
+		getUsers()
+	});
+}
 
 
 
