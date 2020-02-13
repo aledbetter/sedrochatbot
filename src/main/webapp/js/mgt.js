@@ -17,6 +17,7 @@
 
 var glob_max_persona = 0;
 var glob_cur_persona = 0;
+var glob_api_key = null;
 
 function resetPage() {
 	$(".sedro_version").html(getSedroVersion()); // add version
@@ -67,6 +68,24 @@ function clearErrors() {
 /////////////////////////////////////////////////////////////////
 $(document).ready(function() {
 	resetPage();
+	
+	// get the key
+	scsGetSettings(function(data) {
+		if (data.info.sedro_access_key) {
+			glob_api_key = data.info.sedro_access_key;
+			$("#api_key").val(data.info.sedro_access_key); 
+			setAPIKey(glob_api_key);
+			sedroGetAccount(function (data) {
+				if (data) showTenant(data.results[0]);
+				else $("#xtenant_action").html("ERROR: Adding Account for: " + glob_api_key);
+			});
+		} else {
+			glob_api_key = null;
+			$("#api_key").val(""); 
+			$("#xtenant_action").html("ERROR: RAPID API key not set ");
+		}
+	});
+	
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// Get or Add Tenant
@@ -508,6 +527,15 @@ function removeTenantDb(name) {
 			getTenant();
 		}
 		else $("#xpool_action").html("ERROR: Removing DB: " + rctx + " / " + rname);
+	});
+}
+function scsGetSettings(cb) {
+	$.ajax({url: "/api/1.0/settings", type: 'GET', dataType: "json", contentType: 'application/json', 
+	  success: function(data){
+		  cb(data);
+	  }, error: function(xhr) {
+		  cb(null);
+	  }
 	});
 }
 	

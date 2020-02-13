@@ -19,10 +19,17 @@ package main.java.com.sedroApps.util;
 
 
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.commons.lang3.SerializationUtils;
+
+
 
 
 /*
@@ -31,9 +38,8 @@ import org.apache.commons.lang3.SerializationUtils;
  * 
  */
 public class DButil {	
-	// File
-	static private String def_tree_path = "ont/";
-	static private boolean useDB = true;
+	// save all to here
+	static final String TABLE_NAME = "sedrochatbot";
 	
     static String prod_user = null;
     static String prod_pass = null;
@@ -48,19 +54,13 @@ public class DButil {
     static {
     	System.out.println("DBUtil: start initialize");
         try {      
- 		   if (!useDB) {
-			   dbinit = true;
-			   prod_DB = null;
-			   System.out.println("DBUtil: Initialized: local file");
-		   } else {  
-	        	setupJDBC(); // RDB
-		   }		
+	        setupJDBC(); // RDB	
         } catch (Throwable ex) {
             throw new ExceptionInInitializerError(ex);
         }
     }
     
-    public static void setupAmazonSQL() {
+    public static void setupDB() {
     	String RDS_HOSTNAME = System.getenv("RDS_HOSTNAME"); // The hostname of the DB instance.
     	String RDS_PORT = System.getenv("RDS_PORT"); // The port on which the DB instance accepts connections. The default value varies among DB engines.
     	String prod_db = System.getenv("RDS_DB_NAME"); // The database name, ebdb.
@@ -77,7 +77,7 @@ public class DButil {
     private static void setupJDBC() {
 	   try{
 		   Class.forName(JDBC_DRIVER);
-		   setupAmazonSQL();
+		   setupDB();
 	   } catch(Exception e){
 	      e.printStackTrace();
 	   }
@@ -90,9 +90,6 @@ public class DButil {
     }
     public static boolean haveDB() {
     	return dbinit;
-    }
-    public static String getFilePath() {
-    	return def_tree_path;
     }
     public static String getRDBPath() {
     	return prod_DB;
@@ -137,21 +134,88 @@ public class DButil {
     	}
     	return true;
     }
-    
+	public static boolean createDataTable(Connection conn) {
+		String sql = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" (key VARCHAR(64) PRIMARY KEY, data bytea);";
+  		if (conn == null) {
+  			System.out.println("ERROR createDirTable["+TABLE_NAME+"] connect fail");
+  			return false;
+  		}
+  		try {
+  			Statement stmt = conn.createStatement();
+		    stmt.executeUpdate(sql);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		//System.out.println("createDirTable["+DIR_NAME+"] Complete");
+		return true;
+	}
+	private static InputStream getDBDataStream(String key) {
+  		Connection conn = DButil.getConnection();
+  		if (conn == null) return null;
+  		String sql = "SELECT * FROM "+TABLE_NAME + " WHERE key = '" + key+"'";
+  		InputStream data = null;
+  		try {
+  			Statement stmt = conn.createStatement();
+		    ResultSet rs = stmt.executeQuery(sql);
+		    if (rs.next()) {
+		    	try {
+			    String label = rs.getString("key");
+				data = rs.getBinaryStream("data");
+		    	} catch (Throwable t) {}
+			    rs.close();	
+		    }
+		} catch (SQLException e) { 
+			e.printStackTrace();
+		}
+  		DButil.closeConnection(conn); 		
+		return data;
+	}
+	private static int saveDBData(String key, byte [] data) {
+		if (data == null || key == null) return 0;
+		int cnt = 0;
+		
+		String sql = "INSERT INTO " + TABLE_NAME + " (key, data) VALUES(?, ?) "
+		+ " ON CONFLICT (name) DO UPDATE SET data = ?";
+		
+  		Connection conn = DButil.getConnection();
+  		if (conn == null) {
+  			System.out.println("ERROR: saveTreeDescDynDB() no db connected");
+  			return 0;
+  		}
+  		// create tables for ont
+  		createDataTable(conn);
+  		try {
+  			PreparedStatement pstmt = conn.prepareStatement(sql);
+  			conn.setAutoCommit(false);
+  			pstmt.setString(1, key);
+  			pstmt.setBytes(2, data);
+		
+  			/// OR
+  			pstmt.setBytes(3, data);								
+  			pstmt.addBatch();		
+
+  			pstmt.executeBatch();
+  			conn.commit(); 			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+			
+		DButil.closeConnection(conn);		
+		return cnt;
+	}  
     
     public static void save(String key, HashMap<String, Object> data) {
     	if (data == null || key == null) return;
+    	if (!haveDB()) return;
     	byte[] dataFlat = SerializationUtils.serialize(data);
-
-    	// FIXME 
-    	
+    	saveDBData(key, dataFlat);
     }
     public static HashMap<String, Object> load(String key) {
     	if (key == null) return null;
+    	if (!haveDB()) return null;
 
-    
-    	InputStream data = null;
-    	// FIXME get daa
+    	InputStream data = getDBDataStream(key);
     	if (data == null) return null;
 
 		@SuppressWarnings({ "unchecked", "unused" })
