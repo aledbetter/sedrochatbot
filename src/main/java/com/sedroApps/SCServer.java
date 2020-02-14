@@ -10,7 +10,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import main.java.com.sedroApps.util.DButil;
 
-public class ChatServer {
+public class SCServer {
 	private static final int DEFAULT_INTERVAL = (1000*60)*3;
 
 	private String username;
@@ -21,16 +21,16 @@ public class ChatServer {
 
 	List<UserAccount> uaList;	// list of users
 	
-	private static ChatServer cs = null;
+	private static SCServer cs = null;
 	private static Timer proc_timer = null;
 
 	
 	// so a single static instance (could instaciate in the servlet... if it is always there)
 	static {
-		cs = new ChatServer();
+		cs = new SCServer();
 	}
 	
-	public static ChatServer getChatServer() {
+	public static SCServer getChatServer() {
 		return cs;
 	}
 	public String getSedro_access_key() {

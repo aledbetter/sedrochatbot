@@ -10,7 +10,7 @@ public class UserAccount {
 	
 	// service info
 	HashMap<String, HashMap<String, String>> service_info = null;
-	List<ChatService> services = null;
+	List<ChatAdapter> services = null;
 	List<Orator> orators = null;
 	
 	
@@ -55,20 +55,20 @@ public class UserAccount {
 	
 	////////////////////////////////////////
 	// Manage the services
-	public ChatService findChatService(String service) {
+	public ChatAdapter findChatService(String service) {
 		if (services == null) return null;
-		for (ChatService cs:services) {
+		for (ChatAdapter cs:services) {
 			if (cs.getName().equals(service)) return cs;
 		}
 		return null;
 	}
-	public void addChatService(ChatService cs) {
+	public void addChatService(ChatAdapter cs) {
 		if (services == null) services = new ArrayList<>();
 		if (!services.contains(cs)) services.add(cs);
 	}
 	public void removeChatService(String service) {
 		if (services == null) return;
-		ChatService cs = findChatService(service);
+		ChatAdapter cs = findChatService(service);
 		if (cs == null) return;
 		cs.disconnnect(this);
 		// remove any orator associated
@@ -83,7 +83,7 @@ public class UserAccount {
 		if (orators == null) orators = new ArrayList<>();
 		if (!orators.contains(orator)) orators.add(orator);
 	}
-	public Orator findOratorForChatService(ChatService cs) {
+	public Orator findOratorForChatService(ChatAdapter cs) {
 		if (orators == null || cs == null) return null;
 		for (Orator orat:orators) {
 			if (orat.service.equals(cs)) return orat;
@@ -102,8 +102,6 @@ public class UserAccount {
 	// process the Ortors
 	public void process() {
 		// process the orators
-		System.out.println("Process User: " + this.getCBUsername());
-
 		if (orators != null && orators.size() > 0) {
 			for (Orator orat:orators) {
 				orat.process();
@@ -118,13 +116,13 @@ public class UserAccount {
 		if (service_info.keySet().size() > 0) {
 			// initiallize all the interfaces
 			for (String key:service_info.keySet()) {
-				ChatService cs = findChatService(key);
+				ChatAdapter cs = findChatService(key);
 				switch (key) {
 				case "twitter":
 					if (cs == null) cs = new ChatTwitter();
 					if (cs.init(this) == 0) {
 						addChatService(cs);
-						Orator orat = new Orator(ChatServer.getChatServer(), cs, new Sedro(), this);
+						Orator orat = new Orator(SCServer.getChatServer(), cs, new Sedro(), this);
 						this.addOrator(orat);
 					} else {
 						removeChatService(key);
@@ -153,17 +151,14 @@ public class UserAccount {
 	// Functionality
 	public void save() {
 		// always save all
-		ChatServer.getChatServer().save();
+		SCServer.getChatServer().save();
 	}
 	
 	public void load(HashMap<String, Object> um) {
 		// load user info from DB
 		if (service_info == null) service_info = new HashMap<>();
 		if (services == null) services = new ArrayList<>();
-		System.out.println("FIXME load user: " + this.getCBUsername());
-		// Load 
-// FIXME
-		
+
 		// initialize Services
 		initializeServices();
 	}

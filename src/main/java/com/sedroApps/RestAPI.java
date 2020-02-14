@@ -59,7 +59,7 @@ public class RestAPI {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 		String username = null, password = null, keep = null;
 
-		ChatServer cs = ChatServer.getChatServer();		
+		SCServer cs = SCServer.getChatServer();		
 		try {
 			JSONObject obj = new JSONObject(body);
 			username = RestUtil.getJStr(obj, "username");
@@ -87,7 +87,7 @@ public class RestAPI {
 			@Context HttpServletRequest hsr, 
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		ChatServer cs = ChatServer.getChatServer();
+		SCServer cs = SCServer.getChatServer();
 		cs.logout();
 		// drop cookie
 		return rr.ret("atok=;Path=/");
@@ -99,7 +99,7 @@ public class RestAPI {
 			@Context HttpServletRequest hsr, 
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		ChatServer cs = ChatServer.getChatServer();
+		SCServer cs = SCServer.getChatServer();
 		rr.setInfo(cs.getMap());
 		return rr.ret();
 	}
@@ -110,7 +110,7 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		ChatServer cs = ChatServer.getChatServer();
+		SCServer cs = SCServer.getChatServer();
 
 		String sedro_access_key = null, username = null, password = null;
 
@@ -157,7 +157,7 @@ public class RestAPI {
 			@Context HttpServletRequest hsr, 
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		ChatServer cs = ChatServer.getChatServer();
+		SCServer cs = SCServer.getChatServer();
 		List<UserAccount> ual = cs.getUsers();
 		if (ual == null || ual.size() < 1) return rr.ret();
 		
@@ -174,7 +174,7 @@ public class RestAPI {
     		@PathParam("user") String user,
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		ChatServer cs = ChatServer.getChatServer();
+		SCServer cs = SCServer.getChatServer();
 		UserAccount ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
 		rr.setInfo(ua.getMap());
@@ -199,7 +199,7 @@ public class RestAPI {
 		}	
 		if (!RestUtil.paramHave(username)) return rr.ret(401);
 
-		ChatServer cs = ChatServer.getChatServer();
+		SCServer cs = SCServer.getChatServer();
 		UserAccount ua = cs.getUser(username);
 		if (ua != null) return rr.ret(409);
 			
@@ -219,7 +219,7 @@ public class RestAPI {
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 
-		ChatServer cs = ChatServer.getChatServer();
+		SCServer cs = SCServer.getChatServer();
 		UserAccount ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
 		
@@ -237,7 +237,7 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		ChatServer cs = ChatServer.getChatServer();
+		SCServer cs = SCServer.getChatServer();
 		UserAccount ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
 		

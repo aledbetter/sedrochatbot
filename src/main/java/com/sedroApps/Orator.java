@@ -5,12 +5,12 @@ import java.util.List;
 
 public class Orator {
 	Sedro processor = null;
-	ChatService service = null;
-	ChatServer server = null;
+	ChatAdapter service = null;
+	SCServer server = null;
 	UserAccount user = null;
 	String ctok = null;
 	
-	Orator(ChatServer server, ChatService service, Sedro processor, UserAccount user) {
+	Orator(SCServer server, ChatAdapter service, Sedro processor, UserAccount user) {
 		this.processor = processor;
 		this.service = service;
 		this.server = server;
@@ -30,13 +30,15 @@ public class Orator {
 			System.out.println("OProc["+processor.getStatus()+"] NO PERSONA");
 			return;
 		}
-		System.out.println("OProc["+processor.getStatus()+"]["+persona+"]");
+		System.out.println("OProc1["+processor.getStatus()+"]["+persona+"]");
 
 		// wake the persona
 		if (processor.getStatus().equals("wake")) {
 			List<HashMap<String, Object>> msg = processor.chatWake(server.getSedro_access_key(), 
 									persona, user.getCBUsername(), ctok, null, null, null, -1);
 			procCnt++;
+			System.out.println("OProc2["+processor.getStatus()+"]["+persona+"] msg: " + processor.msg_num);
+
 		}
 						
 		/*
@@ -72,12 +74,12 @@ public class Orator {
 				// public direct messages
 				if (isDirect) {
 				// FIXME
-					System.out.println("TLDM: " + msg);
+					System.out.println("PUB_D: " + msg);
 
 				} else {
 				// public board
 				// FIXME
-					System.out.println("TLMSG: " + msg);
+					System.out.println("PUB: " + msg);
 
 				}
 			}
@@ -89,6 +91,8 @@ public class Orator {
 			}
 
 		}
+		System.out.println("OProc3["+processor.getStatus()+"]["+persona+"] msg: " + processor.msg_num);
+
 	}
 	
 }

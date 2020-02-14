@@ -3,7 +3,7 @@ package main.java.com.sedroApps;
 import java.util.List;
 
 
-public class ChatService {
+public class ChatAdapter {
 
 	public String getName() {
 		return "none";	
@@ -33,4 +33,10 @@ public class ChatService {
 	public List<String> getDirectMessages() {
 		return null;
 	}
+	
+	// callback for receive (when deployed with public IP only)
+	public List<String> getReceiveMessages(String msg) {
+		return null;
+	}
+	
 }
