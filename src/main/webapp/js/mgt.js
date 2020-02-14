@@ -255,10 +255,10 @@ function showTenant(tenant) {
 		
 	var pselect = "";
 	if (tenant.personas) {
-		hh += "<div class='fLn personas' style='margin-top:10px;margin-bottom:4px;padding-bottom:10px;border-bottom:solid 2px #CCC;font-size:18px'>&nbsp;Tenant Personas: " + tenant.personas.length+ "</div>";
+		hh += "<div class='fLn personas' style='margin-top:15px;padding-bottom:10px;border-bottom:solid 2px #555;font-size:18px'>&nbsp;Tenant Personas: " + tenant.personas.length+ "</div>";
 		var hp = "";
 		for (var i=0;i<tenant.personas.length;i++) {
-			hp += "<div class='fLn' style='margin-top:4px;margin-bottom:4px;border-bottom:solid 1px #CCC'><span>&nbsp;&nbsp;&nbsp;&nbsp;";
+			hp += "<div class='fLn' style='padding-top:8px;padding-bottom:4px;font-size:16px;margin-top:4px;border-bottom:solid 1px #555;'><span>&nbsp;&nbsp;&nbsp;&nbsp;";
 			hp += "<b>" + tenant.personas[i]+"</b></span>";
 			hp += "<div class='bslink' onClick='showChat(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Chat</div>";		
 			hp += "<div class='bslink' onClick='showPresonaForm(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Add Form</div>";		
