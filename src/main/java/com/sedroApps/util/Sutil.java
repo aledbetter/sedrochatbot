@@ -55,32 +55,32 @@ import com.fasterxml.jackson.databind.ObjectWriter;
  */
 public class Sutil {
 	static public String no_space [] = {",", ":", ";", ".", "!", "?"};
-	   public static String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";    
-	    public static String display_pattern_sec = "EEE MMM d h:mm:ss a z yyyy";
-	    public static String display_pattern_msec = "EEE MMM d h:mm:ss.SSS a z yyyy";
-	    public static String display_pattern = "EEE MMM d h:mm a z yyyy";
-	    public static String email_pattern = "yyyy-MM-dd HH:mm:ss";
-	    public static String display_pattern_clock = "h:mm a";
-	    public static String display_pattern_24clock = "HH:mm|EEE";
-	    public static String date_pattern = "M/d/yy";
-	    public static String date_pattern1 = "M/d/yyyy";
-	    public static String date_pattern2 = "EEEEEEEEEEEE, MMMMMMMMMMMMMMM d";
-	    public static String date_pattern3 = "MMMMMMMMMMMMMMM d, yyyy";
-	    public static String dob_pattern = "yyyy-MM";
-	    public static String dob_pattern2 = "yyyy-MM-dd";
-	    public static String dob_pattern4 = "MM/dd/yyyy";
-	    public static String dob_pattern10 = "yyyyMMdd";
-	    public static String dob_pattern5 = "yyyy";
-	    public static String dob_pattern8 = "w"; // week in year
-	    public static String dob_pattern9 = "D"; // day in year
-	    public static String date_pattern_Month = "MMMMMMMMMMMMMMM";
-	    public static String date_pattern_Month3 = "MMM";
+	   public static final String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";    
+	    public static final String display_pattern_sec = "EEE MMM d h:mm:ss a z yyyy";
+	    public static final String display_pattern_msec = "EEE MMM d h:mm:ss.SSS a z yyyy";
+	    public static final String display_pattern = "EEE MMM d h:mm a z yyyy";
+	    public static final String email_pattern = "yyyy-MM-dd HH:mm:ss";
+	    public static final String display_pattern_clock = "h:mm a";
+	    public static final String display_pattern_24clock = "HH:mm|EEE";
+	    public static final String date_pattern = "M/d/yy";
+	    public static final String date_pattern1 = "M/d/yyyy";
+	    public static final String date_pattern2 = "EEEEEEEEEEEE, MMMMMMMMMMMMMMM d";
+	    public static final String date_pattern3 = "MMMMMMMMMMMMMMM d, yyyy";
+	    public static final String dob_pattern = "yyyy-MM";
+	    public static final String dob_pattern2 = "yyyy-MM-dd";
+	    public static final String dob_pattern4 = "MM/dd/yyyy";
+	    public static final String dob_pattern10 = "yyyyMMdd";
+	    public static final String dob_pattern5 = "yyyy";
+	    public static final String dob_pattern8 = "w"; // week in year
+	    public static final String dob_pattern9 = "D"; // day in year
+	    public static final String date_pattern_Month = "MMMMMMMMMMMMMMM";
+	    public static final String date_pattern_Month3 = "MMM";
 	    
-	    public static String ont_time_pattern = "M-d-yyyy-HH:mm:ss.SSS";
-	    public static String ont_date_pattern = "M-d-yyyy";
-	    public static String ont_week_pattern = "'w'w-yyyy";
-	    public static String ont_Month_pattern = "'m'M-yyyy";
-	    public static String ont_year_pattern = "'y'yyyy";
+	    public static final String ont_time_pattern = "M-d-yyyy-HH:mm:ss.SSS";
+	    public static final String ont_date_pattern = "M-d-yyyy";
+	    public static final String ont_week_pattern = "'w'w-yyyy";
+	    public static final String ont_Month_pattern = "'m'M-yyyy";
+	    public static final String ont_year_pattern = "'y'yyyy";
     
     // Get a new GUID (not inteded for printing)
 	public final static BigInteger getGUID() {
@@ -1241,6 +1241,25 @@ public class Sutil {
 		int eMonth = end.get(Calendar.MONTH);
 		return ((eyear - syear) + ((eMonth - sMonth) + 1) / 12);
 	}
+	
+	// get local time zone
+	public static TimeZone getLocalTimeZone() {
+		Calendar now = Calendar. getInstance();
+		TimeZone timeZone = now.getTimeZone();
+		return timeZone;
+	}
+	public static String getLocalTimeZoneString() {
+		Calendar now = Calendar. getInstance();
+		TimeZone timeZone = now.getTimeZone();
+		return timeZone.getDisplayName();
+	}
+	public static Calendar getLocalTime() {
+		return Calendar. getInstance();
+	}
+	public static Calendar getTime(String timezone) {
+		Calendar c = Calendar.getInstance(TimeZone.getTimeZone(timezone));
+		return c;
+	}		
 	
 	/*
 	 * getUTCInstance()
