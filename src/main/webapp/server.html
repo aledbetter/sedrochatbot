@@ -11,6 +11,7 @@
 
 	<link rel="stylesheet" href="/css/style.css" />	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/api_sedro.js?version=2"></script> 
 	<script type="text/javascript" src="/js/chatbot.js?version=2"></script> 
 </head>
 
@@ -70,14 +71,14 @@
 					<h1>Edit info: <span class='username'>...</span></h1>
 					<div class='fLn'> 
 						<h2>Twitter Configuration:</h2>
-						<div class='fLn' style='margin-top:5px'><b>consumer_key:</b> <input class='inform' style='width:300px' type='text' id='twitter_consumer_key'/> </div>
-						<div class='fLn' style='margin-top:5px'><b>consumer_secret:</b> <input class='inform' style='width:300px' type='text' id='twitter_consumer_secret'/> </div>
-						<div class='fLn' style='margin-top:5px'><b>access_token:</b> <input class='inform' style='width:300px' type='text' id='twitter_access_token'/> </div>
-						<div class='fLn' style='margin-top:5px'><b>access_token_secret:</b> <input class='inform' style='width:300px' type='text' id='twitter_access_token_secret'/> </div>					
+						<div class='fLn' style='margin-top:5px'><b>consumer_key:</b> <input class='inform' style='width:250px' type='text' id='twitter_consumer_key'/> </div>
+						<div class='fLn' style='margin-top:5px'><b>consumer_secret:</b> <input class='inform' style='width:400px' type='text' id='twitter_consumer_secret'/> </div>
+						<div class='fLn' style='margin-top:5px'><b>access_token:</b> <input class='inform' style='width:400px' type='text' id='twitter_access_token'/> </div>
+						<div class='fLn' style='margin-top:5px'><b>access_token_secret:</b> <input class='inform' style='width:400px' type='text' id='twitter_access_token_secret'/> </div>					
 					</div>	
 					<div class='fLn' style='margin-top:15px'>
 						<h2 >Sedro Linkage:</h2>
-						<div class='fLn'><b>Sedro Persona:</b> <input class='inform' type='text' id='twitter_sedro_persona'/> </div>
+						<div class='fLn'><b>Sedro Persona:</b> <select class='inform persona_list' id='twitter_sedro_persona' style='width:160px'><option value=''>No Personas</option></select></div>
 					</div>
 				
 					<div class='fLn' style='margin-top:15px'> 	

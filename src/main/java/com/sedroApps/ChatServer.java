@@ -25,7 +25,6 @@ public class ChatServer {
 	private static Timer proc_timer = null;
 
 	
-	
 	// so a single static instance (could instaciate in the servlet... if it is always there)
 	static {
 		cs = new ChatServer();
@@ -125,6 +124,7 @@ public class ChatServer {
 		if (uaList == null) uaList = new ArrayList<>();
 		UserAccount ua = new UserAccount(username);
 		uaList.add(ua);
+		save();
 		return ua;
 	}
 	public boolean delUser(String username) {
@@ -132,6 +132,7 @@ public class ChatServer {
 		for (UserAccount ua: uaList) {
 			if (ua.getCBUsername().equals(username)) {
 				uaList.remove(ua);
+				save();
 				return true;
 			}
 		}
@@ -147,7 +148,6 @@ public class ChatServer {
 			for (UserAccount ua:uaList) sl.add(ua.getMap());
 			sm.put("users", sl);
 		}
-	
 		DButil.save("chatserver", sm);
 	}
 	public void load() {

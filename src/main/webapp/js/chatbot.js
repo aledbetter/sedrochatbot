@@ -141,7 +141,6 @@ $(document).ready(function() {
 		getSettings();
 		getUsers();
 	}
-	
 });
 	
 function getSettings() {
@@ -152,9 +151,22 @@ function getSettings() {
 		if (data.info.sedro_access_key) {
 			$("#set_sedro_access_key").val(data.info.sedro_access_key); 
 			$("#setting_sedro_access_key").html(data.info.sedro_access_key); 
+			glob_api_key = data.info.sedro_access_key;
+			sedroGetPersonas(function (data) {
+				// persona select list
+				if (data.list && data.list.length > 0) {
+					var pselect = "";
+					for (var i=0;i<data.list.length;i++) {
+						pselect += "<option value='"+data.list[i]+"'>"+data.list[i]+"</option>";						
+					}
+					if (pselect == "") pselect = "<option value=''>No Personas</option>";
+					$(".persona_list").html(pselect);
+				}
+			});
 		} else {
 			$("#set_sedro_access_key").val(""); 
 			$("#setting_sedro_access_key").html("none"); 
+			glob_api_key = null;
 		}
 
 	});

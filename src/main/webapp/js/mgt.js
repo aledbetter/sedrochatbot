@@ -129,6 +129,7 @@ $(document).ready(function() {
 		var err = false;
 		if (!ctx) {
 			$("#ctx").addClass("error");
+			alert("CTX");
 			err = true;
 		}
 		if (!persona) {

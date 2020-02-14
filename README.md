@@ -21,8 +21,7 @@ run distribution
 	
 Server pages
 
-	localhost:8080                 ==> mangement page
-	localhost:8080/msg             ==> Web chat page
+	localhost:8080                 ==> start here
 	        
       
 Eclipse: Steps to get development
@@ -57,4 +56,19 @@ Eclipse: Steps to get development
 	    database user/password
 	
 	12. Run with Jetty for server
+	
+Data Base
+	
+	Environment variables
+	RDS_DB_URL - full jdbc url - jdbc:postgresql://<hostname>:<port>/<dbname>
+	RDS_USERNAME - user name
+	RDS_PASSWORD - password
+	
+Login
+	
+	This server is not secure in any way
+	default username: admin
+	default password: admin
+	
+	to secure it better 1) run it on https 2) alter code to check credentials
 	

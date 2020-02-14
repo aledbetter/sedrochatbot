@@ -160,7 +160,7 @@ public class UserAccount {
 		// load user info from DB
 		if (service_info == null) service_info = new HashMap<>();
 		if (services == null) services = new ArrayList<>();
-		
+		System.out.println("FIXME load user: " + this.getCBUsername());
 		// Load 
 // FIXME
 		
