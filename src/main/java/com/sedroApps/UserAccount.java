@@ -122,7 +122,7 @@ public class UserAccount {
 					if (cs == null) cs = new ChatTwitter();
 					if (cs.init(this) == 0) {
 						addChatService(cs);
-						Orator orat = new Orator(SCServer.getChatServer(), cs, new Sedro(), this);
+						Orator orat = new Orator(SCServer.getChatServer(), cs, new Sedro(), this, true, false);
 						this.addOrator(orat);
 					} else {
 						removeChatService(key);

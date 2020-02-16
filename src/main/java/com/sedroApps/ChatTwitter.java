@@ -45,8 +45,8 @@ public class ChatTwitter extends ChatAdapter {
 	private String paccess_token = null;
 	private String paccess_token_secret = null;
 	
+
 	ChatTwitter() {
-	
 	}
 	
 	public String getName() {
@@ -57,6 +57,7 @@ public class ChatTwitter extends ChatAdapter {
 	// EXTERNAL calls: init & processing
 	@Override
 	public int init(UserAccount ua) {
+		super.init(ua);
 		String consumer_key = ua.getServiceInfo(getName(), "consumer_key");
 		String consumer_secret = ua.getServiceInfo(getName(), "consumer_secret");
 		String access_token = ua.getServiceInfo(getName(), "access_token");

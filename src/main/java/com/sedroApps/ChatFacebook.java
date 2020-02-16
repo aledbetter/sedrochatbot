@@ -18,6 +18,7 @@
 package main.java.com.sedroApps;
 
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,7 @@ public class ChatFacebook extends ChatAdapter {
 	// EXTERNAL calls: init & processing
 	@Override
 	public int init(UserAccount ua) {
+		super.init(ua);
 		String consumer_key = ua.getServiceInfo(getName(), "consumer_key");
 		String consumer_secret = ua.getServiceInfo(getName(), "consumer_secret");
 		String access_token = ua.getServiceInfo(getName(), "access_token");
@@ -101,8 +103,9 @@ public class ChatFacebook extends ChatAdapter {
 		return null;			
 	}
 	
+	// list of messages: from:from user / msg:message text
 	@Override	
-	public List<String> getDirectMessages() {
+	public List<HashMap<String, String>> getDirectMessages() {
 		return null;
 	}
 
