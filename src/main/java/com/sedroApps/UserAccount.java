@@ -6,7 +6,7 @@ import java.util.List;
 
 public class UserAccount {
 	// chatbot info (name may be different accross services)
-	String username;
+	private String username;
 	
 	// service info
 	HashMap<String, HashMap<String, String>> service_info = null;
@@ -83,10 +83,11 @@ public class UserAccount {
 		if (orators == null) orators = new ArrayList<>();
 		if (!orators.contains(orator)) orators.add(orator);
 	}
+	
 	public Orator findOratorForChatService(ChatAdapter cs) {
 		if (orators == null || cs == null) return null;
 		for (Orator orat:orators) {
-			if (orat.service.equals(cs)) return orat;
+			if (orat.getChatService().equals(cs)) return orat;
 		}
 		return null;
 	}
@@ -122,7 +123,7 @@ public class UserAccount {
 					if (cs == null) cs = new ChatTwitter();
 					if (cs.init(this) == 0) {
 						addChatService(cs);
-						Orator orat = new Orator(SCServer.getChatServer(), cs, new Sedro(), this, true, false);
+						Orator orat = new Orator(SCServer.getChatServer(), cs, this, true, false);
 						this.addOrator(orat);
 					} else {
 						removeChatService(key);

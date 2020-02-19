@@ -111,7 +111,7 @@ public class ChatTwitter extends ChatAdapter {
 	}
 	
 	@Override
-	public List<String> getTimeLine() {
+	public List<String> getPublicMessages() {
 		try {
 		    Twitter twitter = getTwitterinstance();	     
 		    return twitter.getHomeTimeline().stream().map(item -> item.getText()).collect(Collectors.toList());

@@ -38,17 +38,35 @@ public class ChatAdapter {
 		return "NOP";			
 	}
 	
-	public List<String> getTimeLine() {
+	//////////////////////////////////////////////////
+	// Polling handlers
+	public List<String> getPublicMessages() {
 		return null;
 	}
 	
+
 	// list of messages: from:from user / msg:message text
+	// Call identifier: "CID" in each
 	public List<HashMap<String, String>> getDirectMessages() {
 		return null;
 	}
 	
+	// get new calls
+	public List<HashMap<String, String>> getDirectCall() {
+		return null;
+	}
+	
+	
+	//////////////////////////////////////////////////
+	// Callback for direct recieve and handle
+	
 	// callback for receive (when deployed with public IP only)
 	public List<String> getReceiveMessages(String msg) {
+		return null;
+	}
+	
+	// call back for new incomming calls 
+	public HashMap<String, String> getReceiveCall() {
 		return null;
 	}
 	

@@ -96,7 +96,7 @@ public class ChatFacebook extends ChatAdapter {
 	}
 	
 	@Override
-	public List<String> getTimeLine() {
+	public List<String> getPublicMessages() {
 		try {
 
 		} catch (Throwable t) { }

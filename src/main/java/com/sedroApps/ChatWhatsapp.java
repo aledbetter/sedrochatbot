@@ -97,14 +97,7 @@ public class ChatWhatsapp extends ChatAdapter {
 		} catch (Throwable t) { }
 		return "ERROR";			
 	}
-	
-	@Override
-	public List<String> getTimeLine() {
-		try {
 
-		} catch (Throwable t) { }
-		return null;			
-	}
 	
 	// list of messages: from:from user / msg:message text
 	@Override	

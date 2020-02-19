@@ -153,9 +153,14 @@
 		    <artifactId>twitter4j-stream</artifactId>
 		    <version>4.0.7</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.mindrot.bcrypt/bcrypt -->
 
-		
+		<!-- twillio for SMS -->
+		<dependency>
+		  <groupId>com.twilio.sdk</groupId>
+		  <artifactId>twilio</artifactId>
+		  <version>7.42.0</version>
+		</dependency>
+				
 		
 	</dependencies>
 

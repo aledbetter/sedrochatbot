@@ -15,27 +15,50 @@ import main.java.com.sedroApps.util.Sutil;
 public class Sedro {
 	private static String rapidapi_host = "inteligent-chatbots.p.rapidapi.com";
 
-	String persona;
-	String persona_full_name;
-	String persona_email;
+	private String persona;
+	private String persona_full_name;
+	private String persona_email;
 	
-	String language;
-	String context;
-	String chid;
-	String key;
+	private String language;
+	private String context;
+	private String chid;
+	private String key;
 	
-	int msg_num_last = 0;	
-	int msg_num = 0;	
-	List<HashMap<String, Object>> msg = null;
+	private int msg_num_last = 0;	
+	private int msg_num = 0;	
+	private boolean readPublic = false;
+	private boolean respPublic = false;
+	private boolean directMsg = false;
+	
+	private List<HashMap<String, Object>> msg = null;
 	
 	private String status = "wake";
 	
-	Sedro() {
-		status = "wake";
+	
+	
+	
+	Sedro(boolean readPublic, boolean respPublic, boolean directMsg) {
+		this.status = "wake";
+		this.readPublic = readPublic;
+		this.respPublic = respPublic;
+		this.directMsg = directMsg;
+	}
+	
+	public boolean isReadPublic() {
+		return readPublic;
+	}
+	public boolean isRespPublic() {
+		return respPublic;
+	}
+	public boolean isDirectMsg() {
+		return directMsg;
 	}
 	
 	public String getStatus() {
 		return status;
+	}
+	public int getMsgNumber() {
+		return msg_num;
 	}
 	
 	private static String getUrl(String ending) {
