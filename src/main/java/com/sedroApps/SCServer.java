@@ -140,12 +140,16 @@ public class SCServer {
 	}
 	
 	public void save() {
+		System.out.println("SAVEING: ALL");
 		// Save the data
 		HashMap<String, Object> sm = getMap();
 		sm.put("password", this.password);
 		if (uaList != null && uaList.size() > 0) {
 			List<HashMap<String, Object>> sl = new ArrayList<>();
-			for (UserAccount ua:uaList) sl.add(ua.getMap());
+			for (UserAccount ua:uaList) {
+				HashMap<String, Object> um = ua.getMap();
+				sl.add(um);
+			}
 			sm.put("users", sl);
 		}
 		DButil.save("chatserver", sm);

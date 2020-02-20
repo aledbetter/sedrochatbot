@@ -194,7 +194,7 @@ function getUsers() {
 							usr += "<h2 class='fLn'><b>Service: " + data.info.users[i].services[k].service + "</b></h2>";
 							for (const property in data.info.users[i].services[k]) {
 								if (property == "service") continue;
-								usr += "<div class='fLn'><b>" + property + "</b>: "+data.info.users[i].services[k][property]+"</div>";
+								usr += "<div class='fLn' style='margin-left:200px;text-align:left'><b>" + property + "</b>: "+data.info.users[i].services[k][property]+"</div>";
 							}
 						}
 					}
@@ -257,7 +257,7 @@ function editUser(username) {
 // save the user info
 function saveUser(username) {
 	
-	var v_sedro_presona = $("#twitter_sedro_persona").val();		
+	var v_twitter_sedro_presona = $("#twitter_sedro_persona").val();		
 	var services = [];
 	
 	// Save twitter
@@ -268,30 +268,32 @@ function saveUser(username) {
 	var v_access_token_secret = $("#twitter_access_token_secret").val();		
 	var twitter_serviceparams = {
 			service: "twitter", 
-			sedro_persona: v_sedro_presona, 
+			sedro_persona: v_twitter_sedro_presona, 
 			consumer_key: v_consumer_key, 
 			consumer_secret: v_consumer_secret, 
 			access_token: v_access_token, 
 			access_token_secret: v_access_token_secret};
-	if (v_consumer_key && consumer_secret && access_token_secret && v_access_token) {
-		if (v_consumer_key.length > 5 && consumer_secret.length > 5 && access_token_secret.length > 5 && v_access_token.length > 5) {
+	if (v_consumer_key && consumer_secret && access_token_secret && v_access_token && v_twitter_sedro_presona) {
+		if (v_consumer_key.length > 5 && consumer_secret.length > 5 && access_token_secret.length > 5 && v_access_token.length > 5 && v_twitter_sedro_presona.length > 3) {
 			services.push(twitter_serviceparams);
 		}
 	}
 
 	// Save SMS
+	var v_sms_sedro_presona = $("#sms_sedro_persona").val();		
 	var v_provider = $("#sms_provider").val();
 	var v_account_sid = $("#sms_account_sid").val();
 	var v_auth_token = $("#sms_auth_token").val();
 
 	var sms_serviceparams = {
 			service: "sms", 
-			sedro_persona: v_sedro_presona, 
-			account_sid: v_consumer_key, 
+			sedro_persona: v_sms_sedro_presona, 
+			provider: v_provider, 
+			account_sid: v_account_sid, 
 			auth_token: v_auth_token};
 	
-	if (v_provider && v_account_sid && v_auth_token) {
-		if (v_provider.length > 3 && v_account_sid.length > 5 && v_auth_token.length > 5) {
+	if (v_provider && v_account_sid && v_auth_token && v_sms_sedro_presona) {
+		if (v_provider.length > 3 && v_account_sid.length > 5 && v_auth_token.length > 5 && v_sms_sedro_presona.length > 3) {
 			services.push(sms_serviceparams);
 		}
 	}	
