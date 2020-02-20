@@ -17,12 +17,21 @@ public class Sedro {
 
 	private String persona;
 	private String persona_full_name;
-	private String persona_email;
+	private String persona_handle;	// email/phone/id
 	
-	private String language;
+	private String caller = null;
+	private String caller_full_name = null;
+	private String caller_handle = null;	// email/phone/id
+
+	private HashMap<String, String> call_info = null;
+	
+	private String language = null;
 	private String context;
 	private String chid;
 	private String key;
+	private String channel_type = null;
+	private String caller_token = null;
+	private int max_qn = -1;
 	
 	private int msg_num_last = 0;	
 	private int msg_num = 0;	
@@ -44,6 +53,8 @@ public class Sedro {
 		this.directMsg = directMsg;
 	}
 	
+	//////////////////////////////////////////////////
+	// Configuration
 	public boolean isReadPublic() {
 		return readPublic;
 	}
@@ -54,6 +65,83 @@ public class Sedro {
 		return directMsg;
 	}
 	
+	public String getPersona() {
+		return persona;
+	}	
+	public void setPersona(String persona) {
+		this.persona = persona;
+	}
+	public String getPersona_full_name() {
+		return persona_full_name;
+	}	
+	public String getPersona_handle() {
+		return persona_handle;
+	}	
+	public void setPersona_handle(String persona_handle) {
+		this.persona_handle = persona_handle;
+	}
+	
+	public String getCaller() {
+		return caller;
+	}	
+	public void setCaller(String caller) {
+		this.caller = caller;
+	}
+	public String getCaller_full_name() {
+		return caller_full_name;
+	}	
+	public void setCaller_full_name(String caller_full_name) {
+		this.caller_full_name = caller_full_name;
+	}
+	public String getCaller_handle() {
+		return caller_handle;
+	}	
+	public void setCaller_handle(String caller_handle) {
+		this.caller_handle = caller_handle;
+	}
+	
+	public void setCall_info(HashMap<String, String> call_info) {
+		this.call_info = call_info;
+	}
+	
+	
+	public String getLanguage() {
+		return language;
+	}	
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+	public String getContext() {
+		return context;
+	}	
+	public void setContext(String context) {
+		this.context = context;
+	}
+	public String getChannel_type() {
+		return channel_type;
+	}
+	public void setChannel_type(String channel_type) {
+		this.channel_type = channel_type;
+	}
+	public void setCaller_token(String caller_token) {
+		this.caller_token = caller_token;
+	}
+	public String getCaller_token() {
+		return caller_token;
+	}	
+	public void setMax_qn(int max_qn) {
+		this.max_qn = max_qn;
+	}
+	public int getMax_qn() {
+		return max_qn;
+	}
+	
+	private static String getUrl(String ending) {
+		return "https://"+ rapidapi_host+ending;
+	}
+
+	//////////////////////////////////////////////////
+	// State and status
 	public String getStatus() {
 		return status;
 	}
@@ -61,9 +149,6 @@ public class Sedro {
 		return msg_num;
 	}
 	
-	private static String getUrl(String ending) {
-		return "https://"+ rapidapi_host+ending;
-	}
 	
 	// get current personas
 	public static List<String> getPersonas(String key) {
@@ -91,7 +176,7 @@ public class Sedro {
 		return null;
 	}
 		
-	public List<HashMap<String, Object>> chatWake(String key, String persona, String caller, String caller_token, String context, String channel_type, String language, int max_qn) {
+	public List<HashMap<String, Object>> chatWake(String key) {
 		if (!getStatus().equals("wake") && !getStatus().equals("bye")) return null;
 
 		String url = getUrl("/persona/chat/wake");
@@ -193,13 +278,12 @@ public class Sedro {
 			} catch (Throwable t) {}
 			try {
 				String persona_email = info.getString("persona_email");
-				this.persona_email = persona_email;
+				this.persona_handle = persona_email;
 			} catch (Throwable t) {}
 	
 			try {
 				JSONArray list = obj.getJSONArray("list");
 				if (list != null && list.length() > 0) {
-					rl = new ArrayList<>();
 					for (int i=0;i<list.length();i++) {
 						// the messages .... 
 				//		if (resp.list[i].r == "false" || !resp.list[i].msg) continue; // only if remote add..

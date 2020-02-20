@@ -27,6 +27,9 @@ public class UserAccount {
 	public String getUsername(String service) {
 		return getServiceInfo(service, "username");
 	}
+	public String getCaller_token(String service) {
+		return getServiceInfo(service, "caller_token");
+	}
 	public String getSedroPersona(String service) {
 		return getServiceInfo(service, "sedro_persona");
 	}		

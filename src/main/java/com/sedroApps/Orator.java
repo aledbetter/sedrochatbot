@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import main.java.com.sedroApps.util.Sutil;
+
 public class Orator {
 	private List<Sedro> processors = null;
 	
 	private ChatAdapter service = null;
 	private SCServer server = null;
 	private UserAccount user = null;
-	private String ctok = null;
 	
 	private Sedro processorPublic = null;
 	boolean procPoll = false;
@@ -19,10 +20,18 @@ public class Orator {
 		this.service = service;
 		this.server = server;
 		this.user = user;
-
+		String persona = user.getSedroPersona(service.getName());
+		if (persona == null) {
+			System.out.println("ERROR OProc: NO PERSONA");
+			return;
+		}
 		if (readPublic) {
 			// add porcessor for public
 			processorPublic = addProcessor(readPublic, respPublic, false);
+			processorPublic.setChannel_type(service.getChannel_type());
+			processorPublic.setLanguage(service.getLanguage());
+			processorPublic.setContext(service.getContext());
+			processorPublic.setPersona(user.getSedroPersona(service.getName()));
 		}
 	}
 	
@@ -55,42 +64,64 @@ public class Orator {
 		processors.remove(s);
 	}
 	
+	public Sedro findProcessor(String caller_handle) {
+		if (getProcessorCount() > 0) {
+			for (Sedro s:processors) {
+				// close all processors
+				if (Sutil.compare(s.getCaller_handle(), caller_handle)) return s;
+			}
+		}
+		return null;
+	}
+	
 	//////////////////////////////////////////////////////
 	// process the conversation
 	public void process() {
 		// this where we look for new calls 
 		if (service.isSession_per_direct()) {
-			// FIXME
-//FIXME ADD NEW channels...Processors
+			List<HashMap<String, String>> newCalls = service.getDirectCall(this);
+			if (newCalls != null && newCalls.size() > 0) {	
+				for (HashMap<String, String> call:newCalls) {
+					// ADD NEW channels...Processors
+					Sedro proc = addProcessor(false, false, true);
+					// add information to it
+					proc.setChannel_type(service.getChannel_type());
+					proc.setLanguage(service.getLanguage());
+					proc.setContext(service.getContext());
+					proc.setPersona(user.getSedroPersona(service.getName()));
+	
+					// information specific to this caller
+					proc.setCaller_token(call.get("caller_token"));
+					proc.setCaller(call.get("caller"));
+					proc.setCaller_handle(call.get("caller_handle"));
+					
+					// what to do with other info?
+					proc.setCall_info(call);
+				}
+			}
 		}
 		
 		if (getProcessorCount() > 0) {
-			String persona = user.getSedroPersona(service.getName());
-			if (persona == null) {
-				System.out.println("OProc: NO PERSONA");
-				return;
-			}
 			for (Sedro s:processors) {
-				process(s, persona);
+				process(s);
 			}
 		}	
 	}
 	
 	
-	private void process(Sedro processor, String persona) {
+	private void process(Sedro processor) {
 		int procCnt = 0;
 
-		System.out.println("OProc1["+processor.getStatus()+"]["+persona+"]");
+		System.out.println("OProc1["+processor.getStatus()+"]["+processor.getPersona()+"]");
 
 		List<HashMap<String, Object>> wake_msg = null;
 				
 		//////////////////////////////////////////////////////
 		// wake the persona
 		if (processor.getStatus().equals("wake")) {
-			wake_msg = processor.chatWake(server.getSedro_access_key(), 
-									persona, user.getCBUsername(), ctok, null, null, null, -1);
+			wake_msg = processor.chatWake(server.getSedro_access_key());
 			procCnt++;
-			System.out.println("OProc2["+processor.getStatus()+"]["+persona+"] msg: " + processor.getMsgNumber());
+			System.out.println("OProc2["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
 
 		}
 						
@@ -109,7 +140,7 @@ public class Orator {
 							String resp_msg = (String)m.get("msg");
 							if (resp_msg == null || resp_msg.isEmpty()) continue;
 							procCnt++;
-							service.postMessage(resp_msg);
+							service.postMessage(processor, resp_msg);
 							System.out.println("PUB_RESP: " + resp_msg);
 						}
 					}
@@ -123,13 +154,15 @@ public class Orator {
 		if (processor.isDirectMsg()) {
 			if (wake_msg != null) {
 				// where to send these messages?
-				// FIXME
+				for (HashMap<String, Object> msg:wake_msg) {
+					String smsg = (String) msg.get("msg");
+					if (smsg == null || smsg.equals("null")) continue;
+					service.sendDirectMessage(processor, processor.getCaller_handle(), smsg);
+				}
 			}
-/*
- * FIXME where to add / remove new sessions for callers?			
- */
+
 			// Deal with direct messages
-			List<HashMap<String, String>> dml = service.getDirectMessages();
+			List<HashMap<String, String>> dml = service.getDirectMessages(this);
 			if (dml != null) {
 				for (HashMap<String, String> mm:dml) {
 					String msg = mm.get("msg");
@@ -146,7 +179,7 @@ public class Orator {
 						}
 						for (HashMap<String, Object> m:rmsg) {
 							// send direct message
-							service.sendDirectMessage(from, msg);
+							service.sendDirectMessage(processor, from, msg);
 						}
 					}
 				}	
@@ -163,7 +196,7 @@ public class Orator {
 			}
 		}
 		
-		System.out.println("OProc3["+processor.getStatus()+"]["+persona+"] msg: " + processor.getMsgNumber());
+		System.out.println("OProc3["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
 
 	}
 	

@@ -49,6 +49,7 @@ public class ChatTwitter extends ChatAdapter {
 	ChatTwitter() {
 	}
 	
+	@Override
 	public String getName() {
 		return "twitter";	
 	}
@@ -91,7 +92,7 @@ public class ChatTwitter extends ChatAdapter {
 	}
 	
 	@Override
-	public String postMessage(String msg) {
+	public String postMessage(Sedro proc, String msg) {
 		try {
 			Twitter twitter = getTwitterinstance();
 			Status status = twitter.updateStatus(msg);
@@ -101,7 +102,7 @@ public class ChatTwitter extends ChatAdapter {
 	}
 
 	@Override
-	public String sendDirectMessage(String touser, String msg) {
+	public String sendDirectMessage(Sedro proc, String touser, String msg) {
 		try {
 		    Twitter twitter = getTwitterinstance();
 		    DirectMessage message = twitter.sendDirectMessage(touser, msg);

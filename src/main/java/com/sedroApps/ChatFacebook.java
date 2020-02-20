@@ -37,6 +37,7 @@ public class ChatFacebook extends ChatAdapter {
 	
 	}
 	
+	@Override
 	public String getName() {
 		return "facebook";	
 	}
@@ -80,7 +81,7 @@ public class ChatFacebook extends ChatAdapter {
 	}
 	
 	@Override
-	public String postMessage(String msg) {
+	public String postMessage(Sedro proc, String msg) {
 		try {
 		
 		} catch (Throwable t) { }
@@ -88,7 +89,7 @@ public class ChatFacebook extends ChatAdapter {
 	}
 
 	@Override
-	public String sendDirectMessage(String touser, String msg) {
+	public String sendDirectMessage(Sedro proc, String touser, String msg) {
 		try {
 
 		} catch (Throwable t) { }
@@ -105,7 +106,7 @@ public class ChatFacebook extends ChatAdapter {
 	
 	// list of messages: from:from user / msg:message text
 	@Override	
-	public List<HashMap<String, String>> getDirectMessages() {
+	public List<HashMap<String, String>> getDirectMessages(Orator orat) {
 		return null;
 	}
 

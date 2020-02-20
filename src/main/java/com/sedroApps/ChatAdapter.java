@@ -16,6 +16,16 @@ public class ChatAdapter {
 	public String getName() {
 		return "none";	
 	}
+	public String getChannel_type() {
+		return "chat";	
+	}
+	public String getContext() {
+		return null;	
+	}
+	public String getLanguage() {
+		return null;	
+	}
+		
 	
 	public int init(UserAccount ua) {
 		// over-ride for each service to set info needed
@@ -30,11 +40,11 @@ public class ChatAdapter {
 		return 0;
 	}
 	
-	public String postMessage(String msg) {
+	public String postMessage(Sedro proc, String msg) {
 		return "NOP";	
 	}
 
-	public String sendDirectMessage(String touser, String msg) {
+	public String sendDirectMessage(Sedro proc, String touser, String msg) {
 		return "NOP";			
 	}
 	
@@ -47,12 +57,12 @@ public class ChatAdapter {
 
 	// list of messages: from:from user / msg:message text
 	// Call identifier: "CID" in each
-	public List<HashMap<String, String>> getDirectMessages() {
+	public List<HashMap<String, String>> getDirectMessages(Orator orat) {
 		return null;
 	}
 	
 	// get new calls
-	public List<HashMap<String, String>> getDirectCall() {
+	public List<HashMap<String, String>> getDirectCall(Orator orat) {
 		return null;
 	}
 	
