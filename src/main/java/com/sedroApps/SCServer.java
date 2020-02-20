@@ -120,11 +120,11 @@ public class SCServer {
 		}
 		return null;
 	}
-	public UserAccount addUser(String username) {
+	public UserAccount addUser(String username, boolean save) {
 		if (uaList == null) uaList = new ArrayList<>();
 		UserAccount ua = new UserAccount(username);
 		uaList.add(ua);
-		save();
+		if (save) save();
 		return ua;
 	}
 	public boolean delUser(String username) {
@@ -140,7 +140,6 @@ public class SCServer {
 	}
 	
 	public void save() {
-		System.out.println("SAVEING: ALL");
 		// Save the data
 		HashMap<String, Object> sm = getMap();
 		sm.put("password", this.password);
@@ -169,7 +168,7 @@ public class SCServer {
 		for (HashMap<String, Object> um:uml) {
 			// load this user
 			String un = (String)um.get("username");
-			UserAccount ua = addUser(un);
+			UserAccount ua = addUser(un, false);
 			ua.load(um);
 		}
 	}

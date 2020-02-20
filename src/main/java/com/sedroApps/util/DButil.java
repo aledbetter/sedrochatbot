@@ -189,7 +189,8 @@ public class DButil {
 	private static int saveDBData(String key, byte [] data) {
 		if (data == null || key == null) return 0;
 		int cnt = 0;
-		
+	//	System.out.println("SAVEING[" + key + "] data: " + data.length);
+
 		String sql = "INSERT INTO " + TABLE_NAME + " (key, data) VALUES(?, ?) "
 		+ " ON CONFLICT (key) DO UPDATE SET data = ?";
 		
@@ -221,6 +222,7 @@ public class DButil {
     public static void save(String key, HashMap<String, Object> data) {
     	if (data == null || key == null) return;
     	if (!haveDB()) return;
+
     	byte[] dataFlat = SerializationUtils.serialize(data);
     	saveDBData(key, dataFlat);
     }

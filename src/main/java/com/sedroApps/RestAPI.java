@@ -203,7 +203,7 @@ public class RestAPI {
 		UserAccount ua = cs.getUser(username);
 		if (ua != null) return rr.ret(409);
 			
-		ua = cs.addUser(username);
+		ua = cs.addUser(username, true);
 		if (ua == null) return rr.ret(500);
 
 		rr.setInfo(ua.getMap());
