@@ -187,7 +187,7 @@ public class UserAccount {
 		if (service_info == null) service_info = new HashMap<>();
 		if (service_state == null) service_state = new HashMap<>();
 		if (services == null) services = new ArrayList<>();
-		System.out.println("  LOAD: " + um.keySet());
+		//System.out.println("  LOAD: " + um.keySet());
 
 		List<HashMap<String, Object>> sl = (List<HashMap<String, Object>>)um.get("services");
 		if (sl != null && sl.size() > 0) {
@@ -196,8 +196,7 @@ public class UserAccount {
 				HashMap<String, String> nhm = new HashMap<>();
 				for (String key:hm.keySet()) {
 					if (key.equals("service")) continue;
-					System.out.println("      S["+sn+"]["+key+"]: " + hm.get(key));
-
+					//System.out.println("      S["+sn+"]["+key+"]: " + hm.get(key));
 					nhm.put(key, ""+hm.get(key));
 				}
 				service_info.put(sn, nhm);
