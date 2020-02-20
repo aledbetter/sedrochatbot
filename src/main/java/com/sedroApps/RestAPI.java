@@ -286,5 +286,49 @@ public class RestAPI {
 		return rr.ret();
 	}
 
+	
+	//////////////////////////////////////////////////////////////////////////////////////
+	// Service Specific WebHooks
+	
+	@POST
+	@Path("/cb/voice_hook")
+	public Response voiceWebHookPOST(@Context UriInfo info, 
+			@Context HttpServletRequest hsr,
+			@CookieParam("atok") String cookie_access_key, 
+			String body) {
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+
+		SCServer cs = SCServer.getChatServer();		
+		try {
+			JSONObject obj = new JSONObject(body);
+			//username = RestUtil.getJStr(obj, "username");
+
+			
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+
+		return rr.ret();
+	}
+	@POST
+	@Path("/cb/sms_hook")
+	public Response smsWebHookPOST(@Context UriInfo info, 
+			@Context HttpServletRequest hsr,
+			@CookieParam("atok") String cookie_access_key, 
+			String body) {
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+
+		SCServer cs = SCServer.getChatServer();		
+		try {
+			JSONObject obj = new JSONObject(body);
+			//username = RestUtil.getJStr(obj, "username");
+
+			
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+
+		return rr.ret();
+	}
 
 }

@@ -10,6 +10,7 @@ public class UserAccount {
 	
 	// service info
 	HashMap<String, HashMap<String, String>> service_info = null;
+	HashMap<String, HashMap<String, String>> service_state = null;
 	List<ChatAdapter> services = null;
 	List<Orator> orators = null;
 	
@@ -54,6 +55,29 @@ public class UserAccount {
 			hm.put(element, value);
 		}
 		service_info.put(service, hm);
+	}
+	
+	public String getServiceState(String service, String element) {
+		if (service_state == null) return null;
+		HashMap<String, String> hm = service_state.get(service);
+		if (hm == null) return null;		
+		return hm.get(element);
+	}
+	public void setServiceState(String service, String element, String value) {
+		if (service == null || element == null) return;
+		if (service_state == null) service_state = new HashMap<>();
+
+		HashMap<String, String> hm = service_state.get(service);
+		if (hm == null) {
+			hm = new HashMap<>();
+			hm.put("service", service);
+		}
+		if (value.isEmpty()) {
+			hm.remove(element);
+		} else {
+			hm.put(element, value);
+		}
+		service_state.put(service, hm);
 	}
 	
 	////////////////////////////////////////
@@ -148,7 +172,7 @@ public class UserAccount {
 				}
 			}
 		}
-		
+
 	}
 	
 	////////////////////////////////////////
@@ -161,8 +185,33 @@ public class UserAccount {
 	public void load(HashMap<String, Object> um) {
 		// load user info from DB
 		if (service_info == null) service_info = new HashMap<>();
+		if (service_state == null) service_state = new HashMap<>();
 		if (services == null) services = new ArrayList<>();
-
+		
+		List<HashMap<String, Object>> sl = (List<HashMap<String, Object>>)um.get("services");
+		if (sl != null && sl.size() > 0) {
+			for (HashMap<String, Object> hm:sl) {
+				String sn = (String)hm.get("service");
+				HashMap<String, String> nhm = new HashMap<>();
+				for (String key:nhm.keySet()) {
+					if (key.equals("service")) continue;
+					nhm.put(key, nhm.get(key));
+				}
+				service_info.put(sn, nhm);
+			}
+		}
+		sl = (List<HashMap<String, Object>>)um.get("services_state");
+		if (sl != null && sl.size() > 0) {
+			for (HashMap<String, Object> hm:sl) {
+				String sn = (String)hm.get("service");
+				HashMap<String, String> nhm = new HashMap<>();
+				for (String key:nhm.keySet()) {
+					if (key.equals("service")) continue;
+					nhm.put(key, nhm.get(key));
+				}
+				service_state.put(sn, nhm);
+			}
+		}
 		// initialize Services
 		initializeServices();
 	}
@@ -185,6 +234,21 @@ public class UserAccount {
 				sl.add(sm);
 			}
 			m.put("services", sl);
+		}
+		if (service_state != null && service_state.keySet().size() > 0) {
+			List<HashMap<String, Object>> sl = new ArrayList<>();
+			for (String key:service_state.keySet()) {
+				//System.out.println("     get["+key+"]");
+
+				HashMap<String, String> sconfig = service_state.get(key);
+				HashMap<String, Object> sm = new HashMap<>();
+				sm.put("service", key);
+				for (String param:sconfig.keySet()) {
+					sm.put(param, sconfig.get(param));
+				}
+				sl.add(sm);
+			}
+			m.put("services_state", sl);
 		}
 		return m;
 	}

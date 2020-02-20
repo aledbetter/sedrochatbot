@@ -150,6 +150,7 @@ public class SCServer {
 		}
 		DButil.save("chatserver", sm);
 	}
+	
 	public void load() {
 		// Load the data
 		HashMap<String, Object> sm = DButil.load("chatserver");
