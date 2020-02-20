@@ -148,6 +148,9 @@ function getSettings() {
 		$("#setting_poll_interval").html(data.info.poll_interval); 
 		$("#setting_username").html(data.info.username); 
 		$("#set_username").val(data.info.username); 
+		if (data.info.database == true) {
+			$("#setting_database_path").html(data.info.database_path); 
+		}
 		if (data.info.sedro_access_key) {
 			$("#set_sedro_access_key").val(data.info.sedro_access_key); 
 			$("#setting_sedro_access_key").html(data.info.sedro_access_key); 
@@ -254,25 +257,51 @@ function editUser(username) {
 // save the user info
 function saveUser(username) {
 	
+	var v_sedro_presona = $("#twitter_sedro_persona").val();		
+	var services = [];
+	
 	// Save twitter
-	var v_service = "twitter";
+	//var v_service = "twitter";
 	var v_consumer_key = $("#twitter_consumer_key").val();
 	var v_consumer_secret = $("#twitter_consumer_secret").val();
 	var v_access_token = $("#twitter_access_token").val();
 	var v_access_token_secret = $("#twitter_access_token_secret").val();		
-	var v_sedro_presona = $("#twitter_sedro_persona").val();		
 	var twitter_serviceparams = {
+			service: "twitter", 
 			sedro_persona: v_sedro_presona, 
 			consumer_key: v_consumer_key, 
 			consumer_secret: v_consumer_secret, 
 			access_token: v_access_token, 
 			access_token_secret: v_access_token_secret};
+	if (v_consumer_key && consumer_secret && access_token_secret && v_access_token) {
+		if (v_consumer_key.length > 5 && consumer_secret.length > 5 && access_token_secret.length > 5 && v_access_token.length > 5) {
+			services.push(twitter_serviceparams);
+		}
+	}
 
-	scsUpdateUser(username, v_service, twitter_serviceparams, function(data) {
+	// Save SMS
+	var v_provider = $("#sms_provider").val();
+	var v_account_sid = $("#sms_account_sid").val();
+	var v_auth_token = $("#sms_auth_token").val();
+
+	var sms_serviceparams = {
+			service: "sms", 
+			sedro_persona: v_sedro_presona, 
+			account_sid: v_consumer_key, 
+			auth_token: v_auth_token};
+	
+	if (v_provider && v_account_sid && v_auth_token) {
+		if (v_provider.length > 3 && v_account_sid.length > 5 && v_auth_token.length > 5) {
+			services.push(sms_serviceparams);
+		}
+	}	
+	
+	scsUpdateUser(username, services, function(data) {
 		glob_edit_u = null;
 		$("#userInfo").hide();
 		getUsers();
 	});
+	
 
 }
 
@@ -388,23 +417,31 @@ function scsDelUser(username, cb) {
 }
 
 
-function scsUpdateUser(username, service, serviceparams, cb) {	
-	if (!service) return;
+function scsUpdateUser(username, services, cb) {	
+	if (!services || services.length < 1) return;
+	
 	var dat = "{"; 
 // FIXME allow add / update / del service info	
-	dat += "\"services\": ["
-	dat += "{";
-
-	dat += "\"" + service + "\":{";
-	var first = true;
-	if (serviceparams) {
-		for (const property in serviceparams) {
-			if (!first) dat += ", ";
-			else first = false;
-			dat += "\""+property+"\": \"" + serviceparams[property] + "\"";
+	dat += "\"services\": [";
+	
+	// for each service set
+	for (var i=0;i<services.length;i++) {
+		var serviceparams = services[i];
+		dat += "{";
+		var service = serviceparams["service"];
+		dat += "\"" + service + "\":{";
+		var first = true;
+		if (serviceparams) {
+			for (const property in serviceparams) {
+				if (property == "service") continue;
+				if (!first) dat += ", ";
+				else first = false;
+				dat += "\""+property+"\": \"" + serviceparams[property] + "\"";
+			}
 		}
+		dat += "}}";
+		if (i != (services.length-1)) dat += ",";
 	}
-	dat += "}}";
 	dat += "]";
     dat += "}";
 	

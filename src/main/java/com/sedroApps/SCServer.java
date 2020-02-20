@@ -176,7 +176,9 @@ public class SCServer {
 		m.put("username", this.username);
 		m.put("poll_interval", this.poll_interval);
 		m.put("sedro_access_key", this.sedro_access_key);
-
+		m.put("database", DButil.haveDB());
+		m.put("database_path", DButil.getRDBPath());
+		
 		return m;
 	}
 }

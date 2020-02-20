@@ -35,12 +35,14 @@
 					<h1 style='padding-bottom:10px;border-bottom:1px solid #333'>Server Configuration</h1>
 					<div class='bslink' id='update_settings_bt' style='width:100px;text-align:center;font-size:16px;margin-top:-50px;margin-left:650px;background:#EEE;'>Update</div>			
 		
-					<div class='fLn' style='display:none;font-size:16px;padding-top:15px;line-height:2em' id='show_settings'> 
+					<div class='fLn' style='margin-left:80px;font-size:16px;padding-top:15px;text-align:left;line-height:2em' id='show_settings'> 
 						<div class='fLn'><b>Username:</b> <span id='setting_username'></span></div>
 						<div class='fLn'><b>Sedro Access Key:</b> <span id='setting_sedro_access_key'></span></div>
 						<div class='fLn'><b>Poll Interval:</b> <span id='setting_poll_interval'></span></div>				
+						<div class='fLn'><b>DataBase:</b> <span id='setting_database_path'></span></div>				
+					
 					</div>
-					<div class='fLn' style='display:none;font-size:16px;padding-top:15px;' id='update_settings'> 
+					<div class='fLn' style='margin-left:80px;display:none;font-size:16px;padding-top:15px;text-align:left' id='update_settings'> 
 						<div class='fLn' style='margin-top:5px'><b>Username:</b> <input type='text' id='set_username'/></div>
 						<div class='fLn' style='margin-top:5px'><b>Password:</b> <input type='password' id='set_password'/></div>
 						<div class='fLn' style='margin-top:5px'><b>Re-enter Password:</b> <input type='password' id='set_password2'/></div>
@@ -73,21 +75,26 @@
 						<h2 >Sedro Linkage:</h2>
 						<div class='fLn'><b>Sedro Persona:</b> <select class='inform persona_list' id='twitter_sedro_persona' style='width:160px'><option value=''>No Personas</option></select></div>
 					</div>
-					<div class='fLn'> 
+					<div class='fLn' style='margin-top:25px'> 
 						<h2>Twitter Configuration:</h2>
-						<div class='fLn' style='margin-top:5px'><b>consumer_key:</b> <input class='inform' style='width:250px' type='text' id='twitter_consumer_key'/> </div>
-						<div class='fLn' style='margin-top:5px'><b>consumer_secret:</b> <input class='inform' style='width:400px' type='text' id='twitter_consumer_secret'/> </div>
-						<div class='fLn' style='margin-top:5px'><b>access_token:</b> <input class='inform' style='width:400px' type='text' id='twitter_access_token'/> </div>
-						<div class='fLn' style='margin-top:5px'><b>access_token_secret:</b> <input class='inform' style='width:400px' type='text' id='twitter_access_token_secret'/> </div>					
-					</div>	
+						
+						<div class='fLn' style='margin-left:200px;text-align:left'> 
+							<div class='fLn' style='margin-top:5px'><b>consumer_key:</b> <input class='inform' style='width:250px' type='text' id='twitter_consumer_key'/> </div>
+							<div class='fLn' style='margin-top:5px'><b>consumer_secret:</b> <input class='inform' style='width:400px' type='text' id='twitter_consumer_secret'/> </div>
+							<div class='fLn' style='margin-top:5px'><b>access_token:</b> <input class='inform' style='width:400px' type='text' id='twitter_access_token'/> </div>
+							<div class='fLn' style='margin-top:5px'><b>access_token_secret:</b> <input class='inform' style='width:400px' type='text' id='twitter_access_token_secret'/> </div>					
+						</div>	
+					</div>
 					
-					<div class='fLn'> 
+					<div class='fLn' style='margin-top:25px'> 
 						<h2>SMS Configuration:</h2>
-						<div class='fLn' style='margin-top:5px'><b>provider:</b> <input class='inform' style='width:400px' type='text' id='sms_provider' value='twillio'/> </div>
-						<div class='fLn' style='margin-top:5px'><b>account_sid:</b> <input class='inform' style='width:250px' type='text' id='sms_account_sid'/> </div>
-						<div class='fLn' style='margin-top:5px'><b>auth_token:</b> <input class='inform' style='width:400px' type='text' id='sms_auth_token'/> </div>
-					</div>	
-				
+						<div class='fLn' style='margin-left:200px;text-align:left'> 
+							<div class='fLn' style='margin-top:5px'><b>provider:</b> <input class='inform' style='width:400px' type='text' id='sms_provider' value='twillio'/> </div>
+							<div class='fLn' style='margin-top:5px'><b>account_sid:</b> <input class='inform' style='width:400px' type='text' id='sms_account_sid'/> </div>
+							<div class='fLn' style='margin-top:5px'><b>auth_token:</b> <input class='inform' style='width:400px' type='text' id='sms_auth_token'/> </div>
+						</div>	
+					</div>
+					
 					<div class='fLn' style='margin-top:15px'> 	
 						<div class='bslink' id='save_user_cancel_bt' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:375px;float:left;background:#EEE;'>Cancel</div>			
 						<div class='bslink' id='save_user_bt' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:10px;float:left;background:#EEE;'>Save</div>			
