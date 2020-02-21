@@ -112,11 +112,12 @@ public class RestAPI {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 		SCServer cs = SCServer.getChatServer();
 
-		String sedro_access_key = null, username = null, password = null;
+		String sedro_access_key = null, username = null, password = null, poll_interval = null;
 
 		try {
 			JSONObject obj = new JSONObject(body);
 			sedro_access_key = RestUtil.getJStr(obj, "sedro_access_key");
+			poll_interval = RestUtil.getJStr(obj, "poll_interval");
 			username = RestUtil.getJStr(obj, "username");
 			password = RestUtil.getJStr(obj, "password");			
 		} catch (Throwable t) {
@@ -125,9 +126,14 @@ public class RestAPI {
 		if (!RestUtil.paramHave(password)) password = null;
 		if (!RestUtil.paramHave(username)) username = null;
 		if (!RestUtil.paramHave(sedro_access_key)) sedro_access_key = null;
+		if (!RestUtil.paramHave(poll_interval)) poll_interval = null;
 		if (password != null) cs.setPassword(password);
 		if (username != null) cs.setUsername(username);
 		if (sedro_access_key != null) cs.setSedro_access_key(sedro_access_key);
+		if (poll_interval != null) {
+			cs.setPoll_interval(Sutil.toInt(poll_interval));
+			// FIXME must update timer
+		}
 		cs.save();
 		// add all the doc content
 		return rr.ret();
@@ -289,7 +295,8 @@ public class RestAPI {
 	
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Service Specific WebHooks
-	
+	//http://chatbot.sedro.xyz/api/1.0/cb/sms_hook
+	//http://chatbot.sedro.xyz/api/1.0/cb/voice_hook	
 	@POST
 	@Path("/cb/voice_hook")
 	public Response voiceWebHookPOST(@Context UriInfo info, 

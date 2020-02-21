@@ -99,7 +99,10 @@ $(document).ready(function() {
 			$("#set_password2, #set_password").addClass("error");
 			return;
 		}
-		scsUpdateSettings(u, p, sak, function(data) {
+		var pi = $("#set_poll_interval").val();
+
+		
+		scsUpdateSettings(u, p, sak, pi, function(data) {
 			getSettings();
 			$("#update_settings_bt").click();
 		});
@@ -146,8 +149,10 @@ $(document).ready(function() {
 function getSettings() {
 	scsGetSettings(function(data) {
 		$("#setting_poll_interval").html(data.info.poll_interval); 
+		$("#set_poll_interval").val(data.info.poll_interval); 
 		$("#setting_username").html(data.info.username); 
 		$("#set_username").val(data.info.username); 
+		
 		if (data.info.database == true) {
 			$("#setting_database_path").html(data.info.database_path); 
 		}
@@ -194,10 +199,13 @@ function getUsers() {
 							usr += "<h2 class='fLn'><b>Service: " + data.info.users[i].services[k].service + "</b></h2>";
 							for (const property in data.info.users[i].services[k]) {
 								if (property == "service") continue;
-								usr += "<div class='fLn' style='margin-left:200px;text-align:left'><b>" + property + "</b>: "+data.info.users[i].services[k][property]+"</div>";
+								usr += "<div class='fLn'>";
+									usr += "<div style='padding-left:200px;text-align:left'><b>" + property + "</b>: "+data.info.users[i].services[k][property]+"</div>";
+								usr += "</div>";				
 							}
 						}
 					}
+					
 					usr += "</div>";				
 				usr += "</div>";				
 			}
@@ -359,10 +367,11 @@ function scsGetSettings(cb) {
 	});
 }
 
-function scsUpdateSettings(username, password, sedro_access_key, cb) {	
+function scsUpdateSettings(username, password, sedro_access_key, poll_interval, cb) {	
 	var dat = "{ "; 
     if (username) dat += "\"username\": \"" + username + "\"";
     if (password) dat += ", \"password\": \"" + password + "\"";
+    if (poll_interval) dat += ", \"poll_interval\": \"" + poll_interval + "\"";
     if (sedro_access_key) dat += ", \"sedro_access_key\": \"" + sedro_access_key + "\"";
     dat += "}";
 	

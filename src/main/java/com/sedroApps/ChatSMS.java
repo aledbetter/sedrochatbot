@@ -40,7 +40,7 @@ import main.java.com.sedroApps.util.Sutil;
 
 public class ChatSMS extends ChatAdapter { 
 	private static final String datefmt = "EEE, dd MMM yyyy HH:mm:ss Z";
-
+	private static final int DEF_PAST = 4; // 4 days
 /*
  * bandwidth.com
  * https://dev.bandwidth.com/numbers/about.html
@@ -58,10 +58,13 @@ public class ChatSMS extends ChatAdapter {
 	private String pprovider = null;  	// twillio / bandwidth.com / etc
 	private String paccount_sid = null;  	// api_key
 	private String pauth_token = null; // api_secret
+	private String pphone_number = null; // number
 	private boolean init = false;
-	private DateTime last_msg_check_time = null;
-	private DateTime last_call_check_time = null;
 	
+	// message cache for polling mode
+	private DateTime last_msg_check_time = null;
+	private List<HashMap<String, String>> msg_set = null;
+
 	// FIXME limit phone numbers ?
 	
 	ChatSMS() {
@@ -70,7 +73,7 @@ public class ChatSMS extends ChatAdapter {
 	
 	@Override
 	public String getName() {
-		return "SMS";	
+		return "sms";	
 	}
 	@Override
 	public String getChannel_type() {
@@ -86,10 +89,11 @@ public class ChatSMS extends ChatAdapter {
 	@Override
 	public int init(UserAccount ua) {
 		super.init(ua);
-	 
+
 		String provider = ua.getServiceInfo(getName(), "provider");
 		String account_sid = ua.getServiceInfo(getName(), "account_sid");
 		String auth_token = ua.getServiceInfo(getName(), "auth_token");
+		String phone_number = ua.getServiceInfo(getName(), "phone_number");
 		if (auth_token == null || account_sid == null || provider == null) {
 			return -1; // not configured... remove
 		}
@@ -98,7 +102,8 @@ public class ChatSMS extends ChatAdapter {
 			if (!pprovider.equals(provider)) change = true;
 			if (!paccount_sid.equals(account_sid)) change = true;
 			if (!pauth_token.equals(auth_token)) change = true;
-			if (!change) return 0;
+			if (!pphone_number.equals(phone_number)) change = true;
+			if (!change) return 1;
 
 		}
 
@@ -106,12 +111,15 @@ public class ChatSMS extends ChatAdapter {
     	pprovider = provider;
     	paccount_sid = account_sid;
     	pauth_token = auth_token;
+    	pphone_number = phone_number;
     	
-		if (isProvider("twillio")) {
-			// twillio init
+		if (isProvider("twilio")) {
+			//System.out.println("  TWI["+account_sid+"] " + auth_token);
+			// twilio init
 			Twilio.init(account_sid, auth_token);
 			init = true;
 		}
+		session_per_direct = true;
 		
 		return 0;
 	}
@@ -132,7 +140,7 @@ public class ChatSMS extends ChatAdapter {
 	@Override
 	public String sendDirectMessage(Sedro proc, String touser, String msg) {
 		try {
-			if (isProvider("twillio")) {
+			if (isProvider("twilio")) {
 				String caller_phone = proc.getCaller_handle();
 				if (touser != null) caller_phone = touser;
 				String persona_phone = proc.getPersona_handle();
@@ -153,60 +161,109 @@ public class ChatSMS extends ChatAdapter {
 	// delete
     //Message.deleter("MMXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX").delete();
    
-	
+
 	//////////////////////////////////////////////////
 	// Polling handlers	
 	// list of messages: from:from user / msg:message text
 	//https://api.twilio.com/2010-04-01/Accounts/{AccountSid}/Messages.json
 	@Override	
-	public List<HashMap<String, String>> getDirectMessages(Orator orat) {		
-		ResourceSet<Message> messages = null;
-		//new DateTime(2019, 3, 1, 0, 0, 0)
-		if (last_msg_check_time != null) {
-			messages = Message.reader().setDateSent(Range.greaterThan(last_msg_check_time)).read();
-		} else {
-			messages = Message.reader().read();
+	public List<HashMap<String, String>> getDirectCall(Orator orat) {	
+		List<HashMap<String, String>> ml = getMessages(orat);
+		if (ml == null || ml.size() < 1) return null;
+		List<HashMap<String, String>> cl = null;
+		for (HashMap<String, String> msg:ml) {
+			// find session...					
+			String from = msg.get("from");
+			Sedro proc = orat.findProcessor(from);					
+			if (proc != null) continue; // check for new calls only	
+			if (cl != null) {
+				// check if accounted for
+				boolean dup = false;
+				for (HashMap<String, String> m:cl) {
+					String tf = m.get("from");
+					if (tf.equals(from)) {
+						dup = true;
+						break;
+					}
+				}
+				if (dup) continue;
+			}
+			if (cl == null) cl = new ArrayList<>();
+			cl.add(msg);
+			//System.out.println("   NEW["+cl.size()+"]: " +from);			
 		}
-		List<HashMap<String, String>> dl = parseTwillioMessages(orat, messages, false);
-		last_msg_check_time = new DateTime();
-		return dl;
+		return cl;
 	}
 
 	
 
 	// get new calls
 	@Override	
-	public List<HashMap<String, String>> getDirectCall(Orator orat) {		
-		ResourceSet<Message> messages = null;
-		//new DateTime(2019, 3, 1, 0, 0, 0)
-		if (last_call_check_time != null) {
-			messages = Message.reader().setDateSent(Range.greaterThan(last_call_check_time)).read();
-		} else {
-			messages = Message.reader().read();
-		}		
-		List<HashMap<String, String>> dl = parseTwillioMessages(orat, messages, true);
-		last_call_check_time = new DateTime();
-		return dl;
+	public List<HashMap<String, String>> getDirectMessages(Orator orat, Sedro processor) {	
+		List<HashMap<String, String>> ml = getMessages(orat);
+		if (ml == null || ml.size() < 1) return null;	
+		
+		List<HashMap<String, String>> cl = null;
+		for (HashMap<String, String> msg:ml) {
+			String caller_handle = msg.get("caller_handle");		
+			if (!caller_handle.equals(processor.getCaller_handle())) continue;
+			
+			if (cl == null) cl = new ArrayList<>();
+			cl.add(msg);
+		}
+		
+		return cl;
+	}
+	
+	@Override	
+	public void clearCache() {
+		msg_set = null;
 	}
 
-	private static List<HashMap<String, String>> parseTwillioMessages(Orator orat, ResourceSet<Message> messages, boolean newcalls) {
+	// get and cache the messages
+	private List<HashMap<String, String>> getMessages(Orator orat) {		
+		// check if use cache
+		if (msg_set != null) return msg_set;
+		
+		ResourceSet<Message> messages = null;
+		if (last_msg_check_time == null) {
+			last_msg_check_time = new DateTime().minusDays(DEF_PAST);
+		}	
+
+		if (pphone_number != null) {
+			messages = Message.reader().setTo(pphone_number).setDateSent(Range.greaterThan(last_msg_check_time)).read();
+		} else {
+			//System.out.println("   DT_S_S["+last_msg_check_time.toString(datefmt)+"]");
+			messages = Message.reader().setDateSent(Range.greaterThan(last_msg_check_time)).read();
+		}
+		List<HashMap<String, String>> dl = parseTwillioMessages(orat, messages);
+		last_msg_check_time = new DateTime();
+		// FIXME not matching correct offset
+		int xx = last_msg_check_time.getZone().getOffsetFromLocal(last_msg_check_time.getMillis());
+		//last_msg_check_time.withZone(newZone)
+		last_msg_check_time = last_msg_check_time.minusMillis(xx);
+
+		//System.out.println("   DT_E_E["+last_msg_check_time.toString(datefmt)+"] ["+xx+"]");
+		msg_set = dl;
+		if (msg_set == null) msg_set = new ArrayList<>();
+		return dl;
+	}
+	
+	private static List<HashMap<String, String>> parseTwillioMessages(Orator orat, ResourceSet<Message> messages) {
 		List<HashMap<String, String>> msgList = null;
 		if (messages == null) return null;
 		
+		//System.out.println("  SMS_GDC["+messages.getPageSize()+"]: count " + messages.getPageSize());		
+
+		int cnt = 0;
 		for(Message record : messages) {
-			System.out.println(record.getSid());
-			if (!"inboud".equals(""+record.getDirection())) continue;
+			cnt++;
+			if (!"inbound".equals(""+record.getDirection())) continue;
 			if (!"received".equals(""+record.getStatus())) continue;
+
 			String from = record.getFrom().toString();
-			Sedro proc = orat.findProcessor(from);
-			if (newcalls) {						
-				if (proc != null) continue; // check for new calls only							
-			} else {
-				if (proc == null) continue;			
-				// is this a new message ?			
-			}		
 			HashMap<String, String> mm = new HashMap<>();
-			
+
 			mm.put("id", record.getSid());
 			mm.put("from", from);
 
@@ -219,12 +276,12 @@ public class ChatSMS extends ChatAdapter {
 			mm.put("caller_handle", from);
 			mm.put("caller", from);
 		//	mm.put("caller_token", status);
-			System.out.println(" MSG txt: " + mm.get("msg"));
+	//		System.out.println(" MSG txt: " + mm.get("msg"));
 
 			if (msgList == null) msgList = new ArrayList<>();
-			msgList.add(mm);
+			msgList.add(0, mm);
 		}
-		
+		//System.out.println("   TOTAL["+cnt+"]");
 		return msgList;
 	}
 	
@@ -285,40 +342,12 @@ public class ChatSMS extends ChatAdapter {
 						mm.put("caller_handle", from);
 						mm.put("caller", from);
 					//	mm.put("caller_token", status);
-
+	
 						
-						/*
-					     "account_sid": "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-					      "api_version": "2010-04-01",
-					      "body": "look mom I have media!",
-					      "date_created": "Fri, 24 May 2019 17:44:46 +0000",
-					      "date_sent": "Fri, 24 May 2019 17:44:49 +0000",
-					      "date_updated": "Fri, 24 May 2019 17:44:49 +0000",
-					      "direction": "inbound",
-					      "error_code": 30004,
-					      "error_message": "Message blocked",
-					      "from": "+12019235161",
-					      "messaging_service_sid": null,
-					      "num_media": "3",
-					      "num_segments": "1",
-					      "price": "-0.00750",
-					      "price_unit": "USD",
-					      "sid": "MMc26223853f8c46b4ab7dfaa6abba0a26",
-					      "status": "received",
-					      "subresource_uris": {
-					        "media": "/2010-04-01/Accounts/ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/Messages/MMc26223853f8c46b4ab7dfaa6abba0a26/Media.json",
-					        "feedback": "/2010-04-01/Accounts/ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/Messages/MMc26223853f8c46b4ab7dfaa6abba0a26/Feedback.json"
-					      },
-					      "to": "+18182008801",
-					      "uri": "/2010-04-01/Accounts/ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/Messages/MMc26223853f8c46b4ab7dfaa6abba0a26.json"
-						 */
-						
-						
-						
-						System.out.println(" MSG["+i+"] txt: " + mm.get("msg"));
+				//		System.out.println(" MSG["+i+"] txt: " + mm.get("msg"));
 
 						if (msgList == null) msgList = new ArrayList<>();
-						msgList.add(mm);
+						msgList.add(0, mm);
 					}
 				}
 			} catch (Throwable t) {}

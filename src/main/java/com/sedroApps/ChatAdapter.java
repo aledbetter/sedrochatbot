@@ -48,6 +48,13 @@ public class ChatAdapter {
 		return "NOP";			
 	}
 	
+	
+	// clear any cache from processing cycle
+	public void clearCache() {
+	
+	}
+	
+	
 	//////////////////////////////////////////////////
 	// Polling handlers
 	public List<String> getPublicMessages() {
@@ -57,7 +64,7 @@ public class ChatAdapter {
 
 	// list of messages: from:from user / msg:message text
 	// Call identifier: "CID" in each
-	public List<HashMap<String, String>> getDirectMessages(Orator orat) {
+	public List<HashMap<String, String>> getDirectMessages(Orator orat, Sedro processor) {
 		return null;
 	}
 	

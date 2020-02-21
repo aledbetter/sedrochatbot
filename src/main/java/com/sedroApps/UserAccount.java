@@ -142,33 +142,37 @@ public class UserAccount {
 	// initialize OR Reinitialize all the servies
 	public void initializeServices() {
 		if (service_info.keySet().size() > 0) {
+			boolean readPublic = true;
+			boolean respPublic = true;
+		
 			// initiallize all the interfaces
 			for (String key:service_info.keySet()) {
 				ChatAdapter cs = findChatService(key);
 				switch (key) {
 				case "twitter":
 					if (cs == null) cs = new ChatTwitter();
-					if (cs.init(this) == 0) {
-						addChatService(cs);
-						Orator orat = new Orator(SCServer.getChatServer(), cs, this, true, false);
-						this.addOrator(orat);
-					} else {
-						removeChatService(key);
-					}
-
 					break;
 				case "facebook":
-					//ChatService cs = new ChatTwitter();
-					//cs.init(this);
+					if (cs == null) cs = new ChatFacebook();
 					break;
-				case "slack":
-					//ChatService cs = new ChatTwitter();
-					//cs.init(this);
+				case "whatsapp":
+					if (cs == null) cs = new ChatWhatsapp();
 					break;
-				case "phone":
-					//ChatService cs = new ChatTwitter();
-					//cs.init(this);
+				case "sms":
+					if (cs == null) cs = new ChatSMS();
 					break;
+				}
+				// up up date
+				if (cs.init(this) == 0) {
+					addChatService(cs);
+					if (cs.isSession_per_direct()) {
+//FIXME hack.. configure each						
+						readPublic = respPublic = false;
+					}
+					Orator orat = new Orator(SCServer.getChatServer(), cs, this, readPublic, respPublic);
+					this.addOrator(orat);
+				} else {
+					removeChatService(key);
 				}
 			}
 		}

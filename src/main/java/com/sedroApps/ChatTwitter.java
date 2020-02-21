@@ -73,7 +73,7 @@ public class ChatTwitter extends ChatAdapter {
 			if (!pconsumer_secret.equals(consumer_secret)) change = true;
 			if (!paccess_token.equals(access_token)) change = true;
 			if (!paccess_token_secret.equals(access_token_secret)) change = true;
-			if (!change) return 0;
+			if (!change) return 1;
 		}
     	ConfigurationBuilder cb = new ConfigurationBuilder();
     	cb.setDebugEnabled(true);

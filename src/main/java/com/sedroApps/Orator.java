@@ -82,6 +82,7 @@ public class Orator {
 			List<HashMap<String, String>> newCalls = service.getDirectCall(this);
 			if (newCalls != null && newCalls.size() > 0) {	
 				for (HashMap<String, String> call:newCalls) {
+
 					// ADD NEW channels...Processors
 					Sedro proc = addProcessor(false, false, true);
 					// add information to it
@@ -106,14 +107,16 @@ public class Orator {
 				process(s);
 			}
 		}	
+		// clear the cache
+		this.getChatService().clearCache();
 	}
 	
 	
 	private void process(Sedro processor) {
 		int procCnt = 0;
 
-		System.out.println("OProc1["+processor.getStatus()+"]["+processor.getPersona()+"]");
-
+		System.out.println("\nPROCESS_["+processor.getStatus()+"]["+processor.getPersona()+"] => ["+processor.getCaller_handle()+"]");
+		
 		List<HashMap<String, Object>> wake_msg = null;
 				
 		//////////////////////////////////////////////////////
@@ -121,8 +124,7 @@ public class Orator {
 		if (processor.getStatus().equals("wake")) {
 			wake_msg = processor.chatWake(server.getSedro_access_key());
 			procCnt++;
-			System.out.println("OProc2["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
-
+			System.out.println(" WAKE_WOKE["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
 		}
 						
 		//////////////////////////////////////////////////////
@@ -157,29 +159,28 @@ public class Orator {
 				for (HashMap<String, Object> msg:wake_msg) {
 					String smsg = (String) msg.get("msg");
 					if (smsg == null || smsg.equals("null")) continue;
+					System.out.println("    outWMSG["+processor.getCaller_handle()+"]: " + smsg);
 					service.sendDirectMessage(processor, processor.getCaller_handle(), smsg);
 				}
 			}
 
 			// Deal with direct messages
-			List<HashMap<String, String>> dml = service.getDirectMessages(this);
+			List<HashMap<String, String>> dml = service.getDirectMessages(this, processor);
 			if (dml != null) {
 				for (HashMap<String, String> mm:dml) {
 					String msg = mm.get("msg");
 					String from = mm.get("from");
-					System.out.println("MSG["+from+"]: " + msg);
+					System.out.println(" inMSG["+from+"]: " + msg);
 					// private direct messages => private direct response
 					procCnt++;
 					List<HashMap<String, Object>> rmsg = processor.chatMsg(msg);
 					if (rmsg != null) {
-						if (wake_msg != null) {
-							// per user sessions ?
-							
-							// FIXME
-						}
 						for (HashMap<String, Object> m:rmsg) {
+							String smsg = (String)m.get("msg");
+							if (smsg == null || smsg.equals("null")) continue;
 							// send direct message
-							service.sendDirectMessage(processor, from, msg);
+							System.out.println("    outMSG["+from+"]: " + smsg);
+							service.sendDirectMessage(processor, from, smsg);
 						}
 					}
 				}	
@@ -196,8 +197,8 @@ public class Orator {
 			}
 		}
 		
-		System.out.println("OProc3["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
-
+		System.out.println(" PROC["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
+		System.out.println("");
 	}
 	
 }

@@ -11,7 +11,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import main.java.com.sedroApps.util.DButil;
 
 public class SCServer {
-	private static final int DEFAULT_INTERVAL = (1000*60)*3;
+	//private static final int DEFAULT_INTERVAL = (1000*60)*3;
+	private static final int DEFAULT_INTERVAL = (1000*30);
 
 	private String username;
 	private String password;	

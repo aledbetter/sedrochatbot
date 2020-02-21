@@ -77,6 +77,8 @@ public class ChatFacebook extends ChatAdapter {
     	pconsumer_secret = consumer_secret;
     	paccess_token = access_token;
     	paccess_token_secret = access_token_secret;
+		session_per_direct = true;
+
     	return 0;
 	}
 	
@@ -106,7 +108,7 @@ public class ChatFacebook extends ChatAdapter {
 	
 	// list of messages: from:from user / msg:message text
 	@Override	
-	public List<HashMap<String, String>> getDirectMessages(Orator orat) {
+	public List<HashMap<String, String>> getDirectMessages(Orator orat, Sedro processor) {
 		return null;
 	}
 

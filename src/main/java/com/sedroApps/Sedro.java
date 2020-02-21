@@ -200,7 +200,7 @@ public class Sedro {
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
-		List<HashMap<String, Object>> rl = chatRespParse(line);
+		List<HashMap<String, Object>> rl = chatRespParse(line, true);
 //FIXME save info for instance
 		
 		return rl;
@@ -217,7 +217,7 @@ public class Sedro {
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
-		List<HashMap<String, Object>> rl = chatRespParse(line);
+		List<HashMap<String, Object>> rl = chatRespParse(line, true);
 		return rl;
 	}
 	
@@ -235,7 +235,7 @@ public class Sedro {
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
-		List<HashMap<String, Object>> rl = chatRespParse(line);
+		List<HashMap<String, Object>> rl = chatRespParse(line, true);
 		return rl;
 	}
 	
@@ -250,12 +250,12 @@ public class Sedro {
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
-		List<HashMap<String, Object>> rl = chatRespParse(line);
+		List<HashMap<String, Object>> rl = chatRespParse(line, true);
 		status = "bye";
 		return rl;
 	}
 	
-	private List<HashMap<String, Object>> chatRespParse(String resp) {
+	private List<HashMap<String, Object>> chatRespParse(String resp, boolean noremote) {
 		if (resp == null) return null;
 
 		msg_num_last = msg_num;
@@ -301,11 +301,17 @@ public class Sedro {
 							//System.out.println(" NAME["+n+"] val: " + val);
 							mm.put(n, val);
 						}
-						
+/*
+ * FIXME
+ * 1) gettting wronge remote: issue with phone number as handle ?
+ * 2) getting all messages instead of just after last						
+ */
 						String remote = (String)mm.get("r");
+	System.out.println("   Smsg["+remote+"]["+mm.get("num")+"/"+this.msg_num_last+"] " + mm.get("msg"));
 						if (Sutil.compare(remote, "true")) {
 							// is remote message
 							// FIXME save or not..
+							if (noremote) continue;
 						}
 
 						String ev = (String)mm.get("event");
@@ -315,7 +321,7 @@ public class Sedro {
 						int mnum = Sutil.toInt((String)mm.get("num"));
 						if (mnum > msg_num) msg_num = mnum;
 						
-						System.out.println(" MSG["+mnum+"] txt: " + mm.get("msg"));
+						//System.out.println(" MSG["+mnum+"] txt: " + mm.get("msg"));
 
 						if (rl == null) rl = new ArrayList<>();
 						rl.add(mm);
