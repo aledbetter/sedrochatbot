@@ -77,6 +77,8 @@ public class Orator {
 	//////////////////////////////////////////////////////
 	// process the conversation
 	public void process() {
+		//System.out.println("  ORATOR _ PROC: " + getProcessorCount());
+
 		// this where we look for new calls 
 		if (service.isSession_per_direct()) {
 			List<HashMap<String, String>> newCalls = service.getDirectCall(this);
@@ -103,10 +105,12 @@ public class Orator {
 		}
 		
 		if (getProcessorCount() > 0) {
+			// if there are any conversations ... deal
 			for (Sedro s:processors) {
 				process(s);
 			}
 		}	
+		
 		// clear the cache
 		this.getChatService().clearCache();
 		// save state (also re-saves config/everything)
@@ -126,7 +130,7 @@ public class Orator {
 		if (processor.getStatus().equals("wake")) {
 			wake_msg = processor.chatWake(server.getSedro_access_key());
 			procCnt++;
-			System.out.println(" WAKE_WOKE["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
+			//System.out.println(" WAKE_WOKE["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
 		}
 						
 		//////////////////////////////////////////////////////
