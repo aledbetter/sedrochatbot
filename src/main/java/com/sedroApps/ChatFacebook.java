@@ -33,8 +33,8 @@ public class ChatFacebook extends ChatAdapter {
 	private String paccess_token = null;
 	private String paccess_token_secret = null;
 	
-	ChatFacebook() {
-	
+	public ChatFacebook(UserAccount user) {
+		super(user);
 	}
 	
 	@Override

@@ -8,7 +8,13 @@ import main.java.com.sedroApps.util.Sutil;
 
 public class ChatAdapter {
 	protected boolean session_per_direct = false;
+	private UserAccount user = null;
+	
+	public ChatAdapter(UserAccount user) {
+		this.user = user;
+	}
 
+	
 	public boolean isSession_per_direct() {
 		return session_per_direct;
 	}
@@ -25,7 +31,19 @@ public class ChatAdapter {
 	public String getLanguage() {
 		return null;	
 	}
-		
+	public UserAccount getUser() {
+		return user;
+	}
+	
+	////////////////////////////////////////////
+	// Service state information
+	public void setServiceState(String element, String value) {
+		user.setServiceState(getName(), element, value);
+	}
+	public String getServiceState(String element) {
+		return user.getServiceState(getName(), element);
+	}
+	
 	
 	public int init(UserAccount ua) {
 		// over-ride for each service to set info needed

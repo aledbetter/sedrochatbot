@@ -39,6 +39,8 @@ import main.java.com.sedroApps.util.Sutil;
 
 
 public class ChatSMS extends ChatAdapter { 
+	private static final boolean no_send = true;
+	
 	private static final String datefmt = "EEE, dd MMM yyyy HH:mm:ss Z";
 	private static final int DEF_PAST = 4; // 4 days
 /*
@@ -65,12 +67,12 @@ public class ChatSMS extends ChatAdapter {
 	private DateTime last_msg_check_time = null;
 	private List<HashMap<String, String>> msg_set = null;
 
-	// FIXME limit phone numbers ?
 	
-	ChatSMS() {
-		
+	
+	public ChatSMS(UserAccount user) {
+		super(user);
 	}
-	
+
 	@Override
 	public String getName() {
 		return "sms";	
@@ -142,21 +144,27 @@ public class ChatSMS extends ChatAdapter {
 				if (touser != null) caller_phone = touser;
 							    
 				System.out.println("sendDirectMessage["+this.pphone_number+" -> " + caller_phone + "]  => " + msg);
-
-	//			Message message = Message.creator(new PhoneNumber(caller_phone), new PhoneNumber(this.pphone_number), msg).create();
-	//		    System.out.println("SMS_SENT: " + message.getSid());
+				if (!no_send) {
+					Message message = Message.creator(new PhoneNumber(caller_phone), new PhoneNumber(this.pphone_number), msg).create();
+					System.out.println("SMS_SENT: " + message.getSid());
+				}
 			}
 		} catch (Throwable t) { }
 		return "ERROR";			
 	}
 	
+	// slow... so maybe not worth it.
+	private void deleteSMS(ArrayList<String> msgids) {
+		
+		/// fetch a single message for account... why?
+		//Message message = Message.fetcher(message_id).fetch();
+		//System.out.println(message.getTo());
+		// delete
+	    //Message.deleter("MMXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX").delete();
+	   
+	}
 	
-	/// fetch a single message for account... why?
-	//Message message = Message.fetcher(message_id).fetch();
-	//System.out.println(message.getTo());
-	// delete
-    //Message.deleter("MMXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX").delete();
-   
+
 
 	//////////////////////////////////////////////////
 	// Polling handlers	
@@ -223,7 +231,14 @@ public class ChatSMS extends ChatAdapter {
 		
 		ResourceSet<Message> messages = null;
 		if (last_msg_check_time == null) {
-			last_msg_check_time = new DateTime().minusDays(DEF_PAST);
+			String ms = getServiceState("msg_check_time");
+			if (ms != null) {
+				long milli = Sutil.toLong(ms);
+				if (milli > 100) last_msg_check_time = new DateTime(milli);
+			}
+			if (last_msg_check_time == null) {
+				last_msg_check_time = new DateTime().minusDays(DEF_PAST);
+			}
 		}	
 
 		if (pphone_number != null) {
@@ -238,10 +253,12 @@ public class ChatSMS extends ChatAdapter {
 		int xx = last_msg_check_time.getZone().getOffsetFromLocal(last_msg_check_time.getMillis());
 		//last_msg_check_time.withZone(newZone)
 		last_msg_check_time = last_msg_check_time.minusMillis(xx);
-
+		setServiceState("msg_check_time", ""+last_msg_check_time.getMillis());
+		
 		//System.out.println("   DT_E_E["+last_msg_check_time.toString(datefmt)+"] ["+xx+"]");
 		msg_set = dl;
 		if (msg_set == null) msg_set = new ArrayList<>();
+		
 		return dl;
 	}
 	

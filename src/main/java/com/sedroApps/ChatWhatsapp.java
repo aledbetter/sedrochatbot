@@ -36,8 +36,8 @@ public class ChatWhatsapp extends ChatAdapter {
 	private String paccess_token = null;
 	private String paccess_token_secret = null;
 	
-	ChatWhatsapp() {
-	
+	public ChatWhatsapp(UserAccount user) {
+		super(user);
 	}
 	
 	@Override

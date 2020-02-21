@@ -109,6 +109,8 @@ public class Orator {
 		}	
 		// clear the cache
 		this.getChatService().clearCache();
+		// save state (also re-saves config/everything)
+		SCServer.getChatServer().save();
 	}
 	
 	

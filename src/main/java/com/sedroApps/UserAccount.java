@@ -150,16 +150,16 @@ public class UserAccount {
 				ChatAdapter cs = findChatService(key);
 				switch (key) {
 				case "twitter":
-					if (cs == null) cs = new ChatTwitter();
+					if (cs == null) cs = new ChatTwitter(this);
 					break;
 				case "facebook":
-					if (cs == null) cs = new ChatFacebook();
+					if (cs == null) cs = new ChatFacebook(this);
 					break;
 				case "whatsapp":
-					if (cs == null) cs = new ChatWhatsapp();
+					if (cs == null) cs = new ChatWhatsapp(this);
 					break;
 				case "sms":
-					if (cs == null) cs = new ChatSMS();
+					if (cs == null) cs = new ChatSMS(this);
 					break;
 				}
 				// up up date

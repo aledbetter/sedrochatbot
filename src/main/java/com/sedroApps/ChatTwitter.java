@@ -46,7 +46,8 @@ public class ChatTwitter extends ChatAdapter {
 	private String paccess_token_secret = null;
 	
 
-	ChatTwitter() {
+	public ChatTwitter(UserAccount user) {
+		super(user);
 	}
 	
 	@Override
