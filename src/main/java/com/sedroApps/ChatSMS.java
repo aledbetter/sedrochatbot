@@ -134,6 +134,7 @@ public class ChatSMS extends ChatAdapter {
 	
 	private String makePhoneNumber(String phone_number) {
 		// FIXME better correction needed
+		if (phone_number.startsWith("+")) return phone_number;
 		return "+"+phone_number;
 	}
 	
@@ -141,12 +142,14 @@ public class ChatSMS extends ChatAdapter {
 	public String sendDirectMessage(Sedro proc, String touser, String msg) {
 		try {
 			if (isProvider("twilio")) {
-				String caller_phone = proc.getCaller_handle();
+				String caller_phone = makePhoneNumber(proc.getCaller_handle());
 				if (touser != null) caller_phone = touser;
-				String persona_phone = proc.getPersona_handle();
 				
-				Message message = Message.creator(new PhoneNumber(makePhoneNumber(caller_phone)),
-			        new PhoneNumber(makePhoneNumber(persona_phone)), msg).create();
+				String persona_phone = this.pphone_number;
+			    
+				System.out.println("sendDirectMessage["+persona_phone+" -> " + caller_phone + "]  => " + msg);
+
+				Message message = Message.creator(new PhoneNumber(caller_phone), new PhoneNumber(persona_phone), msg).create();
 
 			    System.out.println("SENT: " + message.getSid());
 			}

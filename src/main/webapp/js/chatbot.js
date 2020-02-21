@@ -33,6 +33,14 @@ $(document).ready(function() {
 	$("#userInfo").hide();
 	$("#set_password2, #set_password").removeClass("error");
 
+	// get auth cookie
+	var cookie = getCookie("atok");
+	if (!cookie || cookie == "") {
+		if (window.location.href.indexOf(".html") > -1 && window.location.href.indexOf("index.html") == -1) {
+// FIXME only see login
+			window.location.href = "/index.html";			
+		}		
+	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// Add interactive message
@@ -292,16 +300,18 @@ function saveUser(username) {
 	var v_provider = $("#sms_provider").val();
 	var v_account_sid = $("#sms_account_sid").val();
 	var v_auth_token = $("#sms_auth_token").val();
+	var v_phone_number = $("#sms_phone_number").val();
 
 	var sms_serviceparams = {
 			service: "sms", 
 			sedro_persona: v_sms_sedro_presona, 
 			provider: v_provider, 
+			phone_number: v_phone_number, 
 			account_sid: v_account_sid, 
 			auth_token: v_auth_token};
 	
-	if (v_provider && v_account_sid && v_auth_token && v_sms_sedro_presona) {
-		if (v_provider.length > 3 && v_account_sid.length > 5 && v_auth_token.length > 5 && v_sms_sedro_presona.length > 3) {
+	if (v_provider && v_account_sid && v_auth_token && v_sms_sedro_presona && v_phone_number) {
+		if (v_provider.length > 3 && v_account_sid.length > 5 && v_auth_token.length > 5 && v_sms_sedro_presona.length > 3 && v_phone_number.length >= 10) {
 			services.push(sms_serviceparams);
 		}
 	}	
@@ -470,12 +480,19 @@ function scsUpdateUser(username, services, cb) {
 /////////////////////////////////////////////////////////////////////
 //utiity
 String.prototype.escapeSpecialChars = function() {
-return this
-.replace(/[\\]/g, '\\\\')
-.replace(/[\/]/g, '\\/')
-.replace(/[\f]/g, '\\f')
-.replace(/[\n]/g, '\\n')
-.replace(/[\r]/g, '\\r')
-.replace(/[\t]/g, '\\t')
-.replace(/[\"]/g, '\\"');
+	return this
+	.replace(/[\\]/g, '\\\\')
+	.replace(/[\/]/g, '\\/')
+	.replace(/[\f]/g, '\\f')
+	.replace(/[\n]/g, '\\n')
+	.replace(/[\r]/g, '\\r')
+	.replace(/[\t]/g, '\\t')
+	.replace(/[\"]/g, '\\"');
 };
+
+// get a cookie
+function getCookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
+}

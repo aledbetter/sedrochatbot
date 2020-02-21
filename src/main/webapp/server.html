@@ -88,7 +88,12 @@
 						<h2>SMS Configuration:</h2>
 						<div class='fLn' style='padding-left:200px;text-align:left'> 
 							<div class='fLn' style='margin-top:5px'><b>Sedro Persona:</b> <select class='inform persona_list' id='sms_sedro_persona' style='width:160px'><option value=''>No Personas</option></select></div>
-							<div class='fLn' style='margin-top:5px'><b>provider:</b> <input class='inform' style='width:400px' type='text' id='sms_provider' value='twilio'/> </div>
+							<div class='fLn' style='margin-top:5px'><b>provider:</b> 							
+								<select class='inform' id='sms_provider' style='width:160px'>
+									<option value='twilio'>twilio</option>
+								</select>							
+							</div>
+							<div class='fLn' style='margin-top:5px'><b>phone number:</b> <input class='inform' style='width:200px' type='text' id='sms_phone_number'/> </div>
 							<div class='fLn' style='margin-top:5px'><b>account_sid:</b> <input class='inform' style='width:400px' type='text' id='sms_account_sid'/> </div>
 							<div class='fLn' style='margin-top:5px'><b>auth_token:</b> <input class='inform' style='width:400px' type='text' id='sms_auth_token'/> </div>
 						</div>	

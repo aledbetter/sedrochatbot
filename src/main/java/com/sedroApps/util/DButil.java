@@ -40,6 +40,7 @@ import org.apache.commons.lang3.SerializationUtils;
 public class DButil {	
 	// save all to here
 	static final String TABLE_NAME = "sedrochatbot";
+	static final String SESS_TABLE_NAME = "sedrochatbotSess";
 	
     static String prod_user = null;
     static String prod_pass = null;
@@ -147,6 +148,23 @@ public class DButil {
   		Connection conn = DButil.getConnection();
 		if (conn == null) {
   			System.out.println("ERROR createDirTable["+TABLE_NAME+"] connect fail");
+  			return false;
+  		}
+  		try {
+  			Statement stmt = conn.createStatement();
+		    stmt.executeUpdate(sql);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		//System.out.println("createDirTable["+DIR_NAME+"] Complete");
+		return true;
+	}
+	public static boolean createSessionTable() {
+		String sql = "CREATE TABLE IF NOT EXISTS "+SESS_TABLE_NAME+" (key VARCHAR(128) PRIMARY KEY, atok VARCHAR(128), expire TIMESTAMP);";
+  		Connection conn = DButil.getConnection();
+		if (conn == null) {
+  			System.out.println("ERROR createDirTable["+SESS_TABLE_NAME+"] connect fail");
   			return false;
   		}
   		try {

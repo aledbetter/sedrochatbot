@@ -11,8 +11,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import main.java.com.sedroApps.util.DButil;
 
 public class SCServer {
-	//private static final int DEFAULT_INTERVAL = (1000*60)*3;
-	private static final int DEFAULT_INTERVAL = (1000*30);
+	private static final int DEFAULT_INTERVAL = (1000*60)*3;
 
 	private String username;
 	private String password;	
@@ -86,14 +85,18 @@ public class SCServer {
 		return(password_verified);
 	}
 	public void setPassword(String password) {
-		this.password = hashPassword(password);
-		//System.out.println("Passxxxx["+password+"]: " + this.password);
+		synchronized (username) {
+			this.password = hashPassword(password);
+			//System.out.println("Passxxxx["+password+"]: " + this.password);
+		}
 	}
 	
 	public boolean login(String username, String password) {
 		if (username == null || password == null) return false;
-		if (!username.equals(this.username)) return false;
-		if (checkPassword(password, this.password)) return true;
+		synchronized (username) {
+			if (!username.equals(this.username)) return false;
+			if (checkPassword(password, this.password)) return true;
+		}
 		return false;
 	}
 	
@@ -103,10 +106,13 @@ public class SCServer {
 	}
 	
 	public void processInterval() {
+		if (uaList == null) return;
 		// process users	
-		if (uaList != null && uaList.size() > 0) {
-			for (UserAccount ua:uaList) {
-				ua.process();
+		synchronized (uaList) {
+			if (uaList.size() > 0) {
+				for (UserAccount ua:uaList) {
+					ua.process();
+				}
 			}
 		}
 	}
@@ -115,26 +121,34 @@ public class SCServer {
 		return uaList;
 	}
 	public UserAccount getUser(String username) {
-		if (uaList == null || uaList.size() < 1) return null;
-		for (UserAccount ua: uaList) {
-			if (ua.getCBUsername().equals(username)) return ua;
+		if (uaList == null) return null;
+		synchronized (uaList) {
+			if (uaList.size() < 1) return null;
+			for (UserAccount ua: uaList) {
+				if (ua.getCBUsername().equals(username)) return ua;
+			}
 		}
 		return null;
 	}
 	public UserAccount addUser(String username, boolean save) {
 		if (uaList == null) uaList = new ArrayList<>();
-		UserAccount ua = new UserAccount(username);
-		uaList.add(ua);
-		if (save) save();
-		return ua;
+		synchronized (uaList) {
+			UserAccount ua = new UserAccount(username);
+			uaList.add(ua);
+			if (save) save();
+			return ua;
+		}
 	}
 	public boolean delUser(String username) {
-		if (uaList == null || uaList.size() < 1) return false;
-		for (UserAccount ua: uaList) {
-			if (ua.getCBUsername().equals(username)) {
-				uaList.remove(ua);
-				save();
-				return true;
+		if (uaList == null) return false;
+		synchronized (uaList) {
+			if (uaList.size() < 1) return false;
+			for (UserAccount ua: uaList) {
+				if (ua.getCBUsername().equals(username)) {
+					uaList.remove(ua);
+					save();
+					return true;
+				}
 			}
 		}
 		return false;
@@ -144,13 +158,17 @@ public class SCServer {
 		// Save the data
 		HashMap<String, Object> sm = getMap();
 		sm.put("password", this.password);
-		if (uaList != null && uaList.size() > 0) {
-			List<HashMap<String, Object>> sl = new ArrayList<>();
-			for (UserAccount ua:uaList) {
-				HashMap<String, Object> um = ua.getMap();
-				sl.add(um);
+		if (uaList != null) {
+			synchronized (uaList) {
+				if (uaList.size() > 0) {
+					List<HashMap<String, Object>> sl = new ArrayList<>();
+					for (UserAccount ua:uaList) {
+						HashMap<String, Object> um = ua.getMap();
+						sl.add(um);
+					}
+					sm.put("users", sl);
+				}
 			}
-			sm.put("users", sl);
 		}
 		DButil.save("chatserver", sm);
 	}
@@ -160,29 +178,36 @@ public class SCServer {
 		HashMap<String, Object> sm = DButil.load("chatserver");
 		if (sm == null) return;
 		//  load from the data map
-		this.password = (String)sm.get("password");
-		this.username = (String)sm.get("username");
-		this.sedro_access_key = (String)sm.get("sedro_access_key");
-		this.poll_interval = (Integer)sm.get("poll_interval");
+		synchronized (username) {
+			this.password = (String)sm.get("password");
+			this.username = (String)sm.get("username");
+			this.sedro_access_key = (String)sm.get("sedro_access_key");
+			this.poll_interval = (Integer)sm.get("poll_interval");
+		}
 		List<HashMap<String, Object>> uml = (List<HashMap<String, Object>>)sm.get("users");
 		if (uml == null || uml.size() < 1) return;
-		for (HashMap<String, Object> um:uml) {
-			// load this user
-			String un = (String)um.get("username");
-			UserAccount ua = addUser(un, false);
-			ua.load(um);
+		
+		if (uaList == null) uaList = new ArrayList<>();
+		synchronized (uaList) {
+				for (HashMap<String, Object> um:uml) {
+				// load this user
+				String un = (String)um.get("username");
+				UserAccount ua = addUser(un, false);
+				ua.load(um);
+			}
 		}
 	}
 	
 	// get al lthe user info as a map..
 	public HashMap<String, Object> getMap() {
 		HashMap<String, Object> m = new HashMap<>();
-		m.put("username", this.username);
-		m.put("poll_interval", this.poll_interval);
-		m.put("sedro_access_key", this.sedro_access_key);
-		m.put("database", DButil.haveDB());
-		m.put("database_path", DButil.getRDBPath());
-		
+		synchronized (username) {
+			m.put("username", this.username);
+			m.put("poll_interval", this.poll_interval);
+			m.put("sedro_access_key", this.sedro_access_key);
+			m.put("database", DButil.haveDB());
+			m.put("database_path", DButil.getRDBPath());
+		}
 		return m;
 	}
 }

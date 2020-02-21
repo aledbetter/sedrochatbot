@@ -178,6 +178,7 @@ public class Sedro {
 		
 	public List<HashMap<String, Object>> chatWake(String key) {
 		if (!getStatus().equals("wake") && !getStatus().equals("bye")) return null;
+		//System.out.println(" **CHAT_WAKE");
 
 		String url = getUrl("/persona/chat/wake");
 		this.key = key;
@@ -188,7 +189,7 @@ public class Sedro {
 	    if (caller_token != null) reqData += ", \"caller_token\": \"" + caller_token + "\""; 
 	    if (context != null) reqData += ", \"context\": \"" + context  + "\""; 
 	    if (language != null) reqData += ", \"language\": \"" + language  + "\""; 
-	    if (channel_type != null) reqData += ", \"channel_type\": \"" + channel_type  + "\""; 
+	 //   if (channel_type != null) reqData += ", \"channel_type\": \"" + channel_type  + "\""; 
 	 //   if (save) ind += ", \"save\": \"" + save + "\"";  
 	    if (max_qn >= 0) reqData += ", \"max_qn\": \"" + max_qn + "\"";
 
@@ -208,6 +209,7 @@ public class Sedro {
 	
 	public List<HashMap<String, Object>> chatPoll() {
 		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		//System.out.println(" **CHAT_POLL: " + this.chid);
 
 		String url = getUrl("/persona/chat/poll");
 		String reqData = "{ \"chid\": \"" + this.chid  + "\", \"event\": \"poll\"}";
@@ -223,6 +225,7 @@ public class Sedro {
 	
 	public List<HashMap<String, Object>> chatMsg(String text) {
 		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		//System.out.println(" **CHAT_MSG: " + this.chid);
 
 		String url = getUrl("/persona/chat/msg");
 		String reqData = "{ \"text\": \"";
@@ -241,7 +244,7 @@ public class Sedro {
 	
 	public List<HashMap<String, Object>> chatBye() {
 		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
-		
+		//System.out.println(" **CHAT_BYE");
 		String url = getUrl("/persona/chat/bye");
 		String reqData = "{ \"chid\": \"" + this.chid  + "\", \"event\": \"bye\"}";
 		HashMap<String, String> headers = new HashMap<String, String>();
@@ -280,7 +283,11 @@ public class Sedro {
 				String persona_email = info.getString("persona_email");
 				this.persona_handle = persona_email;
 			} catch (Throwable t) {}
-	
+			
+			String num_sent = info.getString("num_sent");
+			String num_total = info.getString("num_total");
+			//System.out.println("chatRespNUM["+num_sent+"]["+num_total+"] => " + this.chid );
+			
 			try {
 				JSONArray list = obj.getJSONArray("list");
 				if (list != null && list.length() > 0) {
@@ -301,13 +308,8 @@ public class Sedro {
 							//System.out.println(" NAME["+n+"] val: " + val);
 							mm.put(n, val);
 						}
-/*
- * FIXME
- * 1) gettting wronge remote: issue with phone number as handle ?
- * 2) getting all messages instead of just after last						
- */
 						String remote = (String)mm.get("r");
-	System.out.println("   Smsg["+remote+"]["+mm.get("num")+"/"+this.msg_num_last+"] " + mm.get("msg"));
+						//System.out.println("   Smsg["+remote+"]["+mm.get("num")+"/"+this.msg_num_last+"] " + mm.get("msg"));
 						if (Sutil.compare(remote, "true")) {
 							// is remote message
 							// FIXME save or not..

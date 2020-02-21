@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
@@ -38,7 +39,7 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
+import main.java.com.sedroApps.util.DButil;
 import main.java.com.sedroApps.util.RestResp;
 import main.java.com.sedroApps.util.RestUtil;
 import main.java.com.sedroApps.util.Sutil;
@@ -49,6 +50,7 @@ import main.java.com.sedroApps.util.Sutil;
 @Produces(MediaType.APPLICATION_JSON)
 public class RestAPI {
 	public static boolean debug_time = false;
+	public static int SESSION_TIME = (60*120); // 2 hours
 	
 	@POST
 	@Path("/login")
@@ -76,10 +78,20 @@ public class RestAPI {
 		boolean resp = cs.login(username, password);
 		if (!resp) return rr.ret(403);
 		
-		// set cookie
-		String atok = Sutil.getGUIDString();
+		// set cookie with atoken
+		String atok = Sutil.getGUIDString();	
+		Cookie ck = new Cookie("atok", atok);
+		ck.setPath("/");
+		ck.setMaxAge(SESSION_TIME);
+		
+		// add atok to session table
+// FIXME	
+//		DButil.createSessionTable();
+		
+		
 		// add all the doc content
-		return rr.ret("atok="+atok+";Path=/");
+		//return rr.ret("atok="+atok+";Path=/");
+		return rr.ret(ck.toString());
 	}
 	@GET
 	@Path("/logout")
