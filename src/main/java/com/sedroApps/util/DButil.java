@@ -18,6 +18,7 @@
 package main.java.com.sedroApps.util;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -48,6 +49,8 @@ public class DButil {
     static String prod_db = "public";
 	static final String JDBC_DRIVER = "org.postgresql.Driver";  //org.postgresql.Driver
 	static boolean dbinit = false;
+	static String encrypte_key = null;
+	static String encrypte_key_pub = null;
 	
 	/*
 	 *  GET URL: heroku run echo \$JDBC_DATABASE_URL
@@ -77,6 +80,10 @@ public class DButil {
    		
     	}
     	
+    	// get encrypte key
+    	encrypte_key = System.getenv("ENC_KEY");
+    	encrypte_key_pub = System.getenv("PUB_KEY");
+
     	// user/pass
     	prod_user = System.getenv("RDS_USERNAME"); // The user name that you configured for your database..
     	prod_pass = System.getenv("RDS_PASSWORD"); // The password that you configured for your database.
@@ -332,6 +339,7 @@ public class DButil {
     	if (!haveDB()) return;
 
     	byte[] dataFlat = SerializationUtils.serialize(data);
+    	dataFlat = encrypteData(dataFlat);
     	saveDBData(key, dataFlat);
     }
     public static HashMap<String, Object> load(String key) {
@@ -340,11 +348,40 @@ public class DButil {
 
     	InputStream data = getDBDataStream(key, true);
     	if (data == null) return null;
+    	
+    	// use bytes
+    	byte[] bdata = null;
+		try {
+			bdata = new byte[data.available()];
+	    	data.read(bdata);
+	    	bdata = decrypteData(bdata);
+			@SuppressWarnings({ "unchecked", "unused" })
+			HashMap<String, Object> obj = (HashMap<String, Object>)SerializationUtils.deserialize(bdata);
+			return obj;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		@SuppressWarnings({ "unchecked", "unused" })
-		HashMap<String, Object> obj = (HashMap<String, Object>)SerializationUtils.deserialize(data);
-    	return obj;
+		//@SuppressWarnings({ "unchecked", "unused" })
+		//HashMap<String, Object> obj = (HashMap<String, Object>)SerializationUtils.deserialize(data);
+    	//return obj;
+		return null;
     }
     
+    
+    /////////////////////////////////////////
+    // ENCRYPT DATA
+    private static byte[] decrypteData(byte[] bdata) {
+    	if (encrypte_key == null) return bdata;
+    	
+ // FIXME do it   	
+    	return bdata;
+    }
+    private static byte[] encrypteData(byte[] bdata) {
+    	if (encrypte_key == null) return bdata;
+
+ // FIXME do it   	
+    	return bdata;
+    }
 }
 

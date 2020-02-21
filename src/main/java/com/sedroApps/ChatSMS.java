@@ -77,7 +77,8 @@ public class ChatSMS extends ChatAdapter {
 	}
 	@Override
 	public String getChannel_type() {
-		return "sms";	
+		return "chat";	
+		//return "sms";	
 	}
 	
 	public boolean isProvider(String provider) {
@@ -97,6 +98,7 @@ public class ChatSMS extends ChatAdapter {
 		if (auth_token == null || account_sid == null || provider == null) {
 			return -1; // not configured... remove
 		}
+		phone_number = makePhoneNumber(phone_number);
 		if (init) {
 			boolean change = false;
 			if (!pprovider.equals(provider)) change = true;
@@ -124,17 +126,11 @@ public class ChatSMS extends ChatAdapter {
 		return 0;
 	}
 	
-	@Override
-	public String postMessage(Sedro proc, String msg) {
-		try {
-		
-		} catch (Throwable t) { }
-		return "ERROR";	
-	}
-	
 	private String makePhoneNumber(String phone_number) {
 		// FIXME better correction needed
 		if (phone_number.startsWith("+")) return phone_number;
+		phone_number = phone_number.replaceAll("\\D+","");
+		if (phone_number.length() == 10) return "+1"+phone_number; 
 		return "+"+phone_number;
 	}
 	
@@ -144,14 +140,11 @@ public class ChatSMS extends ChatAdapter {
 			if (isProvider("twilio")) {
 				String caller_phone = makePhoneNumber(proc.getCaller_handle());
 				if (touser != null) caller_phone = touser;
-				
-				String persona_phone = this.pphone_number;
-			    
-				System.out.println("sendDirectMessage["+persona_phone+" -> " + caller_phone + "]  => " + msg);
+							    
+				System.out.println("sendDirectMessage["+this.pphone_number+" -> " + caller_phone + "]  => " + msg);
 
-				Message message = Message.creator(new PhoneNumber(caller_phone), new PhoneNumber(persona_phone), msg).create();
-
-			    System.out.println("SENT: " + message.getSid());
+	//			Message message = Message.creator(new PhoneNumber(caller_phone), new PhoneNumber(this.pphone_number), msg).create();
+	//		    System.out.println("SMS_SENT: " + message.getSid());
 			}
 		} catch (Throwable t) { }
 		return "ERROR";			

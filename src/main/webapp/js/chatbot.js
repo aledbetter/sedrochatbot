@@ -158,6 +158,8 @@ function logout() {
 	
 
 function getSettings() {
+	$("#setting_username, #setting_poll_interval, #setting_sedro_access_key, #setting_database_path").html("..."); 
+
 	scsGetSettings(function(data) {
 		$("#setting_poll_interval").html(data.info.poll_interval); 
 		$("#set_poll_interval").val(data.info.poll_interval); 
@@ -166,6 +168,8 @@ function getSettings() {
 		
 		if (data.info.database == true) {
 			$("#setting_database_path").html(data.info.database_path); 
+		} else {
+			$("#setting_database_path").html("NONE"); 
 		}
 		if (data.info.sedro_access_key) {
 			$("#set_sedro_access_key").val(data.info.sedro_access_key); 
@@ -196,7 +200,7 @@ function getSettings() {
 }
 
 function getUsers() {
-	$("#userlist").html("No Users"); 
+	$("#userlist").html("Getting User List..."); 
 	scsGetUsers(function(data) {
 		if (data == null || data.code == 401) {
 			window.location.href = "/index.html";
@@ -231,6 +235,8 @@ function getUsers() {
 		}
 		//alert(usr);
 		if (usr != "") $("#userlist").html(usr); 
+		else $("#userlist").html("No Users"); 
+
 	});
 }
 

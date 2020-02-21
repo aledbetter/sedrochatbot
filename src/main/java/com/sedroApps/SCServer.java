@@ -12,6 +12,7 @@ import main.java.com.sedroApps.util.DButil;
 
 public class SCServer {
 	private static final int DEFAULT_INTERVAL = (1000*60)*3;
+	private static final int DEFAULT_DELAY = (1000*10);
 
 	private String username;
 	private String password;	
@@ -48,8 +49,19 @@ public class SCServer {
 	public int getPoll_interval() {
 		return poll_interval;
 	}
-	public void setPoll_interval(int poll_interval) {
-		this.poll_interval = poll_interval;
+	public void setPoll_interval(int millis) {
+		if (millis < 1000 || this.poll_interval == millis) return;	
+		this.poll_interval = millis;
+		setTimer();
+	}
+	private void setTimer() {
+		if (proc_timer != null) proc_timer.cancel();
+		proc_timer = new Timer();
+		proc_timer.scheduleAtFixedRate(new TimerTask() {
+	            public void run() {
+	            	getChatServer().processInterval();
+	            }
+	        }, DEFAULT_DELAY, poll_interval);
 	}
 	public void init() {
 		if (init) return;
@@ -61,14 +73,10 @@ public class SCServer {
 		setPassword("admin");
 
 		// setup processing timers to run
-		proc_timer = new Timer();
-		proc_timer.scheduleAtFixedRate(new TimerTask() {
-	            public void run() {
-	            	getChatServer().processInterval();
-	            }
-	        }, DEFAULT_INTERVAL, DEFAULT_INTERVAL);
+		setTimer();	
 		init = true;
 	}
+
 
 	public static String hashPassword(String password_plaintext) {
 		String salt = BCrypt.gensalt(12);
@@ -177,7 +185,7 @@ public class SCServer {
 			this.password = (String)sm.get("password");
 			this.username = (String)sm.get("username");
 			this.sedro_access_key = (String)sm.get("sedro_access_key");
-			this.poll_interval = (Integer)sm.get("poll_interval");
+			setPoll_interval((Integer)sm.get("poll_interval"));
 		}
 		List<HashMap<String, Object>> uml = (List<HashMap<String, Object>>)sm.get("users");
 		if (uml == null || uml.size() < 1) return;
