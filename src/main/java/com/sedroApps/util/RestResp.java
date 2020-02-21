@@ -22,6 +22,7 @@ import java.util.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -73,6 +74,11 @@ public class RestResp {
 
 	public Response ret() {
 		return Response.status(200).entity(this.done()).build(); 
+	}
+	public Response ret(NewCookie cookie) {
+		return Response.status(200).cookie(cookie).entity(this.done()).build(); 
+
+	//	return Response.status(200).entity(this.done()).build(); 
 	}
 	public Response ret(String cookie) {
 		return Response.status(200).header("Set-Cookie", cookie).entity(this.done()).build(); 

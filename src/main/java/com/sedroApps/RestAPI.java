@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
@@ -33,6 +32,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -80,18 +80,16 @@ public class RestAPI {
 		
 		// set cookie with atoken
 		String atok = Sutil.getGUIDString();	
-		Cookie ck = new Cookie("atok", atok);
-		ck.setPath("/");
-		ck.setMaxAge(SESSION_TIME);
-		
+		NewCookie cook = new  NewCookie("atok", atok, "/", null, null, SESSION_TIME, false);
+
 		// add atok to session table
 // FIXME	
 //		DButil.createSessionTable();
-		
+		//System.out.println("COOKIE: " + );
 		
 		// add all the doc content
 		//return rr.ret("atok="+atok+";Path=/");
-		return rr.ret(ck.toString());
+		return rr.ret(cook);
 	}
 	@GET
 	@Path("/logout")

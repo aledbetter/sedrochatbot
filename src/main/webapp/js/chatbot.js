@@ -33,12 +33,14 @@ $(document).ready(function() {
 	$("#userInfo").hide();
 	$("#set_password2, #set_password").removeClass("error");
 
-	// get auth cookie
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	// Check auth cookie
 	var cookie = getCookie("atok");
 	if (!cookie || cookie == "") {
 		if (window.location.href.indexOf(".html") > -1 && window.location.href.indexOf("index.html") == -1) {
 // FIXME only see login
-			window.location.href = "/index.html";			
+			window.location.href = "/index.html";	
+			return;
 		}		
 	}
 	
@@ -70,12 +72,6 @@ $(document).ready(function() {
 			} else {
 				$("#loginerror").show().val("Incorrect username or password");
 			}
-		});
-	});
-	
-	$("#logout_bt").on('click', function (e) {
-		scsLogout(username, password, function(data) {
-			window.location.href = "/index.html";
 		});
 	});
 	
@@ -153,6 +149,12 @@ $(document).ready(function() {
 		getUsers();
 	}
 });
+
+function logout() {
+	scsLogout(function(data) {
+		window.location.href = "/index.html";
+	});
+}
 	
 function getSettings() {
 	scsGetSettings(function(data) {
