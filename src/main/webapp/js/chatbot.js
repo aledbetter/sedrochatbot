@@ -156,6 +156,7 @@ function logout() {
 	});
 }
 	
+
 function getSettings() {
 	scsGetSettings(function(data) {
 		$("#setting_poll_interval").html(data.info.poll_interval); 
@@ -171,6 +172,10 @@ function getSettings() {
 			$("#setting_sedro_access_key").html(data.info.sedro_access_key); 
 			glob_api_key = data.info.sedro_access_key;
 			sedroGetPersonas(function (data) {
+				if (data == null || data.code == 401) {
+					window.location.href = "/index.html";
+					return;
+				}
 				// persona select list
 				if (data.list && data.list.length > 0) {
 					var pselect = "";
@@ -193,6 +198,10 @@ function getSettings() {
 function getUsers() {
 	$("#userlist").html("No Users"); 
 	scsGetUsers(function(data) {
+		if (data == null || data.code == 401) {
+			window.location.href = "/index.html";
+			return;
+		}
 		var usr = "";
 		if (data.info && data.info.users) {
 			glob_users = data.info.users;
@@ -319,6 +328,10 @@ function saveUser(username) {
 	}	
 	
 	scsUpdateUser(username, services, function(data) {
+		if (data == null || data.code == 401) {
+			window.location.href = "/index.html";
+			return;
+		}
 		glob_edit_u = null;
 		$("#userInfo").hide();
 		getUsers();
@@ -330,6 +343,10 @@ function saveUser(username) {
 
 function delUser(username) {
 	scsDelUser(username, function(data) {
+		if (data == null || data.code == 401) {
+			window.location.href = "/index.html";
+			return;
+		}
 		getUsers();
 	});
 }

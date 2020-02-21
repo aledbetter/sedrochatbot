@@ -36,7 +36,7 @@ public class RestResp {
 	private int code;	
 	// alternate string for response if needed
 	private HashMap<String, Object> info; 
-	
+	private String atok = null;
 	
 	public RestResp(UriInfo info, 
 					HttpServletRequest hsr, 
@@ -45,11 +45,12 @@ public class RestResp {
 					String atok_cookie) {
 
     	this.setCode(200); // start with no problem always
-   	
+    	
     	// get the atok
     	if (atok == null || atok.isEmpty()) {
     		atok = atok_cookie;
-    	}    	
+    	}  
+    	this.atok = atok;
 	}
 	
 	// get a cookie
@@ -65,6 +66,18 @@ public class RestResp {
 	    return null;
 	}
 	
+	public boolean isAuth() {
+		if (this.atok == null) return false;
+		if (this.atok.length() != 36) {
+			System.out.println("BAD ATOK: " + this.atok);
+			return false;
+		}
+		if (DButil.getSessionKey(this.atok, true) == null) return false;
+		return true;
+	}
+	public String getAtok() {
+		return atok;
+	}
 	public void setCode(int code) {
 		this.code = code;
 	}

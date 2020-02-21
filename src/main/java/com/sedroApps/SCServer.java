@@ -100,11 +100,6 @@ public class SCServer {
 		return false;
 	}
 	
-	public void logout() {
-		// sure..
-
-	}
-	
 	public void processInterval() {
 		if (uaList == null) return;
 		// process users	

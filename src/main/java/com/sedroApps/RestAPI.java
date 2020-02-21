@@ -19,7 +19,9 @@
 package main.java.com.sedroApps;
 
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -50,7 +52,8 @@ import main.java.com.sedroApps.util.Sutil;
 @Produces(MediaType.APPLICATION_JSON)
 public class RestAPI {
 	public static boolean debug_time = false;
-	public static int SESSION_TIME = (60*120); // 2 hours
+	public static int SESSION_TIME = (60*60*2); // 2 hours
+	public static int SESSION_KEEP_TIME = (60*60*48); // 48 hours
 	
 	@POST
 	@Path("/login")
@@ -78,17 +81,18 @@ public class RestAPI {
 		boolean resp = cs.login(username, password);
 		if (!resp) return rr.ret(403);
 		
+		int exp = SESSION_TIME;
+		if (Sutil.compare(keep, "true")) {
+			exp = SESSION_KEEP_TIME;
+		}
+				
 		// set cookie with atoken
 		String atok = Sutil.getGUIDString();	
-		NewCookie cook = new  NewCookie("atok", atok, "/", null, null, SESSION_TIME, false);
-
+		NewCookie cook = new  NewCookie("atok", atok, "/", null, null, exp, false);
+		Calendar ex = Sutil.getUTCTimePlusSeconds(exp);
 		// add atok to session table
-// FIXME	
-//		DButil.createSessionTable();
-		//System.out.println("COOKIE: " + );
-		
-		// add all the doc content
-		//return rr.ret("atok="+atok+";Path=/");
+		Timestamp expire = new Timestamp(ex.getTimeInMillis());
+		DButil.saveSessionKey(atok, username, expire);
 		return rr.ret(cook);
 	}
 	@GET
@@ -97,10 +101,11 @@ public class RestAPI {
 			@Context HttpServletRequest hsr, 
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		SCServer cs = SCServer.getChatServer();
-		cs.logout();
+		// drop session
+		DButil.deleteSessionKey(rr.getAtok());
 		// drop cookie
-		return rr.ret("atok=;Path=/");
+		NewCookie delCookie = new NewCookie("atok", null, "/", null, null, 0, false, true);
+		return rr.ret(delCookie);
 	}
 
 	@GET
@@ -109,6 +114,8 @@ public class RestAPI {
 			@Context HttpServletRequest hsr, 
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!rr.isAuth()) return rr.ret(401);
+		
 		SCServer cs = SCServer.getChatServer();
 		rr.setInfo(cs.getMap());
 		return rr.ret();
@@ -120,6 +127,7 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!rr.isAuth()) return rr.ret(401);
 		SCServer cs = SCServer.getChatServer();
 
 		String sedro_access_key = null, username = null, password = null, poll_interval = null;
@@ -173,6 +181,7 @@ public class RestAPI {
 			@Context HttpServletRequest hsr, 
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!rr.isAuth()) return rr.ret(401);
 		SCServer cs = SCServer.getChatServer();
 		List<UserAccount> ual = cs.getUsers();
 		if (ual == null || ual.size() < 1) return rr.ret();
@@ -190,6 +199,7 @@ public class RestAPI {
     		@PathParam("user") String user,
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!rr.isAuth()) return rr.ret(401);
 		SCServer cs = SCServer.getChatServer();
 		UserAccount ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
@@ -204,7 +214,7 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-
+		if (!rr.isAuth()) return rr.ret(401);
 		String username = null;
 
 		try {
@@ -234,6 +244,7 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!rr.isAuth()) return rr.ret(401);
 
 		SCServer cs = SCServer.getChatServer();
 		UserAccount ua = cs.getUser(user);
@@ -253,6 +264,8 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!rr.isAuth()) return rr.ret(401);
+
 		SCServer cs = SCServer.getChatServer();
 		UserAccount ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
@@ -311,10 +324,8 @@ public class RestAPI {
 	@Path("/cb/voice_hook")
 	public Response voiceWebHookPOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
-			@CookieParam("atok") String cookie_access_key, 
 			String body) {
-		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-
+		RestResp rr = new RestResp(info, hsr, null, null, null);
 		SCServer cs = SCServer.getChatServer();		
 		try {
 			JSONObject obj = new JSONObject(body);
@@ -331,9 +342,8 @@ public class RestAPI {
 	@Path("/cb/sms_hook")
 	public Response smsWebHookPOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
-			@CookieParam("atok") String cookie_access_key, 
 			String body) {
-		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		RestResp rr = new RestResp(info, hsr, null, null, null);
 
 		SCServer cs = SCServer.getChatServer();		
 		try {

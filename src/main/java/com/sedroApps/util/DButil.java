@@ -143,11 +143,12 @@ public class DButil {
     	}
     	return true;
     }
-	public static boolean createDataTable() {
-		String sql = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" (key VARCHAR(64) PRIMARY KEY, data bytea);";
+
+	public static boolean createSessionTable() {
+		String sql = "CREATE TABLE IF NOT EXISTS "+SESS_TABLE_NAME+" (key VARCHAR(128) PRIMARY KEY, username VARCHAR(128), expire TIMESTAMP);";
   		Connection conn = DButil.getConnection();
 		if (conn == null) {
-  			System.out.println("ERROR createDirTable["+TABLE_NAME+"] connect fail");
+  			System.out.println("ERROR createDirTable["+SESS_TABLE_NAME+"] connect fail");
   			return false;
   		}
   		try {
@@ -160,11 +161,99 @@ public class DButil {
 		//System.out.println("createDirTable["+DIR_NAME+"] Complete");
 		return true;
 	}
-	public static boolean createSessionTable() {
-		String sql = "CREATE TABLE IF NOT EXISTS "+SESS_TABLE_NAME+" (key VARCHAR(128) PRIMARY KEY, atok VARCHAR(128), expire TIMESTAMP);";
+	
+	public static Timestamp getSessionKey(String key, boolean confail) {
+		if (key == null) return null;
+		
+ 		Connection conn = DButil.getConnection();
+  		if (conn == null) return null;
+  		String sql = "SELECT * FROM "+SESS_TABLE_NAME + " WHERE key = '" + key+"'";
+  		Timestamp ts = null;
+  		try {
+  			Statement stmt = conn.createStatement();
+		    ResultSet rs = stmt.executeQuery(sql);
+		    if (rs.next()) {
+		    	try {
+				    String atok = rs.getString("key");
+				    String username = rs.getString("username");
+				    ts = rs.getTimestamp("expire");
+		    	} catch (Throwable t) {}
+			    	rs.close();	
+		    }
+	  		DButil.closeConnection(conn); 		
+		} catch (SQLException e) { 
+	  		DButil.closeConnection(conn); 		
+			if (confail) {
+				createSessionTable();
+				return getSessionKey(key, false);
+			} else {
+				e.printStackTrace();
+			}
+		}
+		return ts;
+	}
+	public static int saveSessionKey(String atok, String username, Timestamp expire) {
+		if (atok == null || username == null) return 0;
+		int cnt = 0;
+	//	System.out.println("SAVEING[" + key + "] data: " + data.length);
+
+		String sql = "INSERT INTO " + SESS_TABLE_NAME + " (key, username, expire) VALUES(?, ?, ?) "
+		+ " ON CONFLICT (key) DO UPDATE SET expire = ?";
+		
+  		Connection conn = DButil.getConnection();
+  		if (conn == null) {
+  			System.out.println("ERROR: saveTreeDescDynDB() no db connected");
+  			return 0;
+  		}
+  		try {
+  			PreparedStatement pstmt = conn.prepareStatement(sql);
+  			conn.setAutoCommit(false);
+  			pstmt.setString(1, atok);
+  			pstmt.setString(2, username);
+  			pstmt.setTimestamp(3, expire);
+		
+  			/// OR
+  			pstmt.setTimestamp(4, expire);								
+  			pstmt.addBatch();		
+
+  			pstmt.executeBatch();
+  			conn.commit(); 			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		DButil.closeConnection(conn);		
+		return cnt;
+	} 	
+	public static void deleteSessionKey(String atok) {
+		if (atok == null) return;
+		String sql = "DELETE FROM " + SESS_TABLE_NAME + " WHERE key = '"+atok+"'";
+		
+  		Connection conn = DButil.getConnection();
+  		if (conn == null) {
+  			System.out.println("ERROR: saveTreeDescDynDB() no db connected");
+  			return;
+  		}
+  		try {
+  			PreparedStatement pstmt = conn.prepareStatement(sql);
+  			conn.setAutoCommit(false);
+  			pstmt.executeBatch();
+  			conn.commit(); 			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		DButil.closeConnection(conn);		
+	} 
+
+	
+	
+	
+	public static boolean createDataTable() {
+		String sql = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" (key VARCHAR(64) PRIMARY KEY, data bytea);";
   		Connection conn = DButil.getConnection();
 		if (conn == null) {
-  			System.out.println("ERROR createDirTable["+SESS_TABLE_NAME+"] connect fail");
+  			System.out.println("ERROR createDirTable["+TABLE_NAME+"] connect fail");
   			return false;
   		}
   		try {
@@ -204,6 +293,7 @@ public class DButil {
 		}
 		return data;
 	}
+	
 	private static int saveDBData(String key, byte [] data) {
 		if (data == null || key == null) return 0;
 		int cnt = 0;

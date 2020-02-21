@@ -1301,6 +1301,11 @@ public class Sutil {
 		t.add(Calendar.HOUR, hours);
 		return t;
 	}
+	public static Calendar getUTCTimePlusSeconds(int seconds) {
+		Calendar t = Sutil.getUTCTime();
+		t.add(Calendar.SECOND, seconds);
+		return t;
+	}
 	public static Calendar getUTCTimePlusMinutes(int min) {
 		Calendar t = Sutil.getUTCTime();
 		t.add(Calendar.MINUTE, min);
