@@ -50,7 +50,6 @@ public class DButil {
 	static final String JDBC_DRIVER = "org.postgresql.Driver";  //org.postgresql.Driver
 	static boolean dbinit = false;
 	static String encrypte_key = null;
-	static String encrypte_key_pub = null;
 	
 	/*
 	 *  GET URL: heroku run echo \$JDBC_DATABASE_URL
@@ -82,8 +81,8 @@ public class DButil {
     	
     	// get encrypte key
     	encrypte_key = System.getenv("ENC_KEY");
-    	encrypte_key_pub = System.getenv("PUB_KEY");
-
+    //	encrypte_key = "Sedro Can";
+    	
     	// user/pass
     	prod_user = System.getenv("RDS_USERNAME"); // The user name that you configured for your database..
     	prod_pass = System.getenv("RDS_PASSWORD"); // The password that you configured for your database.
@@ -348,7 +347,7 @@ public class DButil {
 
     	InputStream data = getDBDataStream(key, true);
     	if (data == null) return null;
-    	
+    	if (true) return null;
     	// use bytes
     	byte[] bdata = null;
 		try {
@@ -374,11 +373,15 @@ public class DButil {
     private static byte[] decrypteData(byte[] bdata) {
     	if (encrypte_key == null) return bdata;
     	
+        String en = EncryptUtil.encryptBytes(encrypte_key, bdata);
+        bdata = en.getBytes();
  // FIXME do it   	
     	return bdata;
     }
     private static byte[] encrypteData(byte[] bdata) {
     	if (encrypte_key == null) return bdata;
+    	String data = new String(bdata);
+    	bdata = EncryptUtil.decryptBytes(encrypte_key, data);
 
  // FIXME do it   	
     	return bdata;
