@@ -18,20 +18,22 @@
 package main.java.com.sedroApps;
 
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.google.common.collect.Range;
 import com.twilio.Twilio;
 import com.twilio.base.ResourceSet;
 import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.rest.api.v2010.account.IncomingPhoneNumber;
+import com.twilio.rest.api.v2010.account.IncomingPhoneNumberUpdater;
 import com.twilio.type.PhoneNumber;
+
 
 
 import main.java.com.sedroApps.util.Sutil;
@@ -43,31 +45,20 @@ public class ChatSMS extends ChatAdapter {
 	
 	private static final String datefmt = "EEE, dd MMM yyyy HH:mm:ss Z";
 	private static final int DEF_PAST = 4; // 4 days
-/*
- * bandwidth.com
- * https://dev.bandwidth.com/numbers/about.html
- * https://dev.bandwidth.com/messaging/about.html
- * https://dev.bandwidth.com/sdks/java.html
-<dependency>
-    <groupId>com.bandwidth.sdk</groupId>
-    <artifactId>bandwidth-sdk</artifactId>
-    <version>1.0.0</version>
-</dependency>
 
- */
 	// this is per user?
-	//private TwitterFactory factory = null;
 	private String pprovider = null;  	// twillio / bandwidth.com / etc
 	private String paccount_sid = null;  	// api_key
 	private String pauth_token = null; // api_secret
 	private String pphone_number = null; // number
 	private boolean init = false;
 	
+	private String psms_callback_url = null;
+
 	// message cache for polling mode
 	private DateTime last_msg_check_time = null;
 	private List<HashMap<String, String>> msg_set = null;
 
-	
 	
 	public ChatSMS(UserAccount user) {
 		super(user);
@@ -97,6 +88,7 @@ public class ChatSMS extends ChatAdapter {
 		String account_sid = ua.getServiceInfo(getName(), "account_sid");
 		String auth_token = ua.getServiceInfo(getName(), "auth_token");
 		String phone_number = ua.getServiceInfo(getName(), "phone_number");
+		String sms_callback_url = ua.getServiceInfo(getName(), "sms_callback_url");
 		if (auth_token == null || account_sid == null || provider == null) {
 			return -1; // not configured... remove
 		}
@@ -107,6 +99,7 @@ public class ChatSMS extends ChatAdapter {
 			if (!paccount_sid.equals(account_sid)) change = true;
 			if (!pauth_token.equals(auth_token)) change = true;
 			if (!pphone_number.equals(phone_number)) change = true;
+			if (!Sutil.compare(psms_callback_url, phone_number)) change = true;			
 			if (!change) return 1;
 
 		}
@@ -116,16 +109,38 @@ public class ChatSMS extends ChatAdapter {
     	paccount_sid = account_sid;
     	pauth_token = auth_token;
     	pphone_number = phone_number;
+    	psms_callback_url = sms_callback_url;
     	
 		if (isProvider("twilio")) {
 			//System.out.println("  TWI["+account_sid+"] " + auth_token);
 			// twilio init
 			Twilio.init(account_sid, auth_token);
 			init = true;
+			if (psms_callback_url != null) {
+				// set the callback
+				setPhoneNumberSMSCb(pphone_number, psms_callback_url);
+			}
 		}
 		session_per_direct = true;
 		
 		return 0;
+	}
+	
+	// update the SMS callback for this here phone number
+	private void setPhoneNumberSMSCb(String phone_number, String cb_sms_url) {
+        IncomingPhoneNumber incomingPhoneNumber = IncomingPhoneNumber.creator(
+                new com.twilio.type.PhoneNumber(phone_number)).create();
+        System.out.println(" SMS URL: " + incomingPhoneNumber.getSmsUrl());
+		try {
+			URI smsCb = new URI(cb_sms_url);
+	        if (smsCb.equals(incomingPhoneNumber.getSmsUrl())) return;
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			return;
+		}
+		// get updater
+		IncomingPhoneNumberUpdater pu = IncomingPhoneNumber.updater(incomingPhoneNumber.getSid());
+		pu.setSmsUrl(cb_sms_url).update();
 	}
 	
 	private String makePhoneNumber(String phone_number) {
@@ -298,6 +313,35 @@ public class ChatSMS extends ChatAdapter {
 		return msgList;
 	}
 	
+	
+	
+	
+	//////////////////////////////////////////////////
+	// Callback for direct recieve and handle
+	//https://www.twilio.com/docs/usage/webhooks/sms-webhooks
+	
+	// callback for receive (when deployed with public IP only)
+	@Override	
+	public List<String> getReceiveMessages(String msg) {
+		return null;
+	}
+	
+	// call back for new incomming calls 
+	@Override	
+	public HashMap<String, String> getReceiveCall() {
+		return null;
+	}
+
+	
+	// SMS Webhook
+	/*
+	        Message message = Message.creator(
+	                new com.twilio.type.PhoneNumber("+15558675310"),
+	                new com.twilio.type.PhoneNumber("+15017122661"),
+	                "McAvoy or Stewart? These timelines can get so confusing.")
+	            .setStatusCallback(URI.create("http://postb.in/1234abcd"))
+	            .create();
+	
 	private static List<HashMap<String, String>> parseTwillioMessages(Orator orat, String msgs, boolean newcalls) {
 		List<HashMap<String, String>> msgList = null;
 		
@@ -372,76 +416,6 @@ public class ChatSMS extends ChatAdapter {
 		return msgList;
 	}
 	
-
-	
-	
-	
-	
-	//////////////////////////////////////////////////
-	// Callback for direct recieve and handle
-	//https://www.twilio.com/docs/usage/webhooks/sms-webhooks
-	
-	// callback for receive (when deployed with public IP only)
-	@Override	
-	public List<String> getReceiveMessages(String msg) {
-		return null;
-	}
-	
-	// call back for new incomming calls 
-	@Override	
-	public HashMap<String, String> getReceiveCall() {
-		return null;
-	}
-
-	
-	// SMS Webhook
-	/*
-	public class Example {
-	    // Find your Account Sid and Token at twilio.com/console
-	    // DANGER! This is insecure. See http://twil.io/secure
-	    public static final String ACCOUNT_SID = "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-	    public static final String AUTH_TOKEN = "your_auth_token";
-
-	    public static void main(String[] args) {
-	        Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
-	        Message message = Message.creator(
-	                new com.twilio.type.PhoneNumber("+15558675310"),
-	                new com.twilio.type.PhoneNumber("+15017122661"),
-	                "McAvoy or Stewart? These timelines can get so confusing.")
-	            .setStatusCallback(URI.create("http://postb.in/1234abcd"))
-	            .create();
-
-	        System.out.println(message.getSid());
-	    }
-	}
 	*/
 	
-/*
-{
-  "account_sid": "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "api_version": "2010-04-01",
-  "body": "testing",
-  "date_created": "Fri, 24 May 2019 17:18:27 +0000",
-  "date_sent": "Fri, 24 May 2019 17:18:28 +0000",
-  "date_updated": "Fri, 24 May 2019 17:18:28 +0000",
-  "direction": "outbound-api",
-  "error_code": 30007,
-  "error_message": "Carrier violation",
-  "from": "+12019235161",
-  "messaging_service_sid": "MGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "num_media": "0",
-  "num_segments": "1",
-  "price": "-0.00750",
-  "price_unit": "USD",
-  "sid": "MMXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "status": "sent",
-  "subresource_uris": {
-    "media": "/2010-04-01/Accounts/ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/Messages/SMb7c0a2ce80504485a6f653a7110836f5/Media.json",
-    "feedback": "/2010-04-01/Accounts/ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/Messages/SMb7c0a2ce80504485a6f653a7110836f5/Feedback.json"
-  },
-  "to": "+18182008801",
-  "uri": "/2010-04-01/Accounts/ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/Messages/SMb7c0a2ce80504485a6f653a7110836f5.json"
-}
- */
-
 }
