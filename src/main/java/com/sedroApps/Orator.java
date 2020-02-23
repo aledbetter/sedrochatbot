@@ -80,7 +80,7 @@ public class Orator {
 		//System.out.println("  ORATOR _ PROC: " + getProcessorCount());
 
 		// this where we look for new calls 
-		if (service.isSession_per_direct()) {
+		if (service.isPublicMsg()) {
 			List<HashMap<String, String>> newCalls = service.getDirectCall(this);
 			if (newCalls != null && newCalls.size() > 0) {	
 				for (HashMap<String, String> call:newCalls) {

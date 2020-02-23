@@ -183,8 +183,7 @@ public class UserAccount {
 				// up up date
 				if (cs.init(this) == 0) {
 					addChatService(cs);
-					if (cs.isSession_per_direct()) {
-//FIXME hack.. configure each						
+					if (!cs.isPublicMsg()) {
 						readPublic = respPublic = false;
 					}
 					Orator orat = new Orator(SCServer.getChatServer(), cs, this, readPublic, respPublic);

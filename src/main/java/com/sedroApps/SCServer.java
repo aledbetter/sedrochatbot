@@ -188,7 +188,7 @@ public class SCServer {
 				}
 			}
 		}
-		DButil.save(DButil.SINGLE_KEY, sm);
+		DButil.save(DButil.SINGLE_KEY, sm, null);
 	}
 	
 	public void load() {

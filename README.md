@@ -63,6 +63,7 @@ Data Base
 	RDS_DB_URL - full jdbc url - jdbc:postgresql://<hostname>:<port>/<dbname>
 	RDS_USERNAME - user name
 	RDS_PASSWORD - password
+	ENC_KEY      - data encryption key (16 bytes), without it is not encrypted
 	
 Login
 	

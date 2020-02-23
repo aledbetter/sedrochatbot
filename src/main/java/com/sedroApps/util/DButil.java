@@ -20,17 +20,10 @@ package main.java.com.sedroApps.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 import org.apache.commons.lang3.SerializationUtils;
-
-
 
 
 /*
@@ -59,7 +52,7 @@ public class DButil {
     	System.out.println("DBUtil: start initialize");
         try {      
 	        setupJDBC(); // RDB	
-	 //       dropDataTables();
+	   //     dropDataTables();
 	        
 	        // verify tables
 	        if (!haveDBTable(SINGLE_KEY)) {
@@ -88,8 +81,7 @@ public class DButil {
     	}
     	
     	// get encrypte key
-   // 	encrypte_key = System.getenv("ENC_KEY");
-    //	encrypte_key = "Sedro Can";
+    	encrypte_key = System.getenv("ENC_KEY");
     	
     	// user/pass
     	prod_user = System.getenv("RDS_USERNAME"); // The user name that you configured for your database..
@@ -312,37 +304,28 @@ public class DButil {
 	  		return false;
 		} catch (SQLException e) { 
 	  		DButil.closeConnection(conn); 		
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return false;
 	}
-	private static InputStream getDBDataStream(String key) {
-  		Connection conn = DButil.getConnection();
-  		if (conn == null) return null;
-  		String sql = "SELECT * FROM "+TABLE_NAME + " WHERE key = '" + key+"'";
-  		InputStream data = null;
-  		try {
-  			Statement stmt = conn.createStatement();
-		    ResultSet rs = stmt.executeQuery(sql);
-		    if (rs.next()) {
-		    	try {
-			    String label = rs.getString("key");
-				data = rs.getBinaryStream("data");
-			//	data = rs.getBinaryStream("data2");
-		    	} catch (Throwable t) {}
-			    rs.close();	
-		    }
-	  		DButil.closeConnection(conn); 		
-		} catch (SQLException e) { 
-	  		DButil.closeConnection(conn); 		
-			e.printStackTrace();
-		}
-		return data;
-	}
-	
-	private static int saveDBData(String key, byte [] data) {
-		if (data == null || key == null) return 0;
-		int cnt = 0;
+
+    public static void save(String key, HashMap<String, Object> data, HashMap<String, Object> dataState) {
+    	if (data == null || key == null) return;
+    	if (!haveDB()) return;
+
+    	// flat and encrypted
+    	byte[] dataFlat = null;
+    	if (dataFlat == null) {
+    		dataFlat = SerializationUtils.serialize(data);
+    		dataFlat = encrypteData(dataFlat);
+    	}
+    	
+    	byte[] dataStateFlat = null;
+    	if (dataState != null) {
+    		dataStateFlat = SerializationUtils.serialize(dataState);
+    		dataStateFlat = encrypteData(dataStateFlat);
+    	}
+    	
 	//	System.out.println("SAVEING[" + key + "] data: " + data.length);
 
 		String sql = "INSERT INTO " + TABLE_NAME + " (key, data) VALUES(?, ?) "
@@ -351,16 +334,16 @@ public class DButil {
   		Connection conn = DButil.getConnection();
   		if (conn == null) {
   			System.out.println("ERROR: saveTreeDescDynDB() no db connected");
-  			return 0;
+  			return;
   		}
   		try {
   			PreparedStatement pstmt = conn.prepareStatement(sql);
   			conn.setAutoCommit(false);
   			pstmt.setString(1, key);
-  			pstmt.setBytes(2, data);
+  			pstmt.setBytes(2, dataFlat);
 		
   			/// OR
-  			pstmt.setBytes(3, data);								
+  			pstmt.setBytes(3, dataFlat);								
   			pstmt.addBatch();		
 
   			pstmt.executeBatch();
@@ -370,31 +353,53 @@ public class DButil {
 		}
 		
 		DButil.closeConnection(conn);		
-		return cnt;
-	}  
-    
-    public static void save(String key, HashMap<String, Object> data) {
-    	if (data == null || key == null) return;
-    	if (!haveDB()) return;
-
-    	byte[] dataFlat = SerializationUtils.serialize(data);
-    	dataFlat = encrypteData(dataFlat);
-    	saveDBData(key, dataFlat);
+		return;
     }
     public static HashMap<String, Object> load(String key) {
     	if (key == null) return null;
     	if (!haveDB()) return null;
 
-    	InputStream data = getDBDataStream(key);
-    	if (data == null) return null;
+  		Connection conn = DButil.getConnection();
+  		if (conn == null) return null;
+  		String sql = "SELECT * FROM "+TABLE_NAME + " WHERE key = '" + key+"'";
+  		InputStream data = null, datastate = null;
+  		try {
+  			Statement stmt = conn.createStatement();
+		    ResultSet rs = stmt.executeQuery(sql);
+		    if (rs.next()) {
+		    	try {
+			    String label = rs.getString("key");
+				data = rs.getBinaryStream("data");
+				datastate = rs.getBinaryStream("data2");
+		    	} catch (Throwable t) {}
+			    rs.close();	
+		    }
+	  		DButil.closeConnection(conn); 		
+		} catch (SQLException e) { 
+	  		DButil.closeConnection(conn); 		
+			e.printStackTrace();
+		}
+  		
+    	if (data == null && datastate == null) return null;
     	
     	// use bytes
 		try {
 			byte[] bdata = new byte[data.available()];
 	    	data.read(bdata);
 	    	bdata = decrypteData(bdata);
-			@SuppressWarnings({ "unchecked", "unused" })
 			HashMap<String, Object> obj = (HashMap<String, Object>)SerializationUtils.deserialize(bdata);
+			
+			if (datastate != null) {
+				byte[] bsdata = new byte[datastate.available()];
+				bsdata = decrypteData(bsdata);
+	// FIXME add to obj
+				HashMap<String, Object> objState = (HashMap<String, Object>)SerializationUtils.deserialize(bdata);
+				if (objState != null) {
+				//	List<HashMap<String, Object>> sl = obj.get("user");
+				//	obj.put(objState.get(key));
+				}
+			}
+			
 			return obj;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -405,20 +410,16 @@ public class DButil {
     
     /////////////////////////////////////////
     // ENCRYPT DATA
-    private static byte[] decrypteData(byte[] bdata) {
-    	if (encrypte_key == null) return bdata;
-    	
-        String en = EncryptUtil.encryptBytes(encrypte_key, bdata);
-        bdata = en.getBytes();
- // FIXME do it   	
-    	return bdata;
-    }
     private static byte[] encrypteData(byte[] bdata) {
     	if (encrypte_key == null) return bdata;
+        String en = EncryptUtil.encryptBytes(encrypte_key, bdata);
+        bdata = en.getBytes(); 	
+    	return bdata;
+    }
+    private static byte[]  decrypteData(byte[] bdata) {
+    	if (encrypte_key == null) return bdata;
     	String data = new String(bdata);
-    	bdata = EncryptUtil.decryptBytes(encrypte_key, data);
-
- // FIXME do it   	
+    	bdata = EncryptUtil.decryptBytes(encrypte_key, data); 	
     	return bdata;
     }
 }

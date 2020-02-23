@@ -21,18 +21,11 @@ package main.java.com.sedroApps;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import main.java.com.sedroApps.util.Sutil;
 import twitter4j.DirectMessage;
-import twitter4j.Query;
-import twitter4j.QueryResult;
-import twitter4j.StallWarning;
 import twitter4j.Status;
-import twitter4j.StatusDeletionNotice;
-import twitter4j.StatusListener;
 import twitter4j.Twitter;
-import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
-import twitter4j.TwitterStream;
-import twitter4j.TwitterStreamFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
 
@@ -44,7 +37,9 @@ public class ChatTwitter extends ChatAdapter {
 	private String pconsumer_secret = null; // api_secret
 	private String paccess_token = null;
 	private String paccess_token_secret = null;
-	
+	private String pdopublic = null;
+	private String pdoprivate = null;
+
 
 	public ChatTwitter(UserAccount user, String id) {
 		super(user, id);
@@ -53,6 +48,24 @@ public class ChatTwitter extends ChatAdapter {
 	@Override
 	public String getName() {
 		return "twitter";	
+	}
+	
+	
+	@Override
+	public boolean isPublicMsg() {
+		if (pdoprivate != null) {
+			if (pdoprivate.equals("true")) return true;
+			return false;
+		}
+		return true;
+	}
+	@Override
+	public boolean isPrivateMsg() {
+		if (pdopublic != null) {
+			if (pdopublic.equals("true")) return true;
+			return false;
+		}
+		return true;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
@@ -64,6 +77,9 @@ public class ChatTwitter extends ChatAdapter {
 		String consumer_secret = getServiceInfo("consumer_secret");
 		String access_token = getServiceInfo("access_token");
 		String access_token_secret = getServiceInfo("access_token_secret");
+		String idopublic = getServiceInfo("dopublic");
+		String idoprivate = getServiceInfo("doprivate");
+
 		if (consumer_key == null || consumer_secret == null || access_token == null || access_token_secret == null) {
 			return -1; // not configured... remove
 		}
@@ -74,6 +90,8 @@ public class ChatTwitter extends ChatAdapter {
 			if (!pconsumer_secret.equals(consumer_secret)) change = true;
 			if (!paccess_token.equals(access_token)) change = true;
 			if (!paccess_token_secret.equals(access_token_secret)) change = true;
+			if (Sutil.compare(idopublic, pdopublic)) change = true;
+			if (Sutil.compare(idoprivate, pdoprivate)) change = true;
 			if (!change) return 1;
 		}
     	ConfigurationBuilder cb = new ConfigurationBuilder();
@@ -89,6 +107,8 @@ public class ChatTwitter extends ChatAdapter {
     	pconsumer_secret = consumer_secret;
     	paccess_token = access_token;
     	paccess_token_secret = access_token_secret;
+    	pdoprivate = idoprivate;
+    	pdopublic = idopublic;
     	return 0;
 	}
 	

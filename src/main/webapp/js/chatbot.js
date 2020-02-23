@@ -171,6 +171,10 @@ function getSettings() {
 	$("#setting_username, #setting_poll_interval, #setting_sedro_access_key, #setting_database_path").html("..."); 
 
 	scsGetSettings(function(data) {
+		if (data == null || data.code == 401) {
+			window.location.href = "/index.html";
+			return;
+		}
 		$("#setting_poll_interval").html(data.info.poll_interval); 
 		$("#set_poll_interval").val(data.info.poll_interval); 
 		$("#setting_username").html(data.info.username); 
@@ -186,10 +190,6 @@ function getSettings() {
 			$("#setting_sedro_access_key").html(data.info.sedro_access_key); 
 			glob_api_key = data.info.sedro_access_key;
 			sedroGetPersonas(function (data) {
-				if (data == null || data.code == 401) {
-					window.location.href = "/index.html";
-					return;
-				}
 				// persona select list
 				if (data.list && data.list.length > 0) {
 					var pselect = "";
@@ -234,12 +234,25 @@ function getUsers() {
 					if (data.info.users[i].services) {
 						for (var k=0;k<data.info.users[i].services.length;k++) {
 							usr += "<h2 class='fLn'><b>Service: " + data.info.users[i].services[k].service + "</b></h2>";
+							var sid = null;
 							for (const property in data.info.users[i].services[k]) {
 								if (property == "service") continue;
+								if (property == "id") sid = data.info.users[i].services[k][property];
 								usr += "<div class='fLn'>";
 									usr += "<div style='padding-left:200px;text-align:left'><b>" + property + "</b>: "+data.info.users[i].services[k][property]+"</div>";
 								usr += "</div>";				
 							}
+			/*				
+							// add the service
+							for (const property in data.info.users[i].services[k]) {
+								if (property == "service") {
+									var template = $("#"+data.info.users[i].services[k][property]+"_config").html();
+									template = template.replace("=\'"+data.info.users[i].services[k][property]+"_", "=\'"+sid+"_");
+									usr += template;
+								}
+							}
+							// set the values
+			*/
 						}
 					}
 					
@@ -269,19 +282,19 @@ function getUserInfo(username) {
 	$("#userlist").show();
 
 	if (user.services) {
+		
 		// fill out the form for what we have
-		for (var k=0;k<user.services.length;k++) {			
+		for (var k=0;k<user.services.length;k++) {					
 			for (const property in user.services[k]) {
 				if (property == "service") continue;
+				if (!user.services[k][property] || user.services[k][property] == "") continue;
 				
-				// get base from..
-				//var template = $("#"+user.services[k].service+"_config");				
-// allows only one of each... 	FIXME copy one for each instance	
-				
+				// set the id and service versions
 				$("#"+user.services[k].service+"_"+property).val(user.services[k][property]);
+				$("#"+user.services[k].id+"_"+property).val(user.services[k][property]);
 				if (property == "id") {
 					// existing....
-					$("#"+user.services[k].service+"_"+property).hide();
+					//$("#"+user.services[k].service+"_"+property).hide();
 				}
 			}
 		}
@@ -319,15 +332,19 @@ function saveUser(username) {
 	var services = [];
 	
 	// Save twitter
-	//var v_service = "twitter";
 	var v_t_id = $("#twitter_id").val();
 	var v_consumer_key = $("#twitter_consumer_key").val();
 	var v_consumer_secret = $("#twitter_consumer_secret").val();
 	var v_access_token = $("#twitter_access_token").val();
 	var v_access_token_secret = $("#twitter_access_token_secret").val();		
+	var v_twitter_private = $("#twitter_doprivate").val();		
+	var v_twitter_public = $("#twitter_dopublic").val();		
+	
 	var twitter_serviceparams = {
 			service: "twitter", 
 			id: v_t_id, 
+			doprivate: v_twitter_private, 
+			dopublic: v_twitter_public, 
 			consumer_key: v_consumer_key, 
 			consumer_secret: v_consumer_secret, 
 			access_token: v_access_token, 

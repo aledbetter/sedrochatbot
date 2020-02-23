@@ -79,6 +79,16 @@ public class ChatSMS extends ChatAdapter {
 		return Sutil.compare(provider, pprovider);
 	}
 	
+	@Override
+	public boolean isPublicMsg() {
+		return false;
+	}
+	@Override
+	public boolean isPrivateMsg() {
+		return true;
+	}
+	
+	
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// EXTERNAL calls: init & processing
 	@Override
@@ -102,7 +112,6 @@ public class ChatSMS extends ChatAdapter {
 			if (!pphone_number.equals(phone_number)) change = true;
 			if (!Sutil.compare(psms_callback_url, phone_number)) change = true;			
 			if (!change) return 1;
-
 		}
 
     	// retain config
@@ -122,7 +131,6 @@ public class ChatSMS extends ChatAdapter {
 				setPhoneNumberSMSCb(pphone_number, psms_callback_url);
 			}
 		}
-		session_per_direct = true;
 		
 		return 0;
 	}

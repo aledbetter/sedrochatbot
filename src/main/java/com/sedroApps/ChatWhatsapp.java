@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import main.java.com.sedroApps.util.Sutil;
+
 
 
 public class ChatWhatsapp extends ChatAdapter { 
@@ -80,8 +82,6 @@ public class ChatWhatsapp extends ChatAdapter {
     	pconsumer_secret = consumer_secret;
     	paccess_token = access_token;
     	paccess_token_secret = access_token_secret;
-		session_per_direct = true;
-
     	return 0;
 	}
 	

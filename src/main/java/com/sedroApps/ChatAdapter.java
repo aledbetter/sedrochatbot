@@ -7,9 +7,9 @@ import main.java.com.sedroApps.util.Sutil;
 
 
 public class ChatAdapter {
-	protected boolean session_per_direct = false;
 	private UserAccount user = null;
 	private String id = null;
+	
 	
 	public ChatAdapter(UserAccount user, String id) {
 		this.user = user;
@@ -17,10 +17,6 @@ public class ChatAdapter {
 		else this.id = Sutil.getGUIDNoString();
 	}
 
-	public boolean isSession_per_direct() {
-		return session_per_direct;
-	}
-	
 	public String getName() {
 		return "none";	
 	}
@@ -40,6 +36,13 @@ public class ChatAdapter {
 		return id;	
 	}
 	
+	public boolean isPublicMsg() {
+		return false;
+	}
+	public boolean isPrivateMsg() {
+		return false;
+	}
+	
 	////////////////////////////////////////////
 	// Service state information
 	public void setServiceState(String element, String value) {
@@ -55,9 +58,6 @@ public class ChatAdapter {
 	
 	public int init(UserAccount ua) {
 		// over-ride for each service to set info needed
-		String ssession_per_direct = getServiceInfo("session_per_direct");
-		if (Sutil.compare(ssession_per_direct, "true")) session_per_direct = true;
-		
 		return 0;
 	}
 	

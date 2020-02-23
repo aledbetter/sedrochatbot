@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import main.java.com.sedroApps.util.Sutil;
+
 
 
 public class ChatFacebook extends ChatAdapter { 
@@ -32,6 +34,8 @@ public class ChatFacebook extends ChatAdapter {
 	private String pconsumer_secret = null; // api_secret
 	private String paccess_token = null;
 	private String paccess_token_secret = null;
+	private String pdopublic = null;
+	private String pdoprivate = null;
 	
 	public ChatFacebook(UserAccount user, String id) {
 		super(user, id);
@@ -40,6 +44,23 @@ public class ChatFacebook extends ChatAdapter {
 	@Override
 	public String getName() {
 		return "facebook";	
+	}
+	
+	@Override
+	public boolean isPublicMsg() {
+		if (pdoprivate != null) {
+			if (pdoprivate.equals("true")) return true;
+			return false;
+		}
+		return true;
+	}
+	@Override
+	public boolean isPrivateMsg() {
+		if (pdopublic != null) {
+			if (pdopublic.equals("true")) return true;
+			return false;
+		}
+		return true;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
@@ -51,6 +72,9 @@ public class ChatFacebook extends ChatAdapter {
 		String consumer_secret = getServiceInfo("consumer_secret");
 		String access_token = getServiceInfo("access_token");
 		String access_token_secret = getServiceInfo("access_token_secret");
+		String idopublic = getServiceInfo("dopublic");
+		String idoprivate = getServiceInfo("doprivate");
+
 		if (consumer_key == null || consumer_secret == null || access_token == null || access_token_secret == null) {
 			return -1; // not configured... remove
 		}
@@ -62,6 +86,8 @@ public class ChatFacebook extends ChatAdapter {
 			if (!pconsumer_secret.equals(consumer_secret)) change = true;
 			if (!paccess_token.equals(access_token)) change = true;
 			if (!paccess_token_secret.equals(access_token_secret)) change = true;
+			if (Sutil.compare(idopublic, pdopublic)) change = true;
+			if (Sutil.compare(idoprivate, pdoprivate)) change = true;
 			if (!change) return 0;
 		}
     	ConfigurationBuilder cb = new ConfigurationBuilder();
@@ -77,8 +103,9 @@ public class ChatFacebook extends ChatAdapter {
     	pconsumer_secret = consumer_secret;
     	paccess_token = access_token;
     	paccess_token_secret = access_token_secret;
-		session_per_direct = true;
-
+    	pdoprivate = idoprivate;
+    	pdopublic = idopublic;
+    	
     	return 0;
 	}
 	
