@@ -118,6 +118,8 @@ public class UserAccount {
 		// remove any orator associated
 		removeOrator(findOratorForChatService(cs));
 		services.remove(cs);
+		if (service_info != null) service_info.remove(id);
+		if (service_state != null) service_state.remove(id);
 	}
 	
 	
@@ -189,6 +191,7 @@ public class UserAccount {
 					Orator orat = new Orator(SCServer.getChatServer(), cs, this, readPublic, respPublic);
 					this.addOrator(orat);
 				} else {
+	// ?
 					removeChatService(id);
 				}
 			}

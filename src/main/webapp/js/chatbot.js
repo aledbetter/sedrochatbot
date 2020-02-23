@@ -221,10 +221,16 @@ function getUsers() {
 		if (data.info && data.info.users) {
 			glob_users = data.info.users;
 			for (var i=0;i<data.info.users.length;i++) {
-				usr += "<div class='fLn' id='ua_"+data.info.users[i].username+"' style='padding-top:10px;padding-bottom:10px;border-bottom:1px solid #555;position:relative;background:#FFF'>";				
-					usr += "<div class='bslink' onClick='delUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:100px;background:#EEE;'>Del</div>";	
-					usr += "<div class='bslink' onClick='editUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:180px;background:#EEE;'>Edit</div>";	
-					usr += "<div class='fLn'>";
+				usr += "<div class='fLn' id='ua_"+data.info.users[i].username+"' style='padding-top:10px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #555;position:relative;background:#F7F7F7'>";				
+					usr += "<div class='bslink' onClick='delUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:10px;background:#EEE;'>Del</div>";	
+					usr += "<div class='bslink' onClick='editUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:90px;background:#EEE;'>Edit</div>";	
+					usr += "<div style='width:180px;text-align:center;font-size:16px;position:absolute;top:37px;right:110px'>" +
+							"<select id='"+data.info.users[i].username+"_service' style='width:160px;'>" +
+								"<option value='twitter'>Twitter</option>" +
+								"<option value='twitter'>SMS</option></select></div>";	
+
+					usr += "<div class='bslink' onClick='addService(\""+data.info.users[i].username+"\");' style='width:100px;text-align:center;font-size:16px;position:absolute;top:40px;right:10px;background:#EEE;'>Add Service</div>";	
+					usr += "<div class='fLn' style='padding-bottom:10px;'>";
 						usr += "<div style='text-align:left'><b>Username: " + data.info.users[i].username +"</b></div>";
 						usr += "<div style='text-align:left'><b>Sedro Persona: " + data.info.users[i].sedro_persona +"</b></div>";
 					usr += "</div>";				
@@ -233,7 +239,9 @@ function getUsers() {
 					// all the serviecs
 					if (data.info.users[i].services) {
 						for (var k=0;k<data.info.users[i].services.length;k++) {
-							usr += "<h2 class='fLn'><b>Service: " + data.info.users[i].services[k].service + "</b></h2>";
+							usr += "<div class='fLn' style='position:relative;border-top:1px solid #CCC'>";
+							usr += "<h2 class='fLn' style='margin-bottom:0px;'><b>Service: " + data.info.users[i].services[k].service + "</b></h2>";
+
 							var sid = null;
 							for (const property in data.info.users[i].services[k]) {
 								if (property == "service") continue;
@@ -242,6 +250,8 @@ function getUsers() {
 									usr += "<div style='text-align:left'><b>" + property + "</b>: "+data.info.users[i].services[k][property]+"</div>";
 								usr += "</div>";				
 							}
+							// setup edit
+							// FIXME
 			/*				
 							// add the service
 							for (const property in data.info.users[i].services[k]) {
@@ -253,6 +263,9 @@ function getUsers() {
 							}
 							// set the values
 			*/
+							
+							usr += "<div class='bslink' onClick='delService(\""+sid+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;top:14px;right:10px;background:#EEE;'>Del</div>";	
+							usr += "</div>";
 						}
 					}
 					
@@ -324,6 +337,21 @@ function editUser(username) {
 	// position form: FIXME
 	
 	
+}
+function delService(id) {
+	scsDelUser(id, function(data) {
+		if (data == null || data.code == 401) {
+			window.location.href = "/index.html";
+			return;
+		}
+		getUsers();
+	});
+}
+
+function addService(username) {
+	var service = $("#"+username+"_service").val();
+	// FIXME always the first one in the list
+	alert(service);
 }
 
 // save the user info
@@ -501,6 +529,15 @@ function scsAddUser(username, sedro_persona, cb) {
 }
 function scsDelUser(username, cb) {	
 	$.ajax({url: "/api/1.0/user/"+username+"/del", type: 'POST', async: true, contentType: 'application/json', 
+	  success: function(data){
+		  cb(data);
+	  }, error: function(xhr) {
+		  cb(null);
+	  }
+	});
+}
+function scsDelService(id, cb) {	
+	$.ajax({url: "/api/1.0/service/"+id+"/del", type: 'POST', async: true, contentType: 'application/json', 
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {

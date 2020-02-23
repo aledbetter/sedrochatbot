@@ -258,6 +258,24 @@ public class RestAPI {
 		// add all the doc content
 		return rr.ret();
 	}
+	@POST
+	@Path("/service/{id}/del")
+	public Response GetServiceUserDelServicePOST(@Context UriInfo info, 
+			@Context HttpServletRequest hsr,
+    		@PathParam("id") String id,
+			@CookieParam("atok") String cookie_access_key, 
+			String body) {
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!rr.isAuth()) return rr.ret(401);
+
+		SCServer cs = SCServer.getChatServer();
+		ChatAdapter ca = cs.findChatService(id);
+		if (ca == null) return rr.ret(404);
+		ca.getUser().removeChatService(id);
+		cs.save();
+		// add all the doc content
+		return rr.ret();
+	}
 	
 	@POST
 	@Path("/user/{user}")
