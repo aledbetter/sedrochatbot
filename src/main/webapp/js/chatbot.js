@@ -225,8 +225,8 @@ function getUsers() {
 					usr += "<div class='bslink' onClick='delUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:100px;background:#EEE;'>Del</div>";	
 					usr += "<div class='bslink' onClick='editUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:180px;background:#EEE;'>Edit</div>";	
 					usr += "<div class='fLn'>";
-						usr += "<div style='padding-left:200px;text-align:left'><b>Username: " + data.info.users[i].username +"</b></div>";
-						usr += "<div style='padding-left:200px;text-align:left'><b>Sedro Persona: " + data.info.users[i].sedro_persona +"</b></div>";
+						usr += "<div style='text-align:left'><b>Username: " + data.info.users[i].username +"</b></div>";
+						usr += "<div style='text-align:left'><b>Sedro Persona: " + data.info.users[i].sedro_persona +"</b></div>";
 					usr += "</div>";				
 					usr += "<div id='show_ua'>";
 	
@@ -239,7 +239,7 @@ function getUsers() {
 								if (property == "service") continue;
 								if (property == "id") sid = data.info.users[i].services[k][property];
 								usr += "<div class='fLn'>";
-									usr += "<div style='padding-left:200px;text-align:left'><b>" + property + "</b>: "+data.info.users[i].services[k][property]+"</div>";
+									usr += "<div style='text-align:left'><b>" + property + "</b>: "+data.info.users[i].services[k][property]+"</div>";
 								usr += "</div>";				
 							}
 			/*				
@@ -361,10 +361,13 @@ function saveUser(username) {
 	var v_account_sid = $("#sms_account_sid").val();
 	var v_auth_token = $("#sms_auth_token").val();
 	var v_phone_number = $("#sms_phone_number").val();
+	var v_sms_callback_url = $("#sms_sms_callback_url").val();
+	
 
 	var sms_serviceparams = {
 			service: "sms", 
 			id: v_sms_id, 
+			sms_callback_url: v_sms_callback_url, 			
 			provider: v_provider, 
 			phone_number: v_phone_number, 
 			account_sid: v_account_sid, 
