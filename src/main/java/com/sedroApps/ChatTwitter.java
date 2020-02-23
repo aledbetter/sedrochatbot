@@ -46,8 +46,8 @@ public class ChatTwitter extends ChatAdapter {
 	private String paccess_token_secret = null;
 	
 
-	public ChatTwitter(UserAccount user) {
-		super(user);
+	public ChatTwitter(UserAccount user, String id) {
+		super(user, id);
 	}
 	
 	@Override
@@ -60,10 +60,10 @@ public class ChatTwitter extends ChatAdapter {
 	@Override
 	public int init(UserAccount ua) {
 		super.init(ua);
-		String consumer_key = ua.getServiceInfo(getName(), "consumer_key");
-		String consumer_secret = ua.getServiceInfo(getName(), "consumer_secret");
-		String access_token = ua.getServiceInfo(getName(), "access_token");
-		String access_token_secret = ua.getServiceInfo(getName(), "access_token_secret");
+		String consumer_key = getServiceInfo("consumer_key");
+		String consumer_secret = getServiceInfo("consumer_secret");
+		String access_token = getServiceInfo("access_token");
+		String access_token_secret = getServiceInfo("access_token_secret");
 		if (consumer_key == null || consumer_secret == null || access_token == null || access_token_secret == null) {
 			return -1; // not configured... remove
 		}

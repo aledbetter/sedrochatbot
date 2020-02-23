@@ -20,7 +20,7 @@ public class Orator {
 		this.service = service;
 		this.server = server;
 		this.user = user;
-		String persona = user.getSedroPersona(service.getName());
+		String persona = user.getSedroPersona();
 		if (persona == null) {
 			System.out.println("ERROR OProc: NO PERSONA");
 			return;
@@ -31,7 +31,7 @@ public class Orator {
 			processorPublic.setChannel_type(service.getChannel_type());
 			processorPublic.setLanguage(service.getLanguage());
 			processorPublic.setContext(service.getContext());
-			processorPublic.setPersona(user.getSedroPersona(service.getName()));
+			processorPublic.setPersona(user.getSedroPersona());
 		}
 	}
 	
@@ -91,7 +91,7 @@ public class Orator {
 					proc.setChannel_type(service.getChannel_type());
 					proc.setLanguage(service.getLanguage());
 					proc.setContext(service.getContext());
-					proc.setPersona(user.getSedroPersona(service.getName()));
+					proc.setPersona(user.getSedroPersona());
 	
 					// information specific to this caller
 					proc.setCaller_token(call.get("caller_token"));

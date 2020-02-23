@@ -215,15 +215,17 @@ public class RestAPI {
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 		if (!rr.isAuth()) return rr.ret(401);
-		String username = null;
+		String username = null, sedro_persona = null;
 
 		try {
 			JSONObject obj = new JSONObject(body);
 			username = RestUtil.getJStr(obj, "username");
+			sedro_persona = RestUtil.getJStr(obj, "sedro_persona");
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
-		if (!RestUtil.paramHave(username)) return rr.ret(401);
+		if (!RestUtil.paramHave(username)) return rr.ret(402);
+		if (!RestUtil.paramHave(sedro_persona)) return rr.ret(402);
 
 		SCServer cs = SCServer.getChatServer();
 		UserAccount ua = cs.getUser(username);
@@ -231,7 +233,8 @@ public class RestAPI {
 			
 		ua = cs.addUser(username, true);
 		if (ua == null) return rr.ret(500);
-
+		ua.setSedroPersona(sedro_persona);
+		
 		rr.setInfo(ua.getMap());
 		
 		return rr.ret();
@@ -288,18 +291,30 @@ public class RestAPI {
 					
 					JSONObject svrcfg = srv.getJSONObject(service);
 					String [] params = JSONObject.getNames(svrcfg);
-
+					String id = null;
+					for (String p:params) {
+						if (p.equals("id")) {
+							String val = svrcfg.getString(p);
+							id = val;
+							break;
+						}
+					}
+					
+					// new service
+					if (id == null || id.equalsIgnoreCase("new")) {
+						id = ua.addChatService(service);
+					}
 					//System.out.println("SERVICES params["+service+"] " + params.length);
 
 					for (String p:params) {
+						if (p.equals("id")) continue;
 						String val = svrcfg.getString(p);
-						String cur_val = ua.getServiceInfo(service, p);
+						String cur_val = ua.getServiceInfo(id, p);
 					//	System.out.println("     params["+p+"] " + val);
 
 						if (!Sutil.compare(val, cur_val)) {
-							ua.setServiceInfo(service, p, val);
+							ua.setServiceInfo(id, p, val);
 							//System.out.println("     params["+service+"]["+p+"] " + val);
-
 						}
 						// FIXME: what about remove?
 					}

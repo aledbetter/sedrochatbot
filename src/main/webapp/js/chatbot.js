@@ -32,6 +32,8 @@ $(document).ready(function() {
 	$("#add_username").val("");
 	$("#userInfo").hide();
 	$("#set_password2, #set_password").removeClass("error");
+	
+	$("#userlist").show();
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check auth cookie
@@ -118,16 +120,21 @@ $(document).ready(function() {
 			$("#user_add").hide();
 			$("#user_add").attr("data-v", "show");
 			$("#add_user_bt").html("Add User");
+			$("#userlist").show();
 		} else {
 			$("#user_add").show();
 			$("#user_add").attr("data-v", "hide");
 			$("#add_user_bt").html("Cancel");
+			$("#userlist").hide();
 		}
 	});
 	$("#save_add_user_bt").on('click', function (e) {
 		var u = $("#add_username").val();
 		if (!u) return;
-		scsAddUser(u, function(data) {
+		var up = $("#user_sedro_persona").val();
+		if (!up) return;
+		
+		scsAddUser(u, up, function(data) {
 			getUsers();
 			$("#add_user_bt").click();
 			$("#add_username").val("");
@@ -192,7 +199,7 @@ function getSettings() {
 			});
 		} else {
 			$("#set_sedro_access_key").val(""); 
-			$("#setting_sedro_access_key").html("none"); 
+			$("#setting_sedro_access_key").html("<span style='font-weight:bold;color:red'>KEY REQUIRED</span>"); 
 			glob_api_key = null;
 		}
 
@@ -200,6 +207,7 @@ function getSettings() {
 }
 
 function getUsers() {
+	$("#userlist").show();
 	$("#userlist").html("Getting User List..."); 
 	scsGetUsers(function(data) {
 		if (data == null || data.code == 401) {
@@ -214,6 +222,7 @@ function getUsers() {
 					usr += "<div class='bslink' onClick='delUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:100px;background:#EEE;'>Del</div>";	
 					usr += "<div class='bslink' onClick='editUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:180px;background:#EEE;'>Edit</div>";	
 					usr += "<div class'fLn'><b>Username: " + data.info.users[i].username +"</b></div>";
+					usr += "<div class'fLn'><b>Sedro Persona: " + data.info.users[i].sedro_persona +"</b></div>";
 					usr += "<div id='show_ua'>";
 	
 					// all the serviecs
@@ -252,13 +261,23 @@ function getUserInfo(username) {
 	}
 	if (!user) return null;
 	$(".username").html(username);
-	
+	$("#userlist").show();
+
 	if (user.services) {
 		// fill out the form for what we have
 		for (var k=0;k<user.services.length;k++) {			
 			for (const property in user.services[k]) {
 				if (property == "service") continue;
+				
+				// get base from..
+				//var template = $("#"+user.services[k].service+"_config");				
+// allows only one of each... 	FIXME copy one for each instance	
+				
 				$("#"+user.services[k].service+"_"+property).val(user.services[k][property]);
+				if (property == "id") {
+					// existing....
+					$("#"+user.services[k].service+"_"+property).hide();
+				}
 			}
 		}
 	}
@@ -277,9 +296,11 @@ function editUser(username) {
 	}
 	glob_edit_u = username;	
 	
-	
 	$(".inform").val(""); 	// clear the forms
+	$(".inform_id").val("new"); 	// clear the forms
 	getUserInfo(username); 	// fill out the form
+	
+	$("#userlist").hide();
 	$("#userInfo").show();
 
 	// position form: FIXME
@@ -290,30 +311,30 @@ function editUser(username) {
 // save the user info
 function saveUser(username) {
 	
-	var v_twitter_sedro_presona = $("#twitter_sedro_persona").val();		
 	var services = [];
 	
 	// Save twitter
 	//var v_service = "twitter";
+	var v_t_id = $("#twitter_id").val();
 	var v_consumer_key = $("#twitter_consumer_key").val();
 	var v_consumer_secret = $("#twitter_consumer_secret").val();
 	var v_access_token = $("#twitter_access_token").val();
 	var v_access_token_secret = $("#twitter_access_token_secret").val();		
 	var twitter_serviceparams = {
 			service: "twitter", 
-			sedro_persona: v_twitter_sedro_presona, 
+			id: v_t_id, 
 			consumer_key: v_consumer_key, 
 			consumer_secret: v_consumer_secret, 
 			access_token: v_access_token, 
 			access_token_secret: v_access_token_secret};
-	if (v_consumer_key && consumer_secret && access_token_secret && v_access_token && v_twitter_sedro_presona) {
-		if (v_consumer_key.length > 5 && consumer_secret.length > 5 && access_token_secret.length > 5 && v_access_token.length > 5 && v_twitter_sedro_presona.length > 3) {
+	if (v_consumer_key && v_consumer_secret && v_access_token_secret && v_access_token) {
+		if (v_consumer_key.length > 5 && v_consumer_secret.length > 5 && v_access_token_secret.length > 5 && v_access_token.length > 5) {
 			services.push(twitter_serviceparams);
 		}
 	}
 
 	// Save SMS
-	var v_sms_sedro_presona = $("#sms_sedro_persona").val();		
+	var v_sms_id = $("#sms_id").val();
 	var v_provider = $("#sms_provider").val();
 	var v_account_sid = $("#sms_account_sid").val();
 	var v_auth_token = $("#sms_auth_token").val();
@@ -321,14 +342,14 @@ function saveUser(username) {
 
 	var sms_serviceparams = {
 			service: "sms", 
-			sedro_persona: v_sms_sedro_presona, 
+			id: v_sms_id, 
 			provider: v_provider, 
 			phone_number: v_phone_number, 
 			account_sid: v_account_sid, 
 			auth_token: v_auth_token};
 	
-	if (v_provider && v_account_sid && v_auth_token && v_sms_sedro_presona && v_phone_number) {
-		if (v_provider.length > 3 && v_account_sid.length > 5 && v_auth_token.length > 5 && v_sms_sedro_presona.length > 3 && v_phone_number.length >= 10) {
+	if (v_provider && v_account_sid && v_auth_token && v_phone_number) {
+		if (v_provider.length > 3 && v_account_sid.length > 5 && v_auth_token.length > 5 && v_phone_number.length >= 10) {
 			services.push(sms_serviceparams);
 		}
 	}	
@@ -439,9 +460,10 @@ function scsGetUser(user, cb) {
 	});
 }
 
-function scsAddUser(username, cb) {	
+function scsAddUser(username, sedro_persona, cb) {	
 	var dat = "{ "; 
     dat += "\"username\": \"" + username + "\"";
+    dat += ", \"sedro_persona\": \"" + sedro_persona + "\"";
     dat += "}";
 	
 	$.ajax({url: "/api/1.0/user/add", type: 'POST', async: true, data: dat, contentType: 'application/json', 
@@ -479,7 +501,6 @@ function scsUpdateUser(username, services, cb) {
 		var first = true;
 		if (serviceparams) {
 			for (const property in serviceparams) {
-				if (property == "service") continue;
 				if (!first) dat += ", ";
 				else first = false;
 				dat += "\""+property+"\": \"" + serviceparams[property] + "\"";

@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import main.java.com.sedroApps.util.Sutil;
+
 public class UserAccount {
 	// chatbot info (name may be different accross services)
 	private String username;
+	private String sedro_persona;
 	
 	// service info
 	HashMap<String, HashMap<String, String>> service_info = null;
@@ -23,69 +26,83 @@ public class UserAccount {
 		return username;
 	}
 	
+	
+	public String getSedroPersona() {
+		return sedro_persona;
+	}		
+	public void setSedroPersona(String sedro_persona) {
+		this.sedro_persona = sedro_persona;
+	}	
+	
 	////////////////////////////////////////
 	// Manage configuration
-	public String getUsername(String service) {
-		return getServiceInfo(service, "username");
-	}
-	public String getCaller_token(String service) {
-		return getServiceInfo(service, "caller_token");
-	}
-	public String getSedroPersona(String service) {
-		return getServiceInfo(service, "sedro_persona");
-	}		
-	public String getServiceInfo(String service, String element) {
+	public String getServiceInfo(String id, String element) {
 		if (service_info == null) return null;
-		HashMap<String, String> hm = service_info.get(service);
+		HashMap<String, String> hm = service_info.get(id);
 		if (hm == null) return null;		
 		return hm.get(element);
 	}
-	public void setServiceInfo(String service, String element, String value) {
-		if (service == null || element == null) return;
+	public void setServiceInfo(String id, String element, String value) {
+		if (id == null || element == null) return;
 		if (service_info == null) service_info = new HashMap<>();
 
-		HashMap<String, String> hm = service_info.get(service);
+		HashMap<String, String> hm = service_info.get(id);
 		if (hm == null) {
 			hm = new HashMap<>();
-			hm.put("service", service);
+			hm.put("id", id);
 		}
 		if (value.isEmpty()) {
 			hm.remove(element);
 		} else {
 			hm.put(element, value);
 		}
-		service_info.put(service, hm);
+		service_info.put(id, hm);
 	}
 	
-	public String getServiceState(String service, String element) {
+	public String getServiceState(String id, String element) {
 		if (service_state == null) return null;
-		HashMap<String, String> hm = service_state.get(service);
+		HashMap<String, String> hm = service_state.get(id);
 		if (hm == null) return null;		
 		return hm.get(element);
 	}
-	public void setServiceState(String service, String element, String value) {
-		if (service == null || element == null) return;
+	public void setServiceState(String id, String element, String value) {
+		if (id == null || element == null) return;
 		if (service_state == null) service_state = new HashMap<>();
 
-		HashMap<String, String> hm = service_state.get(service);
+		HashMap<String, String> hm = service_state.get(id);
 		if (hm == null) {
 			hm = new HashMap<>();
-			hm.put("service", service);
+			hm.put("id", id);
 		}
 		if (value.isEmpty()) {
 			hm.remove(element);
 		} else {
 			hm.put(element, value);
 		}
-		service_state.put(service, hm);
+		service_state.put(id, hm);
+	}
+	
+	public String addChatService(String service) {
+		// new service
+		String id = Sutil.getGUIDNoString();
+		setServiceInfo(id, "id", id);
+		setServiceInfo(id, "service", service);
+		return id;
 	}
 	
 	////////////////////////////////////////
 	// Manage the services
-	public ChatAdapter findChatService(String service) {
+	public ChatAdapter findChatServiceByService(String service) {
 		if (services == null) return null;
 		for (ChatAdapter cs:services) {
 			if (cs.getName().equals(service)) return cs;
+		}
+		return null;
+	}
+	public ChatAdapter findChatService(String id) {
+		if (services == null) return null;
+		for (ChatAdapter cs:services) {
+			if (cs.getId().equals(id)) return cs;
 		}
 		return null;
 	}
@@ -93,9 +110,9 @@ public class UserAccount {
 		if (services == null) services = new ArrayList<>();
 		if (!services.contains(cs)) services.add(cs);
 	}
-	public void removeChatService(String service) {
+	public void removeChatService(String id) {
 		if (services == null) return;
-		ChatAdapter cs = findChatService(service);
+		ChatAdapter cs = findChatService(id);
 		if (cs == null) return;
 		cs.disconnnect(this);
 		// remove any orator associated
@@ -146,20 +163,21 @@ public class UserAccount {
 			boolean respPublic = true;
 		
 			// initiallize all the interfaces
-			for (String key:service_info.keySet()) {
-				ChatAdapter cs = findChatService(key);
-				switch (key) {
+			for (String id:service_info.keySet()) {
+				ChatAdapter cs = findChatService(id);
+				String service = this.getServiceInfo(id, "service");
+				switch (service) {
 				case "twitter":
-					if (cs == null) cs = new ChatTwitter(this);
+					if (cs == null) cs = new ChatTwitter(this, id);
 					break;
 				case "facebook":
-					if (cs == null) cs = new ChatFacebook(this);
+					if (cs == null) cs = new ChatFacebook(this, id);
 					break;
 				case "whatsapp":
-					if (cs == null) cs = new ChatWhatsapp(this);
+					if (cs == null) cs = new ChatWhatsapp(this, id);
 					break;
 				case "sms":
-					if (cs == null) cs = new ChatSMS(this);
+					if (cs == null) cs = new ChatSMS(this, id);
 					break;
 				}
 				// up up date
@@ -172,7 +190,7 @@ public class UserAccount {
 					Orator orat = new Orator(SCServer.getChatServer(), cs, this, readPublic, respPublic);
 					this.addOrator(orat);
 				} else {
-					removeChatService(key);
+					removeChatService(id);
 				}
 			}
 		}
@@ -185,37 +203,45 @@ public class UserAccount {
 		// always save all
 		SCServer.getChatServer().save();
 	}
+	public void saveState() {
+		// always save all
+		SCServer.getChatServer().save();
+	}
 	
 	public void load(HashMap<String, Object> um) {
+		// user config
+		this.sedro_persona = (String)um.get("sedro_persona");
+		
 		// load user info from DB
 		if (service_info == null) service_info = new HashMap<>();
 		if (service_state == null) service_state = new HashMap<>();
 		if (services == null) services = new ArrayList<>();
 		//System.out.println("  LOAD: " + um.keySet());
 
+		// load Config
 		List<HashMap<String, Object>> sl = (List<HashMap<String, Object>>)um.get("services");
 		if (sl != null && sl.size() > 0) {
 			for (HashMap<String, Object> hm:sl) {
-				String sn = (String)hm.get("service");
+				String sid = (String)hm.get("id");
 				HashMap<String, String> nhm = new HashMap<>();
 				for (String key:hm.keySet()) {
-					if (key.equals("service")) continue;
 					//System.out.println("      S["+sn+"]["+key+"]: " + hm.get(key));
 					nhm.put(key, ""+hm.get(key));
 				}
-				service_info.put(sn, nhm);
+				service_info.put(sid, nhm);
 			}
 		}
+		
+		// load State
 		sl = (List<HashMap<String, Object>>)um.get("services_state");
 		if (sl != null && sl.size() > 0) {
 			for (HashMap<String, Object> hm:sl) {
-				String sn = (String)hm.get("service");
+				String sid = (String)hm.get("id");
 				HashMap<String, String> nhm = new HashMap<>();
 				for (String key:hm.keySet()) {
-					if (key.equals("service")) continue;
 					nhm.put(key,""+hm.get(key));
 				}
-				service_state.put(sn, nhm);
+				service_state.put(sid, nhm);
 			}
 		}
 		// initialize Services
@@ -223,17 +249,38 @@ public class UserAccount {
 	}
 
 	// get al lthe user info as a map..
+	public List<HashMap<String, Object>> getMapState() {
+		if (service_state != null && service_state.keySet().size() > 0) {
+			List<HashMap<String, Object>> sl = new ArrayList<>();
+			for (String id:service_state.keySet()) {
+				//System.out.println("     get["+key+"]");
+
+				HashMap<String, String> sconfig = service_state.get(id);
+				HashMap<String, Object> sm = new HashMap<>();
+				sm.put("id", id);			
+				for (String param:sconfig.keySet()) {
+					sm.put(param, sconfig.get(param));
+				}
+				sl.add(sm);
+			}
+			return sl;
+		}
+		return null;
+	}
+	// get al lthe user info as a map..
 	public HashMap<String, Object> getMap() {
 		HashMap<String, Object> m = new HashMap<>();
 		m.put("username", this.username);
+		m.put("sedro_persona", this.sedro_persona);
+		
 		if (service_info != null && service_info.keySet().size() > 0) {
 			List<HashMap<String, Object>> sl = new ArrayList<>();
-			for (String key:service_info.keySet()) {
+			for (String id:service_info.keySet()) {
 				//System.out.println("     get["+key+"]");
-
-				HashMap<String, String> sconfig = service_info.get(key);
+				
+				HashMap<String, String> sconfig = service_info.get(id);
 				HashMap<String, Object> sm = new HashMap<>();
-				sm.put("service", key);
+				sm.put("id", id);
 				for (String param:sconfig.keySet()) {
 					sm.put(param, sconfig.get(param));
 				}
@@ -241,21 +288,10 @@ public class UserAccount {
 			}
 			m.put("services", sl);
 		}
-		if (service_state != null && service_state.keySet().size() > 0) {
-			List<HashMap<String, Object>> sl = new ArrayList<>();
-			for (String key:service_state.keySet()) {
-				//System.out.println("     get["+key+"]");
-
-				HashMap<String, String> sconfig = service_state.get(key);
-				HashMap<String, Object> sm = new HashMap<>();
-				sm.put("service", key);
-				for (String param:sconfig.keySet()) {
-					sm.put(param, sconfig.get(param));
-				}
-				sl.add(sm);
-			}
-			m.put("services_state", sl);
-		}
+		
+		List<HashMap<String, Object>> sl = getMapState();
+		if (sl != null) m.put("services_state", sl);
+		
 		return m;
 	}
 	

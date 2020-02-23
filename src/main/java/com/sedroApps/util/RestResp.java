@@ -72,7 +72,7 @@ public class RestResp {
 			System.out.println("BAD ATOK: " + this.atok);
 			return false;
 		}
-		if (DButil.getSessionKey(this.atok, true) == null) return false;
+		if (DButil.getSessionKey(this.atok) == null) return false;
 		return true;
 	}
 	public String getAtok() {

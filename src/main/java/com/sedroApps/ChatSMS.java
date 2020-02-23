@@ -44,7 +44,7 @@ public class ChatSMS extends ChatAdapter {
 	private static final boolean no_send = false;
 	
 	private static final String datefmt = "EEE, dd MMM yyyy HH:mm:ss Z";
-	private static final int DEF_PAST = 4; // 4 days
+	private static final int DEF_PAST = 2; // 2 days
 
 	// this is per user?
 	private String pprovider = null;  	// twillio / bandwidth.com / etc
@@ -60,8 +60,8 @@ public class ChatSMS extends ChatAdapter {
 	private List<HashMap<String, String>> msg_set = null;
 
 	
-	public ChatSMS(UserAccount user) {
-		super(user);
+	public ChatSMS(UserAccount user, String id) {
+		super(user, id);
 	}
 
 	@Override
@@ -84,11 +84,11 @@ public class ChatSMS extends ChatAdapter {
 	public int init(UserAccount ua) {
 		super.init(ua);
 
-		String provider = ua.getServiceInfo(getName(), "provider");
-		String account_sid = ua.getServiceInfo(getName(), "account_sid");
-		String auth_token = ua.getServiceInfo(getName(), "auth_token");
-		String phone_number = ua.getServiceInfo(getName(), "phone_number");
-		String sms_callback_url = ua.getServiceInfo(getName(), "sms_callback_url");
+		String provider = getServiceInfo("provider");
+		String account_sid = getServiceInfo("account_sid");
+		String auth_token = getServiceInfo("auth_token");
+		String phone_number = getServiceInfo("phone_number");
+		String sms_callback_url = getServiceInfo("sms_callback_url");
 		if (auth_token == null || account_sid == null || provider == null) {
 			return -1; // not configured... remove
 		}

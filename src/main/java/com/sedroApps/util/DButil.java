@@ -58,6 +58,11 @@ public class DButil {
     	System.out.println("DBUtil: start initialize");
         try {      
 	        setupJDBC(); // RDB	
+	 //       dropDataTables();
+	        
+	        // verify tables
+			createSessionTable();
+			createDataTable();
         } catch (Throwable ex) {
             throw new ExceptionInInitializerError(ex);
         }
@@ -161,14 +166,14 @@ public class DButil {
   			Statement stmt = conn.createStatement();
 		    stmt.executeUpdate(sql);
 		} catch (Exception e) {
-			e.printStackTrace();
+		//	e.printStackTrace();
 			return false;
 		}
 		//System.out.println("createDirTable["+DIR_NAME+"] Complete");
 		return true;
 	}
 	
-	public static Timestamp getSessionKey(String key, boolean confail) {
+	public static Timestamp getSessionKey(String key) {
 		if (key == null) return null;
 		
  		Connection conn = DButil.getConnection();
@@ -189,12 +194,7 @@ public class DButil {
 	  		DButil.closeConnection(conn); 		
 		} catch (SQLException e) { 
 	  		DButil.closeConnection(conn); 		
-			if (confail) {
-				createSessionTable();
-				return getSessionKey(key, false);
-			} else {
-				e.printStackTrace();
-			}
+			e.printStackTrace();
 		}
 		return ts;
 	}
@@ -256,10 +256,28 @@ public class DButil {
 	
 	
 	public static boolean createDataTable() {
-		String sql = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" (key VARCHAR(64) PRIMARY KEY, data bytea);";
+		String sql = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" (key VARCHAR(64) PRIMARY KEY, data bytea, sdata bytea);";
   		Connection conn = DButil.getConnection();
 		if (conn == null) {
   			System.out.println("ERROR createDirTable["+TABLE_NAME+"] connect fail");
+  			return false;
+  		}
+  		try {
+  			Statement stmt = conn.createStatement();
+		    stmt.executeUpdate(sql);
+		} catch (Exception e) {
+			//e.printStackTrace();
+			return false;
+		}
+		//System.out.println("createDirTable["+DIR_NAME+"] Complete");
+		return true;
+	}
+	
+	public static boolean dropDataTables() {
+		String sql = "DROP TABLE "+TABLE_NAME+", "+SESS_TABLE_NAME+";";
+  		Connection conn = DButil.getConnection();
+		if (conn == null) {
+  			System.out.println("ERROR dropDataTables["+TABLE_NAME+"/"+SESS_TABLE_NAME+"] connect fail");
   			return false;
   		}
   		try {
@@ -272,7 +290,7 @@ public class DButil {
 		//System.out.println("createDirTable["+DIR_NAME+"] Complete");
 		return true;
 	}
-	private static InputStream getDBDataStream(String key, boolean confail) {
+	private static InputStream getDBDataStream(String key) {
   		Connection conn = DButil.getConnection();
   		if (conn == null) return null;
   		String sql = "SELECT * FROM "+TABLE_NAME + " WHERE key = '" + key+"'";
@@ -284,18 +302,14 @@ public class DButil {
 		    	try {
 			    String label = rs.getString("key");
 				data = rs.getBinaryStream("data");
+			//	data = rs.getBinaryStream("data2");
 		    	} catch (Throwable t) {}
 			    rs.close();	
 		    }
 	  		DButil.closeConnection(conn); 		
 		} catch (SQLException e) { 
 	  		DButil.closeConnection(conn); 		
-			if (confail) {
-				createDataTable();
-				return getDBDataStream(key, false);
-			} else {
-				e.printStackTrace();
-			}
+			e.printStackTrace();
 		}
 		return data;
 	}
@@ -345,7 +359,7 @@ public class DButil {
     	if (key == null) return null;
     	if (!haveDB()) return null;
 
-    	InputStream data = getDBDataStream(key, true);
+    	InputStream data = getDBDataStream(key);
     	if (data == null) return null;
     	if (true) return null;
     	// use bytes
@@ -360,10 +374,6 @@ public class DButil {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		//@SuppressWarnings({ "unchecked", "unused" })
-		//HashMap<String, Object> obj = (HashMap<String, Object>)SerializationUtils.deserialize(data);
-    	//return obj;
 		return null;
     }
     
