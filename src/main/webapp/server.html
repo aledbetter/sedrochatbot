@@ -65,8 +65,11 @@
 				<h1 id='usererror' style='color:red;display:none'></h1>
 				
 				<div class='fLn' style='display:none;font-size:16px;padding-top:15px;' id='user_add'>
-					<div class='fLn' style='margin-top:5px'><b>Username:</b> <input type='text' id='add_username'/></div>						
-					<div class='fLn' style='margin-top:5px'><b>Sedro Persona:</b> <select class='inform persona_list' id='user_sedro_persona' style='width:160px'><option value=''>No Personas</option></select>&nbsp;&nbsp;&nbsp;<a href='/mgt.html'>(Add or Edit Persona)</a></div>
+					<div class='fLn' style='padding-left:200px;text-align:left'> 					
+						<div class='fLn' style='margin-top:5px'><b>Username:</b> <input type='text' id='add_username'/></div>						
+						<div class='fLn' style='margin-top:5px'><b>Sedro Persona:</b> <select class='inform persona_list' id='user_sedro_persona' style='width:160px'><option value=''>No Personas</option></select>&nbsp;&nbsp;&nbsp;<a href='/mgt.html'>(Add or Edit Persona)</a></div>
+					</div>
+					
 					<div class='fLn' style='margin-top:15px'>
 						<div class='bslink' id='save_add_user_bt' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:440px;background:#EEE;'>Add</div>			
 					</div>
@@ -74,22 +77,23 @@
 		
 				<div class='fLn' id='userInfo' style='display:none;background:#FFF;padding-bottom:20px;font-size:16px;padding-top:15px;border-bottom:1px solid #333;border-top:1px solid #333;margin-top:10px; margin-bottom:10px'>					
 					<h1>Edit info: <span class='username'>...</span></h1>
-					
+		<!-- CONFIG -->			
 					<div class='fLn' id='twitter_config' style='margin-top:25px'> 
 						<h2>Twitter Configuration:</h2>
 						
 						<div class='fLn' style='padding-left:200px;text-align:left'> 
+							<div class='fLn' style='margin-top:5px'><b>id:</b> <input class='inform inform_id' style='width:200px;color:#777' type='text' id='twitter_id'/> </div>
 							<div class='fLn' style='margin-top:5px'><b>consumer_key:</b> <input class='inform' style='width:250px' type='text' id='twitter_consumer_key'/> </div>
 							<div class='fLn' style='margin-top:5px'><b>consumer_secret:</b> <input class='inform' style='width:400px' type='text' id='twitter_consumer_secret'/> </div>
 							<div class='fLn' style='margin-top:5px'><b>access_token:</b> <input class='inform' style='width:400px' type='text' id='twitter_access_token'/> </div>
 							<div class='fLn' style='margin-top:5px'><b>access_token_secret:</b> <input class='inform' style='width:400px' type='text' id='twitter_access_token_secret'/> </div>					
-							<div class='fLn' style='margin-top:5px'><b>id:</b> <input class='inform inform_id' style='width:200px;color:#777' type='text' id='twitter_id'/> </div>
 						</div>	
 					</div>
 					
 					<div class='fLn' id='sms_config' style='margin-top:25px'> 
 						<h2>SMS Configuration:</h2>
 						<div class='fLn' style='padding-left:200px;text-align:left'> 
+							<div class='fLn' style='margin-top:5px'><b>id:</b> <input class='inform inform_id' style='width:200px;color:#777' type='text' id='sms_id'/> </div>
 							<div class='fLn' style='margin-top:5px'><b>provider:</b> 							
 								<select class='inform' id='sms_provider' style='width:160px'>
 									<option value='twilio' selected>twilio</option>
@@ -98,10 +102,9 @@
 							<div class='fLn' style='margin-top:5px'><b>phone number:</b> <input class='inform' style='width:200px' type='text' id='sms_phone_number'/> </div>
 							<div class='fLn' style='margin-top:5px'><b>account_sid:</b> <input class='inform' style='width:400px' type='text' id='sms_account_sid'/> </div>
 							<div class='fLn' style='margin-top:5px'><b>auth_token:</b> <input class='inform' style='width:400px' type='text' id='sms_auth_token'/> </div>
-							<div class='fLn' style='margin-top:5px'><b>id:</b> <input class='inform inform_id' style='width:200px;color:#777' type='text' id='sms_id'/> </div>
 						</div>	
 					</div>
-					
+			<!-- CONFIG -->			
 					<div class='fLn' style='margin-top:15px'> 	
 						<div class='bslink' id='save_user_cancel_bt' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:375px;float:left;background:#EEE;'>Cancel</div>			
 						<div class='bslink' id='save_user_bt' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:10px;float:left;background:#EEE;'>Save</div>			

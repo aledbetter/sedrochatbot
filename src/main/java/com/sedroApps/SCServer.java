@@ -158,6 +158,7 @@ public class SCServer {
 	}
 	
 	public void save() {
+
 		// Save the data
 		HashMap<String, Object> sm = getMap();
 		sm.put("password", this.password);
@@ -173,12 +174,12 @@ public class SCServer {
 				}
 			}
 		}
-		DButil.save("chatserver", sm);
+		DButil.save(DButil.SINGLE_KEY, sm);
 	}
 	
 	public void load() {
 		// Load the data
-		HashMap<String, Object> sm = DButil.load("chatserver");
+		HashMap<String, Object> sm = DButil.load(DButil.SINGLE_KEY);
 		if (sm == null) return;
 		//  load from the data map
 		synchronized (username) {

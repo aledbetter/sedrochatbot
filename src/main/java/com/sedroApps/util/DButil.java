@@ -39,6 +39,7 @@ import org.apache.commons.lang3.SerializationUtils;
  * 
  */
 public class DButil {	
+	public static final String SINGLE_KEY = "chatserver";
 	// save all to here
 	static final String TABLE_NAME = "sedrochatbot";
 	static final String SESS_TABLE_NAME = "sedrochatbotSess";
@@ -61,8 +62,10 @@ public class DButil {
 	 //       dropDataTables();
 	        
 	        // verify tables
-			createSessionTable();
-			createDataTable();
+	        if (!haveDBTable(SINGLE_KEY)) {
+	        	createSessionTable();
+				createDataTable();
+	        }
         } catch (Throwable ex) {
             throw new ExceptionInInitializerError(ex);
         }
@@ -85,7 +88,7 @@ public class DButil {
     	}
     	
     	// get encrypte key
-    	encrypte_key = System.getenv("ENC_KEY");
+   // 	encrypte_key = System.getenv("ENC_KEY");
     //	encrypte_key = "Sedro Can";
     	
     	// user/pass
@@ -290,6 +293,29 @@ public class DButil {
 		//System.out.println("createDirTable["+DIR_NAME+"] Complete");
 		return true;
 	}
+	private static boolean haveDBTable(String key) {
+  		Connection conn = DButil.getConnection();
+  		if (conn == null) return false;
+  		String sql = "SELECT * FROM "+TABLE_NAME + " WHERE key = '" + key+"'";
+  		String label = null;
+  		try {
+  			Statement stmt = conn.createStatement();
+		    ResultSet rs = stmt.executeQuery(sql);
+		    if (rs.next()) {
+		    	try {
+			    label = rs.getString("key");
+		    	} catch (Throwable t) {}
+			    rs.close();	
+		    }
+	  		DButil.closeConnection(conn); 	
+	  		if (label != null) return true;
+	  		return false;
+		} catch (SQLException e) { 
+	  		DButil.closeConnection(conn); 		
+			e.printStackTrace();
+		}
+		return false;
+	}
 	private static InputStream getDBDataStream(String key) {
   		Connection conn = DButil.getConnection();
   		if (conn == null) return null;
@@ -361,11 +387,10 @@ public class DButil {
 
     	InputStream data = getDBDataStream(key);
     	if (data == null) return null;
-    	if (true) return null;
+    	
     	// use bytes
-    	byte[] bdata = null;
 		try {
-			bdata = new byte[data.available()];
+			byte[] bdata = new byte[data.available()];
 	    	data.read(bdata);
 	    	bdata = decrypteData(bdata);
 			@SuppressWarnings({ "unchecked", "unused" })
