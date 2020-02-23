@@ -104,7 +104,7 @@ public class ChatAdapter {
 	// Callback for direct recieve and handle
 	
 	// callback for receive (when deployed with public IP only)
-	public List<String> getReceiveMessages(String msg) {
+	public List<String> getReceiveMessages(String data) {
 		return null;
 	}
 	

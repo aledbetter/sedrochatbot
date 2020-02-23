@@ -333,43 +333,32 @@ public class RestAPI {
 	
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Service Specific WebHooks
-	//http://chatbot.sedro.xyz/api/1.0/cb/sms_hook
-	//http://chatbot.sedro.xyz/api/1.0/cb/voice_hook	
+	//http://chatbot.sedro.xyz/api/1.0/cb/sms_hook/<id>
+	//http://chatbot.sedro.xyz/api/1.0/cb/voice_hook/<id>
 	@POST
-	@Path("/cb/voice_hook")
+	@Path("/cb/voice_hook/{id}")
 	public Response voiceWebHookPOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
+    		@PathParam("id") String id,
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, null, null);
-		SCServer cs = SCServer.getChatServer();		
-		try {
-			JSONObject obj = new JSONObject(body);
-			//username = RestUtil.getJStr(obj, "username");
-
-			
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-
+		SCServer cs = SCServer.getChatServer();	
+		ChatAdapter ca = cs.findChatService(id);
+		if (ca == null) return rr.ret(402);
+		ca.getReceiveMessages(body);
 		return rr.ret();
 	}
 	@POST
-	@Path("/cb/sms_hook")
+	@Path("/cb/sms_hook/{id}")
 	public Response smsWebHookPOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
+    		@PathParam("id") String id,
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, null, null);
-
-		SCServer cs = SCServer.getChatServer();		
-		try {
-			JSONObject obj = new JSONObject(body);
-			//username = RestUtil.getJStr(obj, "username");
-
-			
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-
+		SCServer cs = SCServer.getChatServer();	
+		ChatAdapter ca = cs.findChatService(id);
+		if (ca == null) return rr.ret(402);
+		ca.getReceiveMessages(body);
 		return rr.ret();
 	}
 

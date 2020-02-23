@@ -65,7 +65,7 @@
 				<h1 id='usererror' style='color:red;display:none'></h1>
 				
 				<div class='fLn' style='display:none;font-size:16px;padding-top:15px;' id='user_add'>
-					<div class='fLn' style='padding-left:200px;text-align:left'> 					
+					<div class='fLn' style='margin-left:200px;text-align:left'> 					
 						<div class='fLn' style='margin-top:5px'><b>Username:</b> <input type='text' id='add_username'/></div>						
 						<div class='fLn' style='margin-top:5px'><b>Sedro Persona:</b> <select class='inform persona_list' id='user_sedro_persona' style='width:160px'><option value=''>No Personas</option></select>&nbsp;&nbsp;&nbsp;<a href='/mgt.html'>(Add or Edit Persona)</a></div>
 					</div>
@@ -87,6 +87,18 @@
 							<div class='fLn' style='margin-top:5px'><b>consumer_secret:</b> <input class='inform' style='width:400px' type='text' id='twitter_consumer_secret'/> </div>
 							<div class='fLn' style='margin-top:5px'><b>access_token:</b> <input class='inform' style='width:400px' type='text' id='twitter_access_token'/> </div>
 							<div class='fLn' style='margin-top:5px'><b>access_token_secret:</b> <input class='inform' style='width:400px' type='text' id='twitter_access_token_secret'/> </div>					
+							<div class='fLn' style='margin-top:5px'><b>public:</b> 
+								<select class='inform' id='twitter_public' style='width:160px'>
+									<option value='true' selected>True</option>
+									<option value='false'>False</option>
+								</select>
+							</div>	
+							<div class='fLn' style='margin-top:5px'><b>private:</b> 
+								<select class='inform' id='twitter_private' style='width:160px'>
+									<option value='true' selected>True</option>
+									<option value='false'>False</option>
+								</select>
+							</div>					
 						</div>	
 					</div>
 					

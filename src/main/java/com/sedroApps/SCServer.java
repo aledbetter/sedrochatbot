@@ -157,6 +157,20 @@ public class SCServer {
 		return false;
 	}
 	
+	public ChatAdapter findChatService(String id) {
+		if (uaList == null) return null;
+		synchronized (uaList) {
+			if (uaList.size() < 1) return null;
+			for (UserAccount ua: uaList) {
+				ChatAdapter ca = ua.findChatService(id);
+				if (ca != null) return ca;
+			}
+		}
+		return null;
+	}
+	
+	
+	
 	public void save() {
 
 		// Save the data

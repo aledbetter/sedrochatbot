@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.json.JSONObject;
 
 import com.google.common.collect.Range;
 import com.twilio.Twilio;
@@ -131,6 +132,8 @@ public class ChatSMS extends ChatAdapter {
         IncomingPhoneNumber incomingPhoneNumber = IncomingPhoneNumber.creator(
                 new com.twilio.type.PhoneNumber(phone_number)).create();
         System.out.println(" SMS URL: " + incomingPhoneNumber.getSmsUrl());
+        // add ID to the end
+        cb_sms_url = cb_sms_url + this.getId();
 		try {
 			URI smsCb = new URI(cb_sms_url);
 	        if (smsCb.equals(incomingPhoneNumber.getSmsUrl())) return;
@@ -323,6 +326,14 @@ public class ChatSMS extends ChatAdapter {
 	// callback for receive (when deployed with public IP only)
 	@Override	
 	public List<String> getReceiveMessages(String msg) {
+		try {
+			JSONObject obj = new JSONObject(msg);
+			//username = RestUtil.getJStr(obj, "username");
+// FIXME
+			
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
 		return null;
 	}
 	
