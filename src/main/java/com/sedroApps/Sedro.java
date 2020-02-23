@@ -309,7 +309,7 @@ public class Sedro {
 							mm.put(n, val);
 						}
 						String remote = (String)mm.get("r");
-						System.out.println("   Smsg["+remote+"]["+mm.get("num")+"/"+this.msg_num_last+"] " + mm.get("msg"));
+						//System.out.println("   Smsg["+remote+"]["+mm.get("num")+"/"+this.msg_num_last+"] " + mm.get("msg"));
 						if (Sutil.compare(remote, "false")) {
 							// is remote message
 							// FIXME save or not..

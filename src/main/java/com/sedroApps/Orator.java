@@ -7,6 +7,9 @@ import java.util.List;
 import main.java.com.sedroApps.util.Sutil;
 
 public class Orator {
+	private static final boolean debug = false;
+	
+	
 	private List<Sedro> processors = null;
 	
 	private ChatAdapter service = null;
@@ -125,7 +128,7 @@ public class Orator {
 	private void process(Sedro processor) {
 		int procCnt = 0;
 
-		System.out.println("\nPROCESS_["+processor.getStatus()+"]["+processor.getPersona()+"] => ["+processor.getCaller_handle()+"]");
+		if (debug) System.out.println("\nPROCESS_["+processor.getStatus()+"]["+processor.getPersona()+"] => ["+processor.getCaller_handle()+"]");
 		
 		List<HashMap<String, Object>> wake_msg = null;
 				
@@ -153,7 +156,7 @@ public class Orator {
 							if (resp_msg == null || resp_msg.isEmpty()) continue;
 							procCnt++;
 							service.postMessage(processor, resp_msg);
-							System.out.println("PUB_RESP: " + resp_msg);
+							if (debug) System.out.println("PUB_RESP: " + resp_msg);
 						}
 					}
 				}
@@ -169,7 +172,7 @@ public class Orator {
 				for (HashMap<String, Object> msg:wake_msg) {
 					String smsg = (String) msg.get("msg");
 					if (smsg == null || smsg.equals("null")) continue;
-					System.out.println("    outWMSG["+processor.getCaller_handle()+"]: " + smsg);
+					if (debug) System.out.println("    outWMSG["+processor.getCaller_handle()+"]: " + smsg);
 					service.sendDirectMessage(processor, processor.getCaller_handle(), smsg);
 				}
 			}
@@ -180,7 +183,7 @@ public class Orator {
 				for (HashMap<String, String> mm:dml) {
 					String msg = mm.get("msg");
 					String from = mm.get("from");
-					System.out.println(" inMSG["+from+"]: " + msg);
+					if (debug) System.out.println(" inMSG["+from+"]: " + msg);
 					// private direct messages => private direct response
 					procCnt++;
 					List<HashMap<String, Object>> rmsg = processor.chatMsg(msg);
@@ -189,7 +192,7 @@ public class Orator {
 							String smsg = (String)m.get("msg");
 							if (smsg == null || smsg.equals("null")) continue;
 							// send direct message
-							System.out.println("    outMSG["+from+"]: " + smsg);
+							if (debug) System.out.println("    outMSG["+from+"]: " + smsg);
 							service.sendDirectMessage(processor, from, smsg);
 						}
 					}
@@ -207,8 +210,10 @@ public class Orator {
 			}
 		}
 		
-		System.out.println(" PROC["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
-		System.out.println("");
+		if (debug) {
+			System.out.println(" PROC["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
+			System.out.println("");
+		}
 	}
 	
 	//////////////////////////////////////////////////////	
