@@ -140,19 +140,7 @@ $(document).ready(function() {
 			$("#add_username").val("");
 		});
 	});
-	$("#save_user_bt").on('click', function (e) {
-		if (!glob_edit_u) return;
-		saveUser(glob_edit_u);
-		$("#userlist").show();
-	});
-	$("#save_user_cancel_bt").on('click', function (e) {
-		glob_edit_u = null;			
-		$("#userInfo").hide();
-		$("#userlist").show();
-
-	});
-	
-	
+		
 	// if this is the server page
 	if (window.location.href.indexOf("server.html") > -1) {
 		getSettings();
@@ -223,18 +211,19 @@ function getUsers() {
 			for (var i=0;i<data.info.users.length;i++) {
 				usr += "<div class='fLn' id='ua_"+data.info.users[i].username+"' style='padding-top:10px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #555;position:relative;background:#F7F7F7'>";				
 					usr += "<div class='bslink' onClick='delUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:10px;background:#EEE;'>Del</div>";	
-					usr += "<div class='bslink' onClick='editUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:90px;background:#EEE;'>Edit</div>";	
-					usr += "<div style='width:180px;text-align:center;font-size:16px;position:absolute;top:37px;right:110px'>" +
+					usr += "<div style='width:180px;text-align:center;font-size:16px;position:absolute;top:8px;right:190px'>" +
 							"<select id='"+data.info.users[i].username+"_service' style='width:160px;'>" +
 								"<option value='twitter'>Twitter</option>" +
-								"<option value='twitter'>SMS</option></select></div>";	
+								"<option value='sms'>SMS</option></select></div>";	
 
-					usr += "<div class='bslink' onClick='addService(\""+data.info.users[i].username+"\");' style='width:100px;text-align:center;font-size:16px;position:absolute;top:40px;right:10px;background:#EEE;'>Add Service</div>";	
+					usr += "<div class='bslink' onClick='addService(\""+data.info.users[i].username+"\");' style='width:100px;text-align:center;font-size:16px;position:absolute;right:90px;background:#EEE;'>Add Service</div>";	
 					usr += "<div class='fLn' style='padding-bottom:10px;'>";
 						usr += "<div style='text-align:left'><b>Username: " + data.info.users[i].username +"</b></div>";
 						usr += "<div style='text-align:left'><b>Sedro Persona: " + data.info.users[i].sedro_persona +"</b></div>";
 					usr += "</div>";				
 					usr += "<div id='show_ua'>";
+					
+					usr += "<div class='fLn' id='"+data.info.users[i].username+"_add_service' style='display:none'></div>";
 	
 					// all the serviecs
 					if (data.info.users[i].services) {
@@ -243,28 +232,28 @@ function getUsers() {
 							usr += "<h2 class='fLn' style='margin-bottom:0px;'><b>Service: " + data.info.users[i].services[k].service + "</b></h2>";
 
 							var sid = null;
+							var service = null;
 							for (const property in data.info.users[i].services[k]) {
-								if (property == "service") continue;
+								if (property == "service") {
+									service = data.info.users[i].services[k][property];
+									continue;
+								}
 								if (property == "id") sid = data.info.users[i].services[k][property];
 								usr += "<div class='fLn'>";
 									usr += "<div style='text-align:left'><b>" + property + "</b>: "+data.info.users[i].services[k][property]+"</div>";
 								usr += "</div>";				
 							}
-							// setup edit
-							// FIXME
-			/*				
-							// add the service
-							for (const property in data.info.users[i].services[k]) {
-								if (property == "service") {
-									var template = $("#"+data.info.users[i].services[k][property]+"_config").html();
-									template = template.replace("=\'"+data.info.users[i].services[k][property]+"_", "=\'"+sid+"_");
-									usr += template;
-								}
-							}
-							// set the values
-			*/
-							
 							usr += "<div class='bslink' onClick='delService(\""+sid+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;top:14px;right:10px;background:#EEE;'>Del</div>";	
+							usr += "<div class='bslink' onClick='editService(\""+data.info.users[i].username+"\", \""+sid+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;top:14px;right:90px;background:#EEE;'>Edit</div>";	
+							
+							usr += "<div class='fLn' id='"+sid+"_edit' style='display:none'>";
+							// make form for service ID
+							var template = $("#"+service+"_config").html();
+							template = template.replaceAll("=\""+service+"_", "=\""+sid+"_");
+							template = template.replaceAll("x"+service, sid);
+							usr += template;	
+							usr += "</div>";
+							
 							usr += "</div>";
 						}
 					}
@@ -276,6 +265,8 @@ function getUsers() {
 		//alert(usr);
 		if (usr != "") $("#userlist").html(usr); 
 		else $("#userlist").html("No Users"); 
+		
+
 
 	});
 }
@@ -303,7 +294,7 @@ function getUserInfo(username) {
 				if (!user.services[k][property] || user.services[k][property] == "") continue;
 				
 				// set the id and service versions
-				$("#"+user.services[k].service+"_"+property).val(user.services[k][property]);
+				//$("#"+user.services[k].service+"_"+property).val(user.services[k][property]);
 				$("#"+user.services[k].id+"_"+property).val(user.services[k][property]);
 				if (property == "id") {
 					// existing....
@@ -315,29 +306,6 @@ function getUserInfo(username) {
 	return user;
 }
 
-var glob_edit_u = null; 
-function editUser(username) {
-	if (glob_edit_u) {
-		// one at a time only
-		$("#userInfo").hide();
-		if (glob_edit_u == username) {
-			glob_edit_u = null;
-			return;
-		}
-	}
-	glob_edit_u = username;	
-	
-	$(".inform").val(""); 	// clear the forms
-	$(".inform_id").val("new"); 	// clear the forms
-	getUserInfo(username); 	// fill out the form
-	
-	$("#userlist").hide();
-	$("#userInfo").show();
-
-	// position form: FIXME
-	
-	
-}
 function delService(id) {
 	scsDelUser(id, function(data) {
 		if (data == null || data.code == 401) {
@@ -350,70 +318,84 @@ function delService(id) {
 
 function addService(username) {
 	var service = $("#"+username+"_service").val();
-	// FIXME always the first one in the list
-	alert(service);
-}
+	// make form for service ID
+	var template = $("#"+service+"_config").html();
+	template = template.replaceAll("=\""+service+"_", "=\""+username+"_");
+	template = template.replaceAll("x"+service, username);
+	$("#"+username+"_add_service").html(template).show();
+	$("#"+username+"_add_service .inform_id").val("new"); 
+	$("#"+username+"_add_service #the_id").hide();
 
-// save the user info
-function saveUser(username) {
-	
+}
+function editService(username, id) {
+	$("#"+id+"_edit").show();	
+	$(".inform").val(""); 	// clear the forms
+	$(".inform_id").val("new"); 	// clear the forms
+	getUserInfo(username); 	// fill out the form		
+}
+function serviceCancel(id) {
+	$("#"+id+"_add_service").hide();
+	$("#"+id+"_edit").hide();
+}
+function serviceSave(id, service) {
 	var services = [];
 	
-	// Save twitter
-	var v_t_id = $("#twitter_id").val();
-	var v_consumer_key = $("#twitter_consumer_key").val();
-	var v_consumer_secret = $("#twitter_consumer_secret").val();
-	var v_access_token = $("#twitter_access_token").val();
-	var v_access_token_secret = $("#twitter_access_token_secret").val();		
-	var v_twitter_private = $("#twitter_doprivate").val();		
-	var v_twitter_public = $("#twitter_dopublic").val();		
-	
-	var twitter_serviceparams = {
-			service: "twitter", 
-			id: v_t_id, 
-			doprivate: v_twitter_private, 
-			dopublic: v_twitter_public, 
-			consumer_key: v_consumer_key, 
-			consumer_secret: v_consumer_secret, 
-			access_token: v_access_token, 
-			access_token_secret: v_access_token_secret};
-	if (v_consumer_key && v_consumer_secret && v_access_token_secret && v_access_token) {
-		if (v_consumer_key.length > 5 && v_consumer_secret.length > 5 && v_access_token_secret.length > 5 && v_access_token.length > 5) {
-			services.push(twitter_serviceparams);
+	if (service == "twitter") {
+		// Save twitter
+		var v_t_id = $("#"+id+"_id").val();
+		var v_consumer_key = $("#"+id+"_consumer_key").val();
+		var v_consumer_secret = $("#"+id+"_consumer_secret").val();
+		var v_access_token = $("#"+id+"_access_token").val();
+		var v_access_token_secret = $("#"+id+"_access_token_secret").val();		
+		var v_twitter_private = $("#"+id+"_doprivate").val();		
+		var v_twitter_public = $("#"+id+"_dopublic").val();		
+		
+		var twitter_serviceparams = {
+				service: "twitter", 
+				id: v_t_id, 
+				doprivate: v_twitter_private, 
+				dopublic: v_twitter_public, 
+				consumer_key: v_consumer_key, 
+				consumer_secret: v_consumer_secret, 
+				access_token: v_access_token, 
+				access_token_secret: v_access_token_secret};
+		if (v_consumer_key && v_consumer_secret && v_access_token_secret && v_access_token) {
+			if (v_consumer_key.length > 5 && v_consumer_secret.length > 5 && v_access_token_secret.length > 5 && v_access_token.length > 5) {
+				services.push(twitter_serviceparams);
+			}
 		}
+		
+	} else 	if (service == "sms") {
+		// Save SMS
+		var v_sms_id = $("#"+id+"_id").val();
+		var v_provider = $("#"+id+"_provider").val();
+		var v_account_sid = $("#"+id+"_account_sid").val();
+		var v_auth_token = $("#"+id+"_auth_token").val();
+		var v_phone_number = $("#"+id+"_phone_number").val();
+		var v_sms_callback_url = $("#"+id+"_sms_callback_url").val();
+		
+	
+		var sms_serviceparams = {
+				service: "sms", 
+				id: v_sms_id, 
+				sms_callback_url: v_sms_callback_url, 			
+				provider: v_provider, 
+				phone_number: v_phone_number, 
+				account_sid: v_account_sid, 
+				auth_token: v_auth_token};
+		
+		if (v_provider && v_account_sid && v_auth_token && v_phone_number) {
+			if (v_provider.length > 3 && v_account_sid.length > 5 && v_auth_token.length > 5 && v_phone_number.length >= 10) {
+				services.push(sms_serviceparams);
+			}
+		}	
 	}
-
-	// Save SMS
-	var v_sms_id = $("#sms_id").val();
-	var v_provider = $("#sms_provider").val();
-	var v_account_sid = $("#sms_account_sid").val();
-	var v_auth_token = $("#sms_auth_token").val();
-	var v_phone_number = $("#sms_phone_number").val();
-	var v_sms_callback_url = $("#sms_sms_callback_url").val();
-	
-
-	var sms_serviceparams = {
-			service: "sms", 
-			id: v_sms_id, 
-			sms_callback_url: v_sms_callback_url, 			
-			provider: v_provider, 
-			phone_number: v_phone_number, 
-			account_sid: v_account_sid, 
-			auth_token: v_auth_token};
-	
-	if (v_provider && v_account_sid && v_auth_token && v_phone_number) {
-		if (v_provider.length > 3 && v_account_sid.length > 5 && v_auth_token.length > 5 && v_phone_number.length >= 10) {
-			services.push(sms_serviceparams);
-		}
-	}	
 	
 	scsUpdateUser(username, services, function(data) {
 		if (data == null || data.code == 401) {
 			window.location.href = "/index.html";
 			return;
 		}
-		glob_edit_u = null;
-		$("#userInfo").hide();
 		getUsers();
 	});
 	
@@ -604,3 +586,8 @@ function getCookie(name) {
   var parts = value.split("; " + name + "=");
   if (parts.length == 2) return parts.pop().split(";").shift();
 }
+
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
