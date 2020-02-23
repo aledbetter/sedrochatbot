@@ -9,7 +9,7 @@ import main.java.com.sedroApps.util.Sutil;
 public class ChatAdapter {
 	private UserAccount user = null;
 	private String id = null;
-	
+	private Orator orat = null;
 	
 	public ChatAdapter(UserAccount user, String id) {
 		this.user = user;
@@ -41,6 +41,12 @@ public class ChatAdapter {
 	}
 	public boolean isPrivateMsg() {
 		return false;
+	}
+	public void setOrator(Orator o) {
+		orat = o;
+	}
+	public Orator getOrator() {
+		return orat;
 	}
 	
 	////////////////////////////////////////////

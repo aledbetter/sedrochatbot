@@ -333,12 +333,12 @@ public class ChatSMS extends ChatAdapter {
 	
 	// callback for receive (when deployed with public IP only)
 	@Override	
-	public List<String> getReceiveMessages(String msg) {
+	public List<String> getReceiveMessages(String data) {
+	
 		try {
-			JSONObject obj = new JSONObject(msg);
-			//username = RestUtil.getJStr(obj, "username");
-// FIXME
-			
+			JSONObject obj = new JSONObject(data);
+			HashMap<String, String> msg = parseTwillioMessage(obj);
+			this.getOrator().processMessage(msg);
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
@@ -353,88 +353,52 @@ public class ChatSMS extends ChatAdapter {
 
 	
 	// SMS Webhook
-	/*
-	        Message message = Message.creator(
-	                new com.twilio.type.PhoneNumber("+15558675310"),
-	                new com.twilio.type.PhoneNumber("+15017122661"),
-	                "McAvoy or Stewart? These timelines can get so confusing.")
-	            .setStatusCallback(URI.create("http://postb.in/1234abcd"))
-	            .create();
-	
-	private static List<HashMap<String, String>> parseTwillioMessages(Orator orat, String msgs, boolean newcalls) {
-		List<HashMap<String, String>> msgList = null;
-		
+
+	private static HashMap<String, String> parseTwillioMessage(JSONObject msg) {
+		HashMap<String, String> fmsg = new HashMap<>();
 		try {
-			JSONObject obj = new JSONObject(msgs);
-			try {
-				JSONArray list = obj.getJSONArray("messages");
-				if (list != null && list.length() > 0) {
-
-					for (int i=0;i<list.length();i++) {
-						// the messages .... 
-						JSONObject msg = list.getJSONObject(i);
-						// only inbound
-						String direction = msg.getString("direction");
-						if (!direction.equals("inbound")) continue;
-						
-						// only recieved
-						String status = msg.getString("status");
-						if (!status.equals("received")) continue;
-						// FIXME limit phone numbers ?
-
-						
-						// find session...					
-						String from = msg.getString("from");
-						Sedro proc = orat.findProcessor(from);
-						if (newcalls) {						
-							if (proc != null) continue; // check for new calls only							
-						} else {
-							if (proc == null) continue;			
-							// is this a new message ?
-	//FIXME					
-						}
-												
-						HashMap<String, String> mm = new HashMap<>();
-						String asid = msg.getString("account_sid");
-						String msid = msg.getString("sid");
-						String to = msg.getString("to");
-						String body = msg.getString("body");
-
-						String date_created = msg.getString("date_created");
-
-						String error_code = msg.getString("error_code");
-						String num_segments = msg.getString("num_segments");
-						String num_media = msg.getString("num_media");
-						
-						mm.put("id", msid);
-						mm.put("from", from);
-						mm.put("date_created", date_created);
-
-						mm.put("to", to);
-						mm.put("status", status);
-						mm.put("error", error_code);
-						mm.put("msg", body);
-												
-						mm.put("caller_handle", from);
-						mm.put("caller", from);
-					//	mm.put("caller_token", status);
-	
-						
-				//		System.out.println(" MSG["+i+"] txt: " + mm.get("msg"));
-
-						if (msgList == null) msgList = new ArrayList<>();
-						msgList.add(0, mm);
-					}
-				}
-			} catch (Throwable t) {}
+			// only inbound
+			String direction = msg.getString("direction");
+			if (!direction.equals("inbound")) return null;
 			
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		
-		return msgList;
+			// only recieved
+			String status = msg.getString("status");
+			if (!status.equals("received")) return null;
+			
+			// find session...					
+			String from = msg.getString("from");
+
+									
+			HashMap<String, String> mm = new HashMap<>();
+			//String asid = msg.getString("account_sid");
+			String msid = msg.getString("sid");
+			String to = msg.getString("to");
+			String body = msg.getString("body");
+
+			String date_created = msg.getString("date_created");
+
+			String error_code = msg.getString("error_code");
+			String num_segments = msg.getString("num_segments");
+			String num_media = msg.getString("num_media");
+			
+			mm.put("id", msid);
+			mm.put("from", from);
+			mm.put("date_created", date_created);
+
+			mm.put("to", to);
+			mm.put("status", status);
+			mm.put("error", error_code);
+			mm.put("msg", body);
+									
+			mm.put("caller_handle", from);
+			mm.put("caller", from);
+		//	mm.put("caller_token", status);
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+				
+		return fmsg;
 	}
-	
-	*/
+
 	
 }

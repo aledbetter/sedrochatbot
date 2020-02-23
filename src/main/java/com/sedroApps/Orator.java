@@ -33,6 +33,7 @@ public class Orator {
 			processorPublic.setContext(service.getContext());
 			processorPublic.setPersona(user.getSedroPersona());
 		}
+		service.setOrator(this);
 	}
 	
 	public int getProcessorCount() {
@@ -74,41 +75,44 @@ public class Orator {
 		return null;
 	}
 	
+	
+	//////////////////////////////////////////////////////
+	// Add processor for new call
+	private Sedro addNewCall(HashMap<String, String> call) {
+		// ADD NEW channels...Processors
+		Sedro proc = addProcessor(false, false, true);
+		// add information to it
+		proc.setChannel_type(service.getChannel_type());
+		proc.setLanguage(service.getLanguage());
+		proc.setContext(service.getContext());
+		proc.setPersona(user.getSedroPersona());
+
+		// information specific to this caller
+		proc.setCaller_token(call.get("caller_token"));
+		proc.setCaller(call.get("caller"));
+		proc.setCaller_handle(call.get("caller_handle"));
+		
+		// what to do with other info?
+		proc.setCall_info(call);
+		return proc;
+	}
+	
 	//////////////////////////////////////////////////////
 	// process the conversation
 	public void process() {
 		//System.out.println("  ORATOR _ PROC: " + getProcessorCount());
 
 		// this where we look for new calls 
-		if (service.isPublicMsg()) {
+		if (service.isPrivateMsg()) {
 			List<HashMap<String, String>> newCalls = service.getDirectCall(this);
 			if (newCalls != null && newCalls.size() > 0) {	
-				for (HashMap<String, String> call:newCalls) {
-
-					// ADD NEW channels...Processors
-					Sedro proc = addProcessor(false, false, true);
-					// add information to it
-					proc.setChannel_type(service.getChannel_type());
-					proc.setLanguage(service.getLanguage());
-					proc.setContext(service.getContext());
-					proc.setPersona(user.getSedroPersona());
-	
-					// information specific to this caller
-					proc.setCaller_token(call.get("caller_token"));
-					proc.setCaller(call.get("caller"));
-					proc.setCaller_handle(call.get("caller_handle"));
-					
-					// what to do with other info?
-					proc.setCall_info(call);
-				}
+				for (HashMap<String, String> call:newCalls) addNewCall(call);
 			}
 		}
 		
 		if (getProcessorCount() > 0) {
 			// if there are any conversations ... deal
-			for (Sedro s:processors) {
-				process(s);
-			}
+			for (Sedro s:processors) process(s);
 		}	
 		
 		// clear the cache
@@ -206,5 +210,56 @@ public class Orator {
 		System.out.println(" PROC["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
 		System.out.println("");
 	}
+	
+	//////////////////////////////////////////////////////	
+	// Process incoming
+	public void processMessage(HashMap<String, String> call) {
+		String hd = (String)call.get("caller_handle");
+		Sedro processor = this.findProcessor(hd);
+		if (processor == null) {
+			System.out.println("ORAT: new session: " + hd);
+			processor = addNewCall(call);
+		} 
+		List<HashMap<String, Object>> wake_msg = null;
+		
+		//////////////////////////////////////////////////////
+		// wake the persona
+		if (processor.getStatus().equals("wake")) {
+			wake_msg = processor.chatWake(server.getSedro_access_key());
+			//System.out.println(" WAKE_WOKE["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
+		}
+		
+		//////////////////////////////////////////////////////
+		// PRIVATE MESSAGES
+		if (processor.isDirectMsg()) {
+			if (wake_msg != null) {
+				// where to send these messages?
+				for (HashMap<String, Object> msg:wake_msg) {
+					String smsg = (String) msg.get("msg");
+					if (smsg == null || smsg.equals("null")) continue;
+					System.out.println("    outWMSG["+processor.getCaller_handle()+"]: " + smsg);
+					service.sendDirectMessage(processor, processor.getCaller_handle(), smsg);
+				}
+			}
+
+			// Deal with direct messages
+			String msg = call.get("msg");
+			String from = call.get("from");
+			System.out.println(" inMSG["+from+"]: " + msg);
+			// private direct messages => private direct response
+			List<HashMap<String, Object>> rmsg = processor.chatMsg(msg);
+			if (rmsg != null) {
+				for (HashMap<String, Object> m:rmsg) {
+					String smsg = (String)m.get("msg");
+					if (smsg == null || smsg.equals("null")) continue;
+					// send direct message
+					System.out.println("    outMSG["+from+"]: " + smsg);
+					service.sendDirectMessage(processor, from, smsg);
+				}
+			}
+
+		}
+	}
+
 	
 }
