@@ -104,7 +104,8 @@ public class Orator {
 	// process the conversation
 	public void process() {
 		//System.out.println("  ORATOR _ PROC: " + getProcessorCount());
-
+		if (!service.isPolled()) return;
+		
 		// this where we look for new calls 
 		if (service.isPrivateMsg()) {
 			List<HashMap<String, String>> newCalls = service.getDirectCall(this);

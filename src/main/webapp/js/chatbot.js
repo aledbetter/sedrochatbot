@@ -19,6 +19,77 @@
 ////////////////////////////////////////////////////////////////////////////////////
 // Doc open
 
+
+////////////////////////////////////////////////////////////////////////////
+// EXTEND THIS FOR NEW SERVICES
+////////////////////////////////////////////////////////////////////////////
+function serviceSave(id, username, service) {
+	var services = [];
+	
+	if (service == "twitter") {
+		// Save twitter
+		var v_t_id = $("#"+id+"_id").val();
+		var v_consumer_key = $("#"+id+"_consumer_key").val();
+		var v_consumer_secret = $("#"+id+"_consumer_secret").val();
+		var v_access_token = $("#"+id+"_access_token").val();
+		var v_access_token_secret = $("#"+id+"_access_token_secret").val();		
+		var v_twitter_private = $("#"+id+"_doprivate").val();		
+		var v_twitter_public = $("#"+id+"_dopublic").val();		
+		
+		var twitter_serviceparams = {
+				service: "twitter", 
+				id: v_t_id, 
+				doprivate: v_twitter_private, 
+				dopublic: v_twitter_public, 
+				consumer_key: v_consumer_key, 
+				consumer_secret: v_consumer_secret, 
+				access_token: v_access_token, 
+				access_token_secret: v_access_token_secret};
+		if (v_consumer_key && v_consumer_secret && v_access_token_secret && v_access_token) {
+			if (v_consumer_key.length > 5 && v_consumer_secret.length > 5 && v_access_token_secret.length > 5 && v_access_token.length > 5) {
+				services.push(twitter_serviceparams);
+			}
+		}
+		
+	} else 	if (service == "sms") {
+		// Save SMS
+		var v_sms_id = $("#"+id+"_id").val();
+		var v_provider = $("#"+id+"_provider").val();
+		var v_account_sid = $("#"+id+"_account_sid").val();
+		var v_auth_token = $("#"+id+"_auth_token").val();
+		var v_phone_number = $("#"+id+"_phone_number").val();
+		var v_sms_callback_url = $("#"+id+"_sms_callback_url").val();
+			
+		var sms_serviceparams = {
+				service: "sms", 
+				id: v_sms_id, 
+				sms_callback_url: v_sms_callback_url, 			
+				provider: v_provider, 
+				phone_number: v_phone_number, 
+				account_sid: v_account_sid, 
+				auth_token: v_auth_token};
+		
+		if (v_provider && v_account_sid && v_auth_token && v_phone_number) {
+			if (v_provider.length > 3 && v_account_sid.length > 5 && v_auth_token.length > 5 && v_phone_number.length >= 10) {
+				services.push(sms_serviceparams);
+			}
+		}	
+	}
+	
+	scsUpdateUser(username, services, function(data) {
+		if (data == null || data.code == 401) {
+			window.location.href = "/index.html";
+			return;
+		}
+		getUsers();
+	});
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////
+// Standard code follows
+////////////////////////////////////////////////////////////////////////////
 var glob_users = null;
 $(document).ready(function() {
 
@@ -251,6 +322,7 @@ function getUsers() {
 							var template = $("#"+service+"_config").html();
 							template = template.replaceAll("=\""+service+"_", "=\""+sid+"_");
 							template = template.replaceAll("x"+service, sid);
+							template = template.replaceAll("xusername", data.info.users[i].username);
 							usr += template;	
 							usr += "</div>";
 							
@@ -265,9 +337,6 @@ function getUsers() {
 		//alert(usr);
 		if (usr != "") $("#userlist").html(usr); 
 		else $("#userlist").html("No Users"); 
-		
-
-
 	});
 }
 
@@ -292,14 +361,7 @@ function getUserInfo(username) {
 			for (const property in user.services[k]) {
 				if (property == "service") continue;
 				if (!user.services[k][property] || user.services[k][property] == "") continue;
-				
-				// set the id and service versions
-				//$("#"+user.services[k].service+"_"+property).val(user.services[k][property]);
 				$("#"+user.services[k].id+"_"+property).val(user.services[k][property]);
-				if (property == "id") {
-					// existing....
-					//$("#"+user.services[k].service+"_"+property).hide();
-				}
 			}
 		}
 	}
@@ -322,6 +384,8 @@ function addService(username) {
 	var template = $("#"+service+"_config").html();
 	template = template.replaceAll("=\""+service+"_", "=\""+username+"_");
 	template = template.replaceAll("x"+service, username);
+	template = template.replaceAll("xusername", username);
+
 	$("#"+username+"_add_service").html(template).show();
 	$("#"+username+"_add_service .inform_id").val("new"); 
 	$("#"+username+"_add_service #the_id").hide();
@@ -337,70 +401,6 @@ function serviceCancel(id) {
 	$("#"+id+"_add_service").hide();
 	$("#"+id+"_edit").hide();
 }
-function serviceSave(id, service) {
-	var services = [];
-	
-	if (service == "twitter") {
-		// Save twitter
-		var v_t_id = $("#"+id+"_id").val();
-		var v_consumer_key = $("#"+id+"_consumer_key").val();
-		var v_consumer_secret = $("#"+id+"_consumer_secret").val();
-		var v_access_token = $("#"+id+"_access_token").val();
-		var v_access_token_secret = $("#"+id+"_access_token_secret").val();		
-		var v_twitter_private = $("#"+id+"_doprivate").val();		
-		var v_twitter_public = $("#"+id+"_dopublic").val();		
-		
-		var twitter_serviceparams = {
-				service: "twitter", 
-				id: v_t_id, 
-				doprivate: v_twitter_private, 
-				dopublic: v_twitter_public, 
-				consumer_key: v_consumer_key, 
-				consumer_secret: v_consumer_secret, 
-				access_token: v_access_token, 
-				access_token_secret: v_access_token_secret};
-		if (v_consumer_key && v_consumer_secret && v_access_token_secret && v_access_token) {
-			if (v_consumer_key.length > 5 && v_consumer_secret.length > 5 && v_access_token_secret.length > 5 && v_access_token.length > 5) {
-				services.push(twitter_serviceparams);
-			}
-		}
-		
-	} else 	if (service == "sms") {
-		// Save SMS
-		var v_sms_id = $("#"+id+"_id").val();
-		var v_provider = $("#"+id+"_provider").val();
-		var v_account_sid = $("#"+id+"_account_sid").val();
-		var v_auth_token = $("#"+id+"_auth_token").val();
-		var v_phone_number = $("#"+id+"_phone_number").val();
-		var v_sms_callback_url = $("#"+id+"_sms_callback_url").val();
-		
-	
-		var sms_serviceparams = {
-				service: "sms", 
-				id: v_sms_id, 
-				sms_callback_url: v_sms_callback_url, 			
-				provider: v_provider, 
-				phone_number: v_phone_number, 
-				account_sid: v_account_sid, 
-				auth_token: v_auth_token};
-		
-		if (v_provider && v_account_sid && v_auth_token && v_phone_number) {
-			if (v_provider.length > 3 && v_account_sid.length > 5 && v_auth_token.length > 5 && v_phone_number.length >= 10) {
-				services.push(sms_serviceparams);
-			}
-		}	
-	}
-	
-	scsUpdateUser(username, services, function(data) {
-		if (data == null || data.code == 401) {
-			window.location.href = "/index.html";
-			return;
-		}
-		getUsers();
-	});
-	
-
-}
 
 
 function delUser(username) {
@@ -414,15 +414,9 @@ function delUser(username) {
 }
 
 
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 // API to ChatServer
-////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 function scsLogin(username, password, cb) {	
 	var dat = "{ "; 
     dat += "\"username\": \"" + username + "\"";
@@ -527,15 +521,10 @@ function scsDelService(id, cb) {
 	  }
 	});
 }
-
-
 function scsUpdateUser(username, services, cb) {	
-	if (!services || services.length < 1) return;
-	
+	if (!services || services.length < 1) return;	
 	var dat = "{"; 
-// FIXME allow add / update / del service info	
 	dat += "\"services\": [";
-	
 	// for each service set
 	for (var i=0;i<services.length;i++) {
 		var serviceparams = services[i];

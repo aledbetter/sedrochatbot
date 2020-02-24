@@ -87,6 +87,11 @@ public class ChatSMS extends ChatAdapter {
 	public boolean isPrivateMsg() {
 		return true;
 	}
+	@Override
+	public boolean isPolled() {
+		if (psms_callback_url != null) return false;
+		return true;	
+	}
 	
 	
 	///////////////////////////////////////////////////////////////////////////////////////////

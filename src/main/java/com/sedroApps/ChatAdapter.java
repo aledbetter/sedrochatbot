@@ -36,18 +36,24 @@ public class ChatAdapter {
 		return id;	
 	}
 	
-	public boolean isPublicMsg() {
-		return false;
-	}
-	public boolean isPrivateMsg() {
-		return false;
-	}
 	public void setOrator(Orator o) {
 		orat = o;
 	}
 	public Orator getOrator() {
 		return orat;
 	}
+	
+	
+	public boolean isPublicMsg() {
+		return false;
+	}
+	public boolean isPrivateMsg() {
+		return false;
+	}
+	public boolean isPolled() {
+		return true;	
+	}
+	
 	
 	////////////////////////////////////////////
 	// Service state information
