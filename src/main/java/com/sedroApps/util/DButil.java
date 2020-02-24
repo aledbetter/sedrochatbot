@@ -32,6 +32,7 @@ import org.apache.commons.lang3.SerializationUtils;
  * 
  */
 public class DButil {	
+	public static final String DEFAULT_CYR_KEY = "Sedro Know's All";
 	public static final String SINGLE_KEY = "chatserver";
 	// save all to here
 	static final String TABLE_NAME = "sedrochatbot";
@@ -82,6 +83,7 @@ public class DButil {
     	
     	// get encrypte key
     	encrypte_key = System.getenv("ENC_KEY");
+    	if (encrypte_key == null) encrypte_key = DEFAULT_CYR_KEY;
     	
     	// user/pass
     	prod_user = System.getenv("RDS_USERNAME"); // The user name that you configured for your database..
