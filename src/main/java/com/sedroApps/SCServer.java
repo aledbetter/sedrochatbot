@@ -3,6 +3,7 @@ package main.java.com.sedroApps;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,13 +23,27 @@ public class SCServer {
 
 	List<UserAccount> uaList;	// list of users
 	
+	private HashMap<String, CbMessage> msgcbMap = null;
+	
 	private static SCServer cs = null;
 	private static Timer proc_timer = null;
 
 	
+	public SCServer() {
+		msgcbMap = new HashMap<>();
+		
+		////////////////////////////////////////////////////////
+		// add all the Call backs here (yes its a bit hackish)
+		////////////////////////////////////////////////////////
+		addCbMsg(new CbExample("example"));
+		// ADD ALL
+		
+		
+	}
+	
 	// so a single static instance (could instaciate in the servlet... if it is always there)
 	static {
-		cs = new SCServer();
+		cs = new SCServer();		
 	}
 	
 	public static SCServer getChatServer() {
@@ -54,6 +69,17 @@ public class SCServer {
 		this.poll_interval = millis;
 		setTimer();
 	}
+	
+	public CbMessage getCbMsg(String name) {
+		return msgcbMap.get(name);
+	}
+	public void addCbMsg(CbMessage cb) {
+		msgcbMap.put(cb.getName(), cb);
+	}
+	public Set<String> getCbMsgNames() {
+		return msgcbMap.keySet();
+	}
+	
 	private void setTimer() {
 		if (proc_timer != null) proc_timer.cancel();
 		proc_timer = new Timer();

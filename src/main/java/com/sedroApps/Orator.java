@@ -78,6 +78,15 @@ public class Orator {
 		return null;
 	}
 	
+	//////////////////////////////////////////////////////	
+	// check callbacks for message override
+	private String getFinalMessage(String caname, Sedro processor, boolean msgPublic, 
+			HashMap<String, Object> msgInfo, String msg) {
+		if (msg == null || msg.equals("null") || msg.isEmpty()) return null;
+		CbMessage cb = this.user.getMessageCb();
+		if (cb != null) return cb.getFinalMessage(caname, processor, msgPublic, msgInfo, msg);
+		return msg;
+	}
 	
 	//////////////////////////////////////////////////////
 	// Add processor for new call
@@ -153,11 +162,11 @@ public class Orator {
 					if (rmsg != null) {
 						for (HashMap<String, Object> m:rmsg) {
 							// send direct message
-							String resp_msg = (String)m.get("msg");
-							if (resp_msg == null || resp_msg.isEmpty()) continue;
+							String smsg = getFinalMessage(service.getName(), processor, true, m, (String)m.get("msg"));
+							if (smsg == null) continue;
 							procCnt++;
-							service.postMessage(processor, resp_msg);
-							if (debug) System.out.println("PUB_RESP: " + resp_msg);
+							service.postMessage(processor, smsg);
+							if (debug) System.out.println("PUB_RESP: " + smsg);
 						}
 					}
 				}
@@ -170,9 +179,9 @@ public class Orator {
 		if (processor.isDirectMsg()) {
 			if (wake_msg != null) {
 				// where to send these messages?
-				for (HashMap<String, Object> msg:wake_msg) {
-					String smsg = (String) msg.get("msg");
-					if (smsg == null || smsg.equals("null")) continue;
+				for (HashMap<String, Object> m:wake_msg) {
+					String smsg = getFinalMessage(service.getName(), processor, false, m, (String)m.get("msg"));
+					if (smsg == null) continue;
 					if (debug) System.out.println("    outWMSG["+processor.getCaller_handle()+"]: " + smsg);
 					service.sendDirectMessage(processor, processor.getCaller_handle(), smsg);
 				}
@@ -190,8 +199,8 @@ public class Orator {
 					List<HashMap<String, Object>> rmsg = processor.chatMsg(msg);
 					if (rmsg != null) {
 						for (HashMap<String, Object> m:rmsg) {
-							String smsg = (String)m.get("msg");
-							if (smsg == null || smsg.equals("null")) continue;
+							String smsg = getFinalMessage(service.getName(), processor, false, m, (String)m.get("msg"));
+							if (smsg == null) continue;
 							// send direct message
 							if (debug) System.out.println("    outMSG["+from+"]: " + smsg);
 							service.sendDirectMessage(processor, from, smsg);
@@ -216,6 +225,7 @@ public class Orator {
 			System.out.println("");
 		}
 	}
+
 	
 	//////////////////////////////////////////////////////	
 	// Process incoming

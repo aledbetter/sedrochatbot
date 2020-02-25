@@ -204,8 +204,11 @@ $(document).ready(function() {
 		if (!u) return;
 		var up = $("#user_sedro_persona").val();
 		if (!up) return;
+		var cbup = $("#user_callback").val();
+		if (cbup && cbup != "") return;
 		
-		scsAddUser(u, up, function(data) {
+		
+		scsAddUser(u, up, cbup, function(data) {
 			getUsers();
 			$("#add_user_bt").click();
 			$("#add_username").val("");
@@ -257,6 +260,18 @@ function getSettings() {
 					}
 					if (pselect == "") pselect = "<option value=''>No Personas</option>";
 					$(".persona_list").html(pselect);
+				}
+			});
+			// get message callbacks 
+			scsMessageCallback(function (data) {
+				// persona select list
+				if (data.list && data.list.length > 0) {
+					var pselect = "";
+					for (var i=0;i<data.list.length;i++) {
+						pselect += "<option value='"+data.list[i]+"'>"+data.list[i]+"</option>";						
+					}
+					if (pselect == "") pselect = "<option value=''>No Callbacks</option>";
+					$(".callback_list").html(pselect);
 				}
 			});
 		} else {
@@ -488,11 +503,21 @@ function scsGetUser(user, cb) {
 	  }
 	});
 }
+function scsMessageCallback(cb) {
+	$.ajax({url: "/api/1.0/callbacks", type: 'GET', dataType: "json", contentType: 'application/json', 
+	  success: function(data){
+		  cb(data);
+	  }, error: function(xhr) {
+		  cb(null);
+	  }
+	});
+}
 
-function scsAddUser(username, sedro_persona, cb) {	
+function scsAddUser(username, sedro_persona, msg_callback, cb) {	
 	var dat = "{ "; 
     dat += "\"username\": \"" + username + "\"";
     dat += ", \"sedro_persona\": \"" + sedro_persona + "\"";
+    if (msg_callback) dat += ", \"callback\": \"" + msg_callback + "\"";
     dat += "}";
 	
 	$.ajax({url: "/api/1.0/user/add", type: 'POST', async: true, data: dat, contentType: 'application/json', 

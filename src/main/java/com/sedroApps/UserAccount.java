@@ -17,6 +17,8 @@ public class UserAccount {
 	List<ChatAdapter> services = null;
 	List<Orator> orators = null;
 	
+	private CbMessage msgcb = null;
+	
 	
 	UserAccount(String username) {
 		this.username = username;
@@ -32,7 +34,21 @@ public class UserAccount {
 	}		
 	public void setSedroPersona(String sedro_persona) {
 		this.sedro_persona = sedro_persona;
+	}
+	
+	
+	////////////////////////////////////////
+	// singleton message calback override for the user.... might register for details ?
+	public CbMessage getMessageCb() {
+		return msgcb;
+	}
+	public void setMessageCb(CbMessage msgcb) {
+		this.msgcb = msgcb;
+	}
+	public void setMessageCb(String callback) {
+		this.msgcb = SCServer.getChatServer().getCbMsg(callback);
 	}	
+
 	
 	////////////////////////////////////////
 	// Manage configuration
@@ -213,6 +229,8 @@ public class UserAccount {
 	public void load(HashMap<String, Object> um) {
 		// user config
 		this.sedro_persona = (String)um.get("sedro_persona");
+		String cbname = (String)um.get("callback");
+		if (cbname != null) this.setMessageCb(cbname);
 		
 		// load user info from DB
 		if (service_info == null) service_info = new HashMap<>();
@@ -274,7 +292,9 @@ public class UserAccount {
 		HashMap<String, Object> m = new HashMap<>();
 		m.put("username", this.username);
 		m.put("sedro_persona", this.sedro_persona);
-		
+		if (this.getMessageCb() != null) {
+			m.put("callback", this.getMessageCb().getName());
+		}
 		if (service_info != null && service_info.keySet().size() > 0) {
 			List<HashMap<String, Object>> sl = new ArrayList<>();
 			for (String id:service_info.keySet()) {

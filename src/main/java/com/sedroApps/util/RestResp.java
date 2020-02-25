@@ -29,13 +29,14 @@ import javax.ws.rs.core.UriInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({ "code", "info"})
+@JsonPropertyOrder({ "code", "info", "list"})
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RestResp {
 	
 	private int code;	
 	// alternate string for response if needed
 	private HashMap<String, Object> info; 
+	private List<Object> list; 
 	private String atok = null;
 	
 	public RestResp(UriInfo info, 
@@ -119,7 +120,10 @@ public class RestResp {
 			
 		}
 	}
-
+	
+	public void setList(List<Object> list) {
+		this.list = list;
+	}
 
 	// ResponseData
 	@SuppressWarnings("unchecked")

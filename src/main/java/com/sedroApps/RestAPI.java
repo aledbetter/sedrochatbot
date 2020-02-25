@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.CookieParam;
@@ -156,7 +157,25 @@ public class RestAPI {
 		// add all the doc content
 		return rr.ret();
 	}
-	
+	@GET
+	@Path("/callbacks")
+    public Response callbacksGET(@Context UriInfo info, 
+			@Context HttpServletRequest hsr, 
+    		@CookieParam("atok") String cookie_access_key) { 
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+		if (!rr.isAuth()) return rr.ret(401);
+		
+		SCServer cs = SCServer.getChatServer();
+		Set<String> ms = cs.getCbMsgNames();
+		if (ms != null && ms.size() > 0) {
+			List<Object> cbl = new ArrayList<>();
+			for (String s: ms) cbl.add(s);
+			rr.setList(cbl);
+		}
+
+		rr.setInfo(cs.getMap());
+		return rr.ret();
+	}
 	
 	/*
 	 * List services
@@ -215,17 +234,19 @@ public class RestAPI {
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 		if (!rr.isAuth()) return rr.ret(401);
-		String username = null, sedro_persona = null;
+		String username = null, sedro_persona = null, callback = null;
 
 		try {
 			JSONObject obj = new JSONObject(body);
 			username = RestUtil.getJStr(obj, "username");
 			sedro_persona = RestUtil.getJStr(obj, "sedro_persona");
+			callback = RestUtil.getJStr(obj, "callback");
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
 		if (!RestUtil.paramHave(username)) return rr.ret(402);
 		if (!RestUtil.paramHave(sedro_persona)) return rr.ret(402);
+		if (!RestUtil.paramHave(callback)) callback = null;
 
 		SCServer cs = SCServer.getChatServer();
 		UserAccount ua = cs.getUser(username);
@@ -234,7 +255,8 @@ public class RestAPI {
 		ua = cs.addUser(username, true);
 		if (ua == null) return rr.ret(500);
 		ua.setSedroPersona(sedro_persona);
-		
+		if (callback != null) ua.setMessageCb(callback);
+
 		rr.setInfo(ua.getMap());
 		
 		return rr.ret();
