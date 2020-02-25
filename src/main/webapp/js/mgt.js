@@ -233,7 +233,7 @@ function getTenant() {
 		return;
 	}
 	$("#xtenant_action").html("Getting Tenant: " + ctx + " ...");
-	sedroGetAccount(ctx, function (ctx, data) {
+	sedroGetAccount(function (data) {
 		if (data && data.results) showTenant(data.results[0]);
 		else $("#xtenant_action").html("ERROR: Getting Tenant: " + ctx);
 	});		
