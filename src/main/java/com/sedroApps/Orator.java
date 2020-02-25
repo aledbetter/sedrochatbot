@@ -8,6 +8,8 @@ import main.java.com.sedroApps.util.Sutil;
 
 public class Orator {
 	private static final boolean debug = false;
+	// wake with text
+	private static final boolean wake_text = false;
 	
 	
 	private List<Sedro> processors = null;
@@ -141,11 +143,13 @@ public class Orator {
 		if (debug) System.out.println("\nPROCESS_["+processor.getStatus()+"]["+processor.getPersona()+"] => ["+processor.getCaller_handle()+"]");
 		
 		List<HashMap<String, Object>> wake_msg = null;
-				
+		String wmsg = null;
+		
+		
 		//////////////////////////////////////////////////////
 		// wake the persona
 		if (processor.getStatus().equals("wake")) {
-			wake_msg = processor.chatWake(server.getSedro_access_key());
+			wake_msg = processor.chatWake(server.getSedro_access_key(), wmsg);
 			procCnt++;
 			//System.out.println(" WAKE_WOKE["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
 		}
@@ -231,17 +235,19 @@ public class Orator {
 	// Process incoming
 	public void processMessage(HashMap<String, String> call) {
 		String hd = (String)call.get("caller_handle");
+		String wmsg = (String)call.get("msg");
 		Sedro processor = this.findProcessor(hd);
 		if (processor == null) {
 			System.out.println("ORAT: new session: " + hd);
 			processor = addNewCall(call);
 		} 
 		List<HashMap<String, Object>> wake_msg = null;
-		
+		if (!wake_text) wmsg = null;
+			
 		//////////////////////////////////////////////////////
 		// wake the persona
 		if (processor.getStatus().equals("wake")) {
-			wake_msg = processor.chatWake(server.getSedro_access_key());
+			wake_msg = processor.chatWake(server.getSedro_access_key(), wmsg);
 			//System.out.println(" WAKE_WOKE["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
 		}
 		
@@ -251,26 +257,28 @@ public class Orator {
 			if (wake_msg != null) {
 				// where to send these messages?
 				for (HashMap<String, Object> msg:wake_msg) {
-					String smsg = (String) msg.get("msg");
-					if (smsg == null || smsg.equals("null")) continue;
+					String smsg = getFinalMessage(service.getName(), processor, false, msg, (String)msg.get("msg"));
+					if (smsg == null) continue;	
 					System.out.println("    outWMSG["+processor.getCaller_handle()+"]: " + smsg);
 					service.sendDirectMessage(processor, processor.getCaller_handle(), smsg);
 				}
 			}
-
-			// Deal with direct messages
-			String msg = call.get("msg");
-			String from = call.get("from");
-			System.out.println(" inMSG["+from+"]: " + msg);
-			// private direct messages => private direct response
-			List<HashMap<String, Object>> rmsg = processor.chatMsg(msg);
-			if (rmsg != null) {
-				for (HashMap<String, Object> m:rmsg) {
-					String smsg = (String)m.get("msg");
-					if (smsg == null || smsg.equals("null")) continue;
-					// send direct message
-					System.out.println("    outMSG["+from+"]: " + smsg);
-					service.sendDirectMessage(processor, from, smsg);
+			
+			if (!wake_text) {
+				// Deal with direct messages
+				String msg = call.get("msg");
+				String from = call.get("from");
+				System.out.println(" inMSG["+from+"]: " + msg);
+				// private direct messages => private direct response
+				List<HashMap<String, Object>> rmsg = processor.chatMsg(msg);
+				if (rmsg != null) {
+					for (HashMap<String, Object> m:rmsg) {
+						String smsg = getFinalMessage(service.getName(), processor, false, m, (String)m.get("msg"));
+						if (smsg == null) continue;					
+						// send direct message
+						System.out.println("    outMSG["+from+"]: " + smsg);
+						service.sendDirectMessage(processor, from, smsg);
+					}
 				}
 			}
 

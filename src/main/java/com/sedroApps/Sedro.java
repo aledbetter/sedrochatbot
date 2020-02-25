@@ -176,7 +176,7 @@ public class Sedro {
 		return null;
 	}
 		
-	public List<HashMap<String, Object>> chatWake(String key) {
+	public List<HashMap<String, Object>> chatWake(String key, String text) {
 		if (!getStatus().equals("wake") && !getStatus().equals("bye")) return null;
 		//System.out.println(" **CHAT_WAKE");
 
@@ -185,6 +185,7 @@ public class Sedro {
 		
 		String reqData = "{\"event\": \"wake\""; 		
 		reqData += ", \"persona\": \"" + persona  + "\""; 
+		if (text != null) reqData += ", \"text\": \"" + escape(text) + "\""; 
 		if (caller != null) reqData += ", \"user\": \"" + escape(caller) + "\""; 
 	    if (caller_token != null) reqData += ", \"caller_token\": \"" + caller_token + "\""; 
 	    if (context != null) reqData += ", \"context\": \"" + context  + "\""; 
@@ -309,7 +310,7 @@ public class Sedro {
 							mm.put(n, val);
 						}
 						String remote = (String)mm.get("r");
-						//System.out.println("   Smsg["+remote+"]["+mm.get("num")+"/"+this.msg_num_last+"] " + mm.get("msg"));
+					//	System.out.println("   Smsg["+remote+"]["+mm.get("num")+"/"+this.msg_num_last+"] " + mm.get("msg"));
 						if (Sutil.compare(remote, "false")) {
 							// is remote message
 							// FIXME save or not..
@@ -318,7 +319,7 @@ public class Sedro {
 						int mnum = Sutil.toInt((String)mm.get("num"));
 						
 						if (mnum <= this.msg_num_last) {
-							System.out.println(" ERROR_RESEND["+mnum+"]["+msg_num+"] txt: " + mm.get("msg"));
+							System.out.println(" ERROR_RESENT["+mnum+"]["+msg_num+"] [sns:"+num_sent+" / "+num_total+"] txt: " + mm.get("msg"));
 							continue; // alredy sent
 						}
 						
