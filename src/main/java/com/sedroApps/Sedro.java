@@ -315,15 +315,21 @@ public class Sedro {
 							// FIXME save or not..
 							if (noremote) continue;
 						}
+						int mnum = Sutil.toInt((String)mm.get("num"));
+						
+						if (mnum <= this.msg_num_last) {
+							System.out.println(" ERROR_RESEND["+mnum+"]["+msg_num+"] txt: " + mm.get("msg"));
+							continue; // alredy sent
+						}
+						
+						if (mnum > msg_num) msg_num = mnum;
 
 						String ev = (String)mm.get("event");
 						if (Sutil.compare(ev, "bye")) {
 							status = "msg";
 						}
-						int mnum = Sutil.toInt((String)mm.get("num"));
-						if (mnum > msg_num) msg_num = mnum;
 						
-						//System.out.println(" MSG["+mnum+"] txt: " + mm.get("msg"));
+						//System.out.println(" MSG["+mnum+"]["+msg_num+"] txt: " + mm.get("msg"));
 
 						if (rl == null) rl = new ArrayList<>();
 						rl.add(mm);

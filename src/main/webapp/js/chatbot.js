@@ -266,11 +266,10 @@ function getSettings() {
 			scsMessageCallback(function (data) {
 				// persona select list
 				if (data.list && data.list.length > 0) {
-					var pselect = "";
+					var pselect = "<option value=''>No Callback</option>";
 					for (var i=0;i<data.list.length;i++) {
 						pselect += "<option value='"+data.list[i]+"'>"+data.list[i]+"</option>";						
 					}
-					if (pselect == "") pselect = "<option value=''>No Callbacks</option>";
 					$(".callback_list").html(pselect);
 				}
 			});

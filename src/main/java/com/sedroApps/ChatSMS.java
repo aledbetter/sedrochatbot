@@ -173,10 +173,10 @@ public class ChatSMS extends ChatAdapter {
 				String caller_phone = makePhoneNumber(proc.getCaller_handle());
 				if (touser != null) caller_phone = touser;
 							    
-				System.out.println("sendDirectMessage["+this.pphone_number+" -> " + caller_phone + "]  => " + msg);
+				//System.out.println("sendDirectMessage["+this.pphone_number+" -> " + caller_phone + "]  => " + msg);
 				if (!no_send) {
 					Message message = Message.creator(new PhoneNumber(caller_phone), new PhoneNumber(this.pphone_number), msg).create();
-					System.out.println("SMS_SENT: " + message.getSid());
+					System.out.println("SMS_SENT: " + message.getSid() + " ["+this.pphone_number+" -> " + caller_phone + "]  => " + msg);
 				}
 			}
 		} catch (Throwable t) { }
@@ -184,14 +184,12 @@ public class ChatSMS extends ChatAdapter {
 	}
 	
 	// slow... so maybe not worth it.
-	private void deleteSMS(ArrayList<String> msgids) {
-		
+	private void deleteSMS(String msgids) {		
 		/// fetch a single message for account... why?
 		//Message message = Message.fetcher(message_id).fetch();
 		//System.out.println(message.getTo());
 		// delete
-	    //Message.deleter("MMXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX").delete();
-	   
+	    Message.deleter(msgids).delete();	   
 	}
 	
 
