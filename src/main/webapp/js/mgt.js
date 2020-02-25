@@ -155,16 +155,13 @@ $(document).ready(function() {
 		var nvlist = {first_name:""+first_name, last_name: ""+last_name, sex: ""+sex, email: ""+email};
 		sedroGeneratePersonaMap(ctx, nvlist, function (data) {
 			$("#xpersona_action").html("Persona Saved: " + persona);
-			$("#first_name").val(""); 
-			$("#last_name").val(""); 
-			$("#sex").val(""); 
-			$("#email").val(""); 
+			$("#first_name, #last_name, #sex, #email").val("");
 			getTenant();
 		});
 
 	});		
 	$("#form_add_bt").on('click', function (e) {
-		addPresonaForm();
+		addPersonaForm();
 	});
 	$("#form_add_cancel_bt").on('click', function (e) {
 		$("#form_content, #form_url").val(""); 
@@ -216,7 +213,7 @@ $(document).ready(function() {
 		var ctx = $("#ctx").val(); 
 		var name = persona +"_info";  //%dbname%_info => ctx+"_"+persona +"_info"
 		$("#xdb_action").html("Generating knowledge: " + ctx + " / " + name + " ...");
-		sedroGenerateDb(ctx, name, content, function (rctx, rname, rcontent, data) {
+		sedroPersonaGenerateDb(ctx, persona, content, function (rctx, rname, rcontent, data) {
 			if (data) {
 				$("#xdb_action").html("Knowledge generated: " + rctx + " / " + rname);
 				$("#knowledge_text").val(""); 
@@ -383,7 +380,7 @@ function showPresonaForm(persona) {
 	$("#form_persona").val(persona);
 	$("#persona_form_show").html(persona);
 }	
-function addPresonaForm() {
+function addPersonaForm() {
 	var ctx = $("#ctx").val();
 
 	var ftype = $("#form_type").val(); // select

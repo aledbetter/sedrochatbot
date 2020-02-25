@@ -49,7 +49,11 @@ public class ChatTwitter extends ChatAdapter {
 	public String getName() {
 		return "twitter";	
 	}
-	
+	@Override
+	public String getChannel_type() {
+		if (isPublicMsg()) return "post";	
+		return "post_direct";
+	}
 	
 	@Override
 	public boolean isPublicMsg() {

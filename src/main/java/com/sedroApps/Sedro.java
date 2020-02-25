@@ -189,7 +189,7 @@ public class Sedro {
 	    if (caller_token != null) reqData += ", \"caller_token\": \"" + caller_token + "\""; 
 	    if (context != null) reqData += ", \"context\": \"" + context  + "\""; 
 	    if (language != null) reqData += ", \"language\": \"" + language  + "\""; 
-	 //   if (channel_type != null) reqData += ", \"channel_type\": \"" + channel_type  + "\""; 
+	    if (channel_type != null) reqData += ", \"channel_type\": \"" + channel_type  + "\""; 
 	 //   if (save) ind += ", \"save\": \"" + save + "\"";  
 	    if (max_qn >= 0) reqData += ", \"max_qn\": \"" + max_qn + "\"";
 

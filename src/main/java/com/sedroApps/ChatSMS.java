@@ -71,8 +71,7 @@ public class ChatSMS extends ChatAdapter {
 	}
 	@Override
 	public String getChannel_type() {
-		return "chat";	
-		//return "sms";	
+		return "sms";	
 	}
 	
 	public boolean isProvider(String provider) {
