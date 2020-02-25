@@ -306,6 +306,7 @@ function getUsers() {
 					usr += "<div class='fLn' style='padding-bottom:10px;'>";
 						usr += "<div style='text-align:left'><b>Username: " + data.info.users[i].username +"</b></div>";
 						usr += "<div style='text-align:left'><b>Sedro Persona: " + data.info.users[i].sedro_persona +"</b></div>";
+						if (data.info.users[i].callback) usr += "<div style='text-align:left'><b>Message Cb: " + data.info.users[i].callback +"</b></div>";
 					usr += "</div>";				
 					usr += "<div id='show_ua'>";
 					
