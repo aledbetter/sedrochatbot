@@ -169,11 +169,13 @@ public class RestAPI {
 		Set<String> ms = cs.getCbMsgNames();
 		if (ms != null && ms.size() > 0) {
 			List<Object> cbl = new ArrayList<>();
-			for (String s: ms) cbl.add(s);
+			for (String s: ms) {
+				cbl.add(s);
+				//System.out.println("CB: " + s);
+			}
 			rr.setList(cbl);
 		}
 
-		rr.setInfo(cs.getMap());
 		return rr.ret();
 	}
 	

@@ -37,7 +37,8 @@ public class RestResp {
 	// alternate string for response if needed
 	private HashMap<String, Object> info; 
 	private List<Object> list; 
-	private String atok = null;
+	
+	private transient String atok = null;
 	
 	public RestResp(UriInfo info, 
 					HttpServletRequest hsr, 
@@ -87,44 +88,43 @@ public class RestResp {
 	}
 
 	public Response ret() {
+		this.atok = null;
 		return Response.status(200).entity(this.done()).build(); 
 	}
 	public Response ret(NewCookie cookie) {
+		this.atok = null;
 		return Response.status(200).cookie(cookie).entity(this.done()).build(); 
-
-	//	return Response.status(200).entity(this.done()).build(); 
 	}
 	public Response ret(String cookie) {
+		this.atok = null;
 		return Response.status(200).header("Set-Cookie", cookie).entity(this.done()).build(); 
 	}
 	
 	public Response ret(int code) {
+		this.atok = null;
 		return Response.status(200).entity(this.done(code)).build(); 
 	}	
 	public Response ret(String param, int code) {
+		this.atok = null;
 		return Response.status(200).entity(this.done(code)).build(); 
 	}	
 	// Called after API completion to get milliseconds updated for the call time and anything else needed
 	public RestResp done(int code) {
 		this.setCode(code);
-		resultDone();
 		return this;
 	}
 	public RestResp done() {
-		resultDone();
 		return this;
 	}
-	public void resultDone() {
-		// if there was an error.. clear the results
-		if (this.code >= 300 && this.code != 502) {
-			
-		}
-	}
+
 	
 	public void setList(List<Object> list) {
 		this.list = list;
 	}
-
+	public List<Object> getList() {
+		return this.list;
+	}
+	
 	// ResponseData
 	@SuppressWarnings("unchecked")
 	public void setInfo(HashMap<String, Object> data) {
