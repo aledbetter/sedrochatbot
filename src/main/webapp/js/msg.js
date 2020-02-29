@@ -244,15 +244,6 @@ function addLocalMsg(msg, tag) {
 	$(tag).append(cmsg) 
 	g_msg_num++;
 }
-// add remote message
-function addRemoteMsg(msg, tag) {
-	var cmsg = "<div class='s_msg' data-num='"+msg.num+"' data-event='"+msg.event+"' data-time='"+msg.time+" 'data-from='"+msg.from+"' ";
-	cmsg += " title='e: "+msg.event+" rply_type: "+msg.rply_type+"' rply_base: "+msg.rply_base+"' req_base: "+msg.req_base+"' ";
-	cmsg += ">"+msg.msg+"</div>";
-	$(tag).append(cmsg);
-	  
-	if (g_msg_num < msg.num) g_msg_num = msg.num;
-}
 
 // handle chat responses
 var chatHandler = function (words, resp) {
@@ -266,28 +257,65 @@ var chatHandler = function (words, resp) {
 		glob_chid = null;
 		return;
 	}
-
+	// interact_msg
+	glob_persona_full_name = resp.info.persona_full_name;
+	$(".personaFullName").html(glob_persona_full_name);
+	
 	glob_chid = resp.info.chid;
-	var bye = false;
-	if (!glob_chid) bye = true;
 
 	if (resp.list && resp.list.length > 0) {
 		for (var i=0;i<resp.list.length;i++) {
 			if (resp.list[i].r == "false" || !resp.list[i].msg) continue; // only if remote add..
-			addRemoteMsg(resp.list[i], "#interact_msg");
-			if (resp.list[i].event == 'bye') bye = true;
+			addMsg(addRemoteMsg(resp.list[i]), resp.list[i].pre_wait, resp.list[i].post_wait, resp.list[i].event);
 		}
-		$("#interact_msg").scrollTop($("#interact_msg")[0].scrollHeight);
 	}
-	if (isProd()) ga('send', 'event', 'API', 'called', 'chat_wake');
 	anz_in_progress = false;
 	
-	if (bye) {
-		glob_chid = null;
-		$("#interact_wd").hide();
-		setTimeout(byeHandler, 10000);
-	}
+	if (!glob_chid) addMsg(null, 0, 0, "bye");
+	// process the messages
+	processMsgs("#interact_msg");
 }
+
+
+function addRemoteMsg(msg) {
+	var cmsg = "<div class='s_msg' data-num='"+msg.num+"' data-qn='"+msg.qn+"' data-event='"+msg.event+"' data-time='"+msg.time+" 'data-from='"+msg.from+"' ";
+	cmsg += " title='qn: "+msg.qn+" e: "+msg.event+" rply_type: "+msg.rply_type+" rply_base: "+msg.rply_base+" req_base: "+msg.req_base+" w: "+msg.pre_wait+" / "+msg.post_wait+" ' ";
+	cmsg += ">"+msg.msg+"</div>";
+	if (g_msg_num < msg.num) g_msg_num = msg.num;
+	return cmsg;
+}
+
+// message queue to post messages with correct delay and possible retraction
+var gmsg_que = [];
+function addMsg(msgHtml, pre_wait, post_wait, event) {
+	var m = {msg:msgHtml, pre_wait:pre_wait, post_wait:post_wait, event:event};
+	gmsg_que.push(m);
+}
+function processMsgs(tag) {
+	if (gmsg_que.length < 1) return;
+	var m = gmsg_que.shift();
+	waitPreWriteMessage(tag, m);
+}
+function waitPreWriteMessage(tag, msg) {
+    setTimeout(function () {	
+		if (msg.msg != null) {
+			$(tag).append(msg.msg); // write message
+			$("#interact_msg").scrollTop($("#interact_msg")[0].scrollHeight);
+		}
+		waitPostMessage(tag, msg);
+	}, (msg.pre_wait * 1000));
+}
+function waitPostMessage(tag, msg) {
+    setTimeout(function () {
+		if (msg.event == 'bye') {
+			glob_chid = null;
+			$("#interact_wd").hide();
+			setTimeout(glob_resolve_bye_handler, glob_resolve_bye_time);		
+		}
+		processMsgs(tag);
+	}, (msg.post_wait * 1000));
+}
+
 
 // handle ask AND tell resp[onses
 var askTellHandler = function (words, resp) {
