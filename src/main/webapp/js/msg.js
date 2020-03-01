@@ -297,13 +297,19 @@ function processMsgs(tag) {
 	waitPreWriteMessage(tag, m);
 }
 function waitPreWriteMessage(tag, msg) {
+	if (msg.msg != null && msg.pre_wait > 0) {
+		$(tag).append("<div class='s_msg s_typeing' style='font-weight:bold'>...</div>");
+		$("#interact_msg").scrollTop($("#interact_msg")[0].scrollHeight);
+	} 
+
     setTimeout(function () {	
 		if (msg.msg != null) {
+			$(tag + " .s_typeing").hide();
 			$(tag).append(msg.msg); // write message
 			$("#interact_msg").scrollTop($("#interact_msg")[0].scrollHeight);
 		}
 		waitPostMessage(tag, msg);
-	}, (msg.pre_wait * 1000));
+	}, (msg.pre_wait * 100));
 }
 function waitPostMessage(tag, msg) {
     setTimeout(function () {
@@ -313,7 +319,7 @@ function waitPostMessage(tag, msg) {
 			setTimeout(glob_resolve_bye_handler, glob_resolve_bye_time);		
 		}
 		processMsgs(tag);
-	}, (msg.post_wait * 1000));
+	}, (msg.post_wait * 100));
 }
 
 
