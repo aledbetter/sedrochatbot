@@ -389,4 +389,24 @@ img.wash {
 	border-color:orange;
 }
 
+/*CHAT*/
+.c_msg {
+	float:right;
+	width:890px;
+	background:#f0f6fc;	
+	margin-top:3px;
+	margin-bottom:2px;
+	padding:3px;
+	padding-left:8px;
+}
+.s_msg {
+	float:left;
+	width:890px;
+	background:#ebf2eb;
+	margin-top:3px;
+	margin-bottom:2px;
+	padding:3px;
+	padding-left:8px;
+}
+
 
