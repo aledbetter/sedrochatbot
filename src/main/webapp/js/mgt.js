@@ -386,7 +386,7 @@ function addPersonaForm() {
 	var furl = $("#form_url").val();
 	if (furl) {
 		// do it
-		sedroPersonaAddFormRemote(ctx, persona, furl, function (rctx, persona, url, data) {
+		sedroPersonaAddFormRemote(ctx, persona, furl, ftype, function (rctx, persona, url, data) {
 			if (data) {
 				//$("#xpool_action").html("removed persona form: " + rctx + " / " + persona);
 				getTenant();
