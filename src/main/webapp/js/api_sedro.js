@@ -317,6 +317,19 @@ function sedroPersonaRemoveForm(ctx, persona, form, cb) {
 	});	
 }
 
+function sedroPersonaUpdateForm(ctx, persona, form, type, cb) {
+	if (!persona || !form) return;
+	var turl = "/tenant/persona/"+persona+"/form/"+form;
+	var ind = "{\"type\": \"" + type + "\"}";
+	$.ajax({url: getUrl(turl), type: 'POST', dataType: "json", crossDomain: true, data: ind,
+		  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+	  success: function(data){
+		  cb(ctx, persona, data);
+	  }, error: function(xhr) {
+		  cb(ctx, persona, null);
+	  }
+	});	
+}
 
 /////////////////////////////////////////////////////////////////////
 //utiity

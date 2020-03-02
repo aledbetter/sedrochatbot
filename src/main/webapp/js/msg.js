@@ -141,9 +141,10 @@ $(document).ready(function() {
 		var author = null; // todo 		
 		var ctoken = $("#caller_token").val(); 
 		if (!ctoken || ctoken.length < 1) ctoken = null;
-		
+		var max_qn = -1;
+
 		// ready..
-		postChatWake(g_tenant, persona, null, author, ctoken, g_context, g_channel_type, g_language, "false", chatHandler);
+		postChatWake(g_tenant, persona, null, author, ctoken, g_context, g_channel_type, g_language, "false", max_qn, chatHandler);
 		// clear it
 		$("#interact_text").val(""); 
 		waitChid();	

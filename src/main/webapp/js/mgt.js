@@ -361,15 +361,34 @@ function showPersona(persona) {
 	});
 }
 function addShowForm(tag, persona, name, del) {
-	var dat = "<div class='fLn' style='width:90%;padding-top:4px;padding-bottom:3px;margin-left:40px;position:relative;border-top:1px solid #CCC'>";
+	var dat = "<div class='fLn' style='width:90%;padding-top:5px;padding-bottom:5px;margin-left:40px;position:relative;border-top:1px solid #CCC'>";
 	if (tag == "load") dat += tag;
 	else dat += "<b>"+tag+"</b>";
 	dat += ":&nbsp;&nbsp;" + name;
 	if (del) {
-		dat += "<div class='bslink' onClick='sedroPersonaRForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:2px;right:10px;background:#666;color:#FFF;'>Remove</div>";		
-		dat += "<div class='bslink' onClick='sedroPersonaRawForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:2px;right:80px;background:#666;color:#FFF;'>Raw</div>";		
+		dat += "<div class='bslink' onClick='sedroPersonaRForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:10px;background:#666;color:#FFF;'>Remove</div>";		
+		dat += "<div class='bslink' onClick='sedroPersonaRawForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:80px;background:#666;color:#FFF;'>Raw</div>";		
+		dat += getTypeSelect(persona, name, tag);		
+		dat += "<div class='bslink' onClick='sedroPersonaUpdateRForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:150px;background:#666;color:#FFF;'>Update</div>";		
 	}
 	dat += "</div>";
+	return dat;
+}
+function getTypeSelect(persona, form, type) {
+	var dat = "<select id='"+persona+"_"+form+"_type' style='width:120px;position:absolute;top:0px;right:225px'>";
+	
+	if (type == "load") dat += "<option value='load' selected>load</option>";
+	else dat += "<option value='load'>load</option>";
+	
+	if (type == "main") dat += "<option value='main' selected>main</option>";
+	else dat += "<option value='main'>main</option>";	
+
+	if (type == "background") dat += "<option value='background' selected>background</option>";
+	else dat += "<option value='background'>background</option>";	
+
+	if (type == "action") dat += "<option value='action' selected>action</option>";
+	else dat += "<option value='action'>action</option>";	
+	dat += "</select>";
 	return dat;
 }
 
@@ -427,12 +446,25 @@ function sedroPersonaRForm(persona, name) {
 	$(".poolCount").html("Removeing persona Form["+persona+"] form["+name+"]...");
 	sedroPersonaRemoveForm(ctx, persona, name, function (rctx, persona, data) {
 		if (data) {
-			$("#xpool_action").html("removed persona form: " + rctx + " / " + persona);
+			$("#xpool_action").html("removed persona form: " + name + " / " + persona);
 			getTenant();		
 		} else {	
 		}
 	});
 }
+function sedroPersonaUpdateRForm(persona, name) {
+	var ctx = $("#ctx").val();
+	var type = $("#pform_"+persona +" #"+persona+"_"+name+"_type").val();
+	$(".poolCount").html("Updateing persona Form["+persona+"] form["+name+"] to " + type);
+	sedroPersonaUpdateForm(ctx, persona, name, type, function (rctx, persona, data) {
+		if (data) {
+			$("#xpool_action").html("updated persona form: " + name + " / " + persona);
+			getTenant();		
+		} else {	
+		}
+	});
+}
+
 function sedroPersonaRawForm(persona, name) {
 	var ctx = $("#ctx").val();
 	sedroPersonaGetFormRaw(ctx, persona, name, function (rctx, persona, form, data) {
