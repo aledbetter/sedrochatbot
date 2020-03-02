@@ -13,7 +13,7 @@ public class Orator {
 	
 		
 	// wake with text
-	private static final boolean send_timed = false;
+	private static final boolean send_timed = true;
 	private static final boolean wake_text = false;
 	
 	
@@ -48,7 +48,11 @@ public class Orator {
 			processorPublic.setPersona(user.getSedroPersona());
 		}
 		service.setOrator(this);
+		
 		msg_set = new ArrayList<>();
+		if (send_timed) {
+			startSendTimer();
+		}
 	}
 	
 	public int getProcessorCount() {
@@ -59,6 +63,46 @@ public class Orator {
 		return this.service;
 	}
 	
+	// timed send for messages
+	private void startSendTimer() {
+		if (msg_timer != null) msg_timer.cancel();
+		
+		msg_timer = new Timer();
+		msg_timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+            	// go through messags until time is not up yet
+            	List<HashMap<String, Object>> sendList = null;
+        		synchronized(msg_set) {       			
+        			if (msg_set.size() < 1) return; // nothing to send
+        			
+        			// make list to send
+        			long tm = Sutil.getUTCTime().getTimeInMillis();
+        			while (msg_set.size()>0) {
+        				HashMap<String, Object> m = msg_set.get(0);
+        				Long stm = (Long)m.get("stime");
+        				if (stm <= tm) {
+        					if (sendList == null) sendList = new ArrayList<>();      					
+                			msg_set.remove(0);
+                			sendList.add(m);
+        				} else {
+        					break;
+        				}
+        			}
+        		}
+        		if (sendList == null) return; // nothing to send
+      
+        		// Send all MESSAGEs
+    			for (HashMap<String, Object> m:sendList) {	            	
+	            	String txt = (String)m.get("msg");
+	            	String to = (String)m.get("to");
+	            	String from = (String)m.get("from");
+	            	Sedro processor = (Sedro)m.get("processor");
+					service.sendDirectMessage(processor, to, txt);
+    			}
+            }
+        }, 100, 100);		
+	}
+	
 	// close 
 	public void close() {
 		if (getProcessorCount() > 0) {
@@ -66,7 +110,8 @@ public class Orator {
 				// close all processors
 				List<HashMap<String, Object>> msg = s.chatBye();
 			}
-		}	 
+		}
+		if (msg_timer != null) msg_timer.cancel();
 	}
 	
 	public Sedro addProcessor(boolean readPublic, boolean respPublic, boolean directMsg) {
@@ -252,7 +297,8 @@ public class Orator {
 		}
 	}
 	
-	// FIXME
+	
+	// Add message to the message QUEUE
 	private void addMsg(String txt, String event, Integer pre_wait, Integer post_wait, String to, String from, Sedro processor) {
 		HashMap<String, Object> smsg = new HashMap<>();
 		smsg.put("msg", txt);		
@@ -283,53 +329,6 @@ public class Orator {
 			msg_set.add(smsg);
 		}
 	}
-	
-	private void setTimer() {
-		if (msg_timer != null) msg_timer.cancel();
-		
-		HashMap<String, Object> msg = null;
-		synchronized(msg_set) {
-			if (msg_set.size() < 1) return;
-			msg = msg_set.get(0);
-			msg_set.remove(0);
-		}
-		// FIXME time
-		
-		msg_timer = new Timer();
-		msg_timer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-            	// go through messags until time is not up yet
-            	List<HashMap<String, Object>> sendList = null;
-        		synchronized(msg_set) {
-        			if (msg_set.size() < 1) return;
-        			
-        			long tm = Sutil.getUTCTime().getTimeInMillis();
-        			while (msg_set.size()>0) {
-        				HashMap<String, Object> m = msg_set.get(0);
-        				Long stm = (Long)m.get("stime");
-        				if (stm <= tm) {
-        					if (sendList == null) sendList = new ArrayList<>();      					
-                			msg_set.remove(0);
-                			sendList.add(m);
-        				} else {
-        					break;
-        				}
-        			}
-        		}
-  // FIXME         
-        		// Send all MESSAGEs
-    			for (HashMap<String, Object> m:sendList) {	            	
-	            	String txt = (String)m.get("msg");
-	            	String to = (String)m.get("to");
-	            	String from = (String)m.get("from");
-	            	Sedro processor = (Sedro)m.get("processor");
-					service.sendDirectMessage(processor, to, txt);
-    			}
-            }
-        }, 100, 100);
-		
-	}
-
 
 	
 	//////////////////////////////////////////////////////	
