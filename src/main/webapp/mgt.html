@@ -66,10 +66,11 @@
 						<div class="fLn" id='add_form' style='display:none;z-index:1000;position:absolute;top:100px;margin-left:15px;width:97%;background:#FFF;border:solid 2px #555'>	
 							<div style='padding:15px'>
 							<h3>Add Form to Persona: <span id='persona_form_show'></span></h3>
-								Form Type: <select id='form_type' style='width:100px'>
+								Form Type: <select id='form_type' style='width:120px'>
 									<option value='load' selected>load</option>
 									<option value='action'>action</option>
 									<option value='background'>background</option>
+									<option value='set'>set</option>
 								</select>
 								&nbsp;&nbsp;Main: <select id='form_main' style='width:100px'>
 									<option value='false' selected>false</option>
@@ -91,7 +92,7 @@
 							<div style='padding:15px'>
 							<h3>Raw Persona: <span id='raw_persona_name'></span></h3>
 								<div class='bslink' id='raw_persona_cancel_bt' style='width:70px;text-align:center;font-size:16px;background:#EEE;position:absolute;top:10px;right:10px'>Cancel</div>			
-								<div class="fLn" style='height:600px;overflow: auto;'><pre><code id='raw_persona_data'></code></pre></div>
+								<div class="fLn" style='z-index:5001;height:600px;overflow: auto;text-align:left'><pre><code id='raw_persona_data'></code></pre></div>
 							</div>
 						</div>
 					</div>
@@ -103,7 +104,7 @@
 						<div class="fLn" id='gen_persona' style='display:none;margin-top:30px;margin-bottom:10px;background:#EEE;padding-bottom:10px;position:relative'>
 							<div class="fLn" style='padding-top:10px'>
 								<h3>&nbsp;Add a Persona</h3>
-								<div class='bslink' id='add_persona_bt' style='width:70px;text-align:center;font-size:16px;position:absolute;top:8px;right:15px;background:#666;color:#FFF'>Add</div>								
+								<div class='bslink' id='add_persona_bt' style='z-index:5;width:70px;text-align:center;font-size:16px;position:absolute;top:8px;right:15px;background:#666;color:#FFF'>Add</div>								
 								
 								<div class="fLn" id='add_persona' style='display:none;padding-top:10px'>							
 									<div class="fLn">	
@@ -118,7 +119,7 @@
 									<div class="fLn" style='padding-top:10px;padding-bottom:10px'>					
 										<div class='fLn action' style='font-weight:bold' id='xpersona_action'></div>
 									</div>	
-									<div class='bslink' id='persona_generate_bt' style='width:200px;text-align:center;float:right;font-size:16px;margin-top:4px;background:#666;color:#FFF;margin-right:10px;'>Generate Persona</div>								
+									<div class='bslink' id='persona_generate_bt' style='z-index:5;width:200px;text-align:center;float:right;font-size:16px;margin-top:4px;background:#666;color:#FFF;margin-right:10px;'>Generate Persona</div>								
 								</div>
 							</div>
 						</div>	
@@ -128,11 +129,11 @@
 							<div class="fLn" style='padding-top:10px'>
 								<h3>&nbsp;Add Knowledge to <select id='persona_select' style='width:200px'></select></h3>
 								
-								<div class='bslink' id='add_knowledge_bt' style='width:70px;text-align:center;font-size:16px;position:absolute;top:8px;right:15px;background:#666;color:#FFF'>Add</div>									
+								<div class='bslink' id='add_knowledge_bt' style='z-index:5;width:70px;text-align:center;font-size:16px;position:absolute;top:8px;right:15px;background:#666;color:#FFF'>Add</div>									
 								
 								<div class="fLn" id='add_knowledge' style='display:none;padding-top:10px'>							
 									<textarea id='knowledge_text' style='width:966px;min-height:40px;margin-top:3px'></textarea>
-									<div class='bslink' id='db_generate_bt' style='width:200px;text-align:center;float:right;font-size:16px;margin-top:4px;background:#666;color:#FFF;margin-right:10px;'>Generate DB</div>			
+									<div class='bslink' id='db_generate_bt' style='z-index:5;width:200px;text-align:center;float:right;font-size:16px;margin-top:4px;background:#666;color:#FFF;margin-right:10px;'>Generate DB</div>			
 								</div>
 							</div>
 						</div>						

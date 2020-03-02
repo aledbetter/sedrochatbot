@@ -330,7 +330,7 @@ function showPersona(persona) {
 			if (data.results) {
 				if (data.results[0].load) {
 					for (var i=0;i<data.results[0].load.length;i++) {
-						dat += addShowForm("load", persona, data.results[0].load[i], false);
+						dat += addShowForm("load", persona, data.results[0].load[i], true);
 					}				
 				}
 				if (data.results[0].background) {
