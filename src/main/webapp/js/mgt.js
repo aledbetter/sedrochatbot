@@ -69,9 +69,19 @@ function clearErrors() {
 $(document).ready(function() {
 	resetPage();
 	
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	// Check auth cookie
+	var cookie = getCookie("atok");
+	if (!cookie || cookie == "") {
+		if (window.location.href.indexOf(".html") > -1 && window.location.href.indexOf("index.html") == -1) {
+			window.location.href = "/index.html";	
+			return;
+		}		
+	}
+	
 	// get the key
 	scsGetSettings(function(data) {
-		if (data.info.sedro_access_key) {
+		if (data && data.info && data.info.sedro_access_key) {
 			glob_api_key = data.info.sedro_access_key;
 			$("#api_key").val(data.info.sedro_access_key); 
 			setAPIKey(glob_api_key);
@@ -351,11 +361,13 @@ function showPersona(persona) {
 	});
 }
 function addShowForm(tag, persona, name, del) {
-	var dat = "<div class='fLn' style='width:90%;margin-left:40px;position:relative;border-top:1px solid #CCC'>";
-	dat += tag+": " + name;
+	var dat = "<div class='fLn' style='width:90%;padding-top:4px;padding-bottom:3px;margin-left:40px;position:relative;border-top:1px solid #CCC'>";
+	if (tag == "load") dat += tag;
+	else dat += "<b>"+tag+"</b>";
+	dat += ":&nbsp;&nbsp;" + name;
 	if (del) {
-		dat += "<div class='bslink' onClick='sedroPersonaRForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:0px;right:10px;background:#666;color:#FFF;'>Remove</div>";		
-		dat += "<div class='bslink' onClick='sedroPersonaRawForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:0px;right:80px;background:#666;color:#FFF;'>Raw</div>";		
+		dat += "<div class='bslink' onClick='sedroPersonaRForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:2px;right:10px;background:#666;color:#FFF;'>Remove</div>";		
+		dat += "<div class='bslink' onClick='sedroPersonaRawForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:2px;right:80px;background:#666;color:#FFF;'>Raw</div>";		
 	}
 	dat += "</div>";
 	return dat;
@@ -399,7 +411,6 @@ function addPersonaForm() {
 			$("#form_content").addClass("error");
 			return;
 		}
-		
 		// do it
 		sedroPersonaAddForm(ctx, persona, fcontent, ftype, fmain, function (rctx, persona, data) {
 			if (data) {
@@ -530,5 +541,12 @@ function scsGetSettings(cb) {
 		  cb(null);
 	  }
 	});
+}
+
+// get a cookie
+function getCookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
 }
 	

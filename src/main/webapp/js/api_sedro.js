@@ -147,6 +147,7 @@ function sedroGetAccount(cb) {
 	});
 }
 
+
 function sedroGetPersonas(cb) {
 	if (!glob_api_key) return;
 	var turl = "/tenant/personas";
@@ -253,7 +254,7 @@ function sedroPersonaGetForms(ctx, persona, cb) {
 // add form embeded: load/action/background/main
 function sedroPersonaAddForm(ctx, persona, form, type, main, cb) {
 	if (!glob_api_key) return;
-	if (!persona || !name) return;
+	if (!persona || !form) return;
 	var turl = "/tenant/persona/"+persona+"/form/add";
 	var ind = "{ \"form\": \"" + form.escapeSpecialChars() + "\""; 
     if (type) ind += ", \"type\": \"" + type + "\"";
@@ -285,6 +286,7 @@ function sedroPersonaAddFormRemote(ctx, persona, url, type, cb) {
 	  }
 	});	
 }
+
 //get raw Form defintion
 function sedroPersonaGetFormRaw(ctx, persona, form, cb) {
 	if (!glob_api_key) return;

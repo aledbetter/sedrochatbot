@@ -50,6 +50,42 @@ $(document).ready(function() {
 		resetPage();
 	}
 	
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	// Check auth cookie
+	var cookie = getCookie("atok");
+	if (!cookie || cookie == "") {
+		if (window.location.href.indexOf(".html") > -1 && window.location.href.indexOf("index.html") == -1) {
+			window.location.href = "/index.html";	
+			return;
+		}		
+	}
+
+	var g_tenant = getUrlParam('tenant');
+
+	// get the key
+	scsGetSettings(function(data) {
+		if (data && data.info && data.info.sedro_access_key) {
+			glob_api_key = data.info.sedro_access_key;
+			$("#api_key").val(data.info.sedro_access_key); 
+			setAPIKey(glob_api_key);
+			sedroGetAccount(function (data) {
+				var pselect = "";
+				if (data.results[0].personas) {
+					for (var i=0;i<data.results[0].personas.length;i++) {
+						pselect += "<option value='"+data.results[0].personas[i]+"'>"+data.results[0].personas[i]+"</option>";						
+					}
+				}		
+				$("#persona").html(pselect);	
+				g_tenant = data.results[0].ctx;			
+			});
+		} else {
+			glob_api_key = null;
+			$("#api_key").val(""); 
+			$("#xtenant_action").html("ERROR: RAPID API key not set ");
+		}
+	});
+
 	function waitChid() {
 	    if (anz_in_progress == true) {
 	        setTimeout(waitChid, 50);//wait 50 millisecnds then recheck
@@ -72,36 +108,16 @@ $(document).ready(function() {
         setTimeout(pollChid, 1000*30); // poll every 30 seconds
 	}
 	
-	var g_tenant = getUrlParam('tenant');
-	if (!g_tenant) {
-		// FIXME get the callers tenant
-		alert("No tenant selected: http://xxx/extern/msg?teant=XXX_TENANT_ID_XXX");
-	}
+
 	g_caller_token = getUrlParam('caller_token');
 	if (g_caller_token) $("#caller_token").val(g_caller_token);
 	
 	// get the select list
-	getPersonasSelect(g_tenant);
+
 	var pers = getUrlParam('persona');
 	if (pers) {
 		$("#persona").val(pers);
 		$("#wake_now_bt").click();
-	}
-
-	
-	// get persona list select
-	function getPersonasSelect(ctx) {
-		sedroGetTenant(ctx, function (ctx, data) {
-			var pselect = "";
-			if (data) {
-				if (data.results[0].personas) {
-					for (var i=0;i<data.results[0].personas.length;i++) {
-						pselect += "<option value='"+data.results[0].personas[i]+"'>"+data.results[0].personas[i]+"</option>";						
-					}
-				}
-			}
-			$("#persona").html(pselect);
-		});			
 	}
 	
 
@@ -365,3 +381,19 @@ var getUrlParam = function getUrlParameter(sParam) {
         }
     }
 };
+
+function scsGetSettings(cb) {
+	$.ajax({url: "/api/1.0/settings", type: 'GET', dataType: "json", contentType: 'application/json', 
+	  success: function(data){
+		  cb(data);
+	  }, error: function(xhr) {
+		  cb(null);
+	  }
+	});
+}
+// get a cookie
+function getCookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
+}

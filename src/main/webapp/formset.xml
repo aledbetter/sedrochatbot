@@ -232,13 +232,13 @@
 
 
 	<!-- story definition for loose TUI.. -->
-	<form name='_support_' data-type='form'>
+	<form name='_support_' role='main' data-type='form'>
 		<input name="intro" data-type="intro"/>
 		<label for="intro" state='wake'>Good %_time_period_of_day% how can I help you?</label>
 
 
 	<!-- task set is always a loop IF "verify".. with question about done at the end ( -->
-		<input name="taskset" role='main' data-type="tasks" 
+		<input name="taskset" data-type="tasks" 
 			data-task-show='update phone number, get balance, send money'
 		/>	
 		<label for="taskset" state='wake' data-pre-wait='10'>What can I help you with this %_time_period_of_day%?</label>

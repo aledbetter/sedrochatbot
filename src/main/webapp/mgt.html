@@ -14,8 +14,8 @@
 	 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 	
-	<script type="text/javascript" src="/js/mgt.js?version=1"></script> 
 	<script type="text/javascript" src="/js/api_sedro.js?version=1"></script> 
+	<script type="text/javascript" src="/js/mgt.js?version=1"></script> 
 
 </head>
 
@@ -60,11 +60,11 @@
 							
 							<span style='float:right;padding-right:10px'>Tenant ID: <span class='ctx'></span></span>	
 						</div>	
-						<div class="fLn" style='padding-top:10px;padding-bottom:0px;'>					
+						<div class="fLn" style='padding-top:10px;padding-bottom:0px;text-align:left'>					
 							<div class='fLn action' style='font-weight:normal' id='xtenant_data'></div>
 						</div>					
 						<div class="fLn" id='add_form' style='display:none;z-index:1000;position:absolute;top:100px;margin-left:15px;width:97%;background:#FFF;border:solid 2px #555'>	
-							<div style='padding:15px'>
+							<div style='padding:15px;text-align:left'>
 							<h3>Add Form to Persona: <span id='persona_form_show'></span></h3>
 								Form Type: <select id='form_type' style='width:120px'>
 									<option value='load' selected>load</option>
@@ -125,8 +125,8 @@
 						</div>	
 						
 						<!-- GENERATE Knowledge DB -->
-						<div class="fLn" id='gen_knowledge' style='display:none;margin-top:10px;margin-bottom:50px;background:#EEE;padding-bottom:10px;position:relative'>
-							<div class="fLn" style='padding-top:10px'>
+						<div class="fLn" id="gen_knowledge" style='display:none;margin-top:10px;margin-bottom:50px;background:#EEE;padding-bottom:10px;position:relative'>
+							<div class="fLn" style="padding-top:10px;text-align:left">
 								<h3>&nbsp;Add Knowledge to <select id='persona_select' style='width:200px'></select></h3>
 								
 								<div class='bslink' id='add_knowledge_bt' style='z-index:5;width:70px;text-align:center;font-size:16px;position:absolute;top:8px;right:15px;background:#666;color:#FFF'>Add</div>									
