@@ -252,15 +252,21 @@ function getSettings() {
 			$("#setting_sedro_access_key").html(data.info.sedro_access_key); 
 			glob_api_key = data.info.sedro_access_key;
 			sedroGetPersonas(function (data) {
+				var pselect = "";
+				var pUser = "";
 				// persona select list
 				if (data.list && data.list.length > 0) {
-					var pselect = "";
 					for (var i=0;i<data.list.length;i++) {
 						pselect += "<option value='"+data.list[i]+"'>"+data.list[i]+"</option>";						
+						pUser += "<div class='fLn persona'>"+data.list[i]+"</div>";						
 					}
-					if (pselect == "") pselect = "<option value=''>No Personas</option>";
-					$(".persona_list").html(pselect);
 				}
+				if (pselect == "") {
+						pselect = "<option value=''>No Personas</option>";
+						pUser += "<div class='fLn persona' style='color:red'>No Personas</div>";						
+				}
+				$(".persona_list").html(pselect);
+				$(".user_persona_list").html(pUser);			
 			});
 			// get message callbacks 
 			scsMessageCallback(function (data) {
