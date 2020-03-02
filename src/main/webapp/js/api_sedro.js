@@ -250,7 +250,7 @@ function sedroPersonaGetForms(ctx, persona, cb) {
 	  }
 	});
 }
-// add form embeded: load/action/active/null
+// add form embeded: load/action/background/main
 function sedroPersonaAddForm(ctx, persona, form, type, main, cb) {
 	if (!glob_api_key) return;
 	if (!persona || !name) return;

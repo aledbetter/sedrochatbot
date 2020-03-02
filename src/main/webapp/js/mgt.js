@@ -328,19 +328,14 @@ function showPersona(persona) {
 				dat += addShowForm("main", persona, data.info.main, false);
 			}
 			if (data.results) {
-				if (data.results[0].embeded) {
-					for (var i=0;i<data.results[0].embeded.length;i++) {
-						dat += addShowForm("embeded", persona, data.results[0].embeded[i], true);
-					}
-				}
 				if (data.results[0].load) {
 					for (var i=0;i<data.results[0].load.length;i++) {
 						dat += addShowForm("load", persona, data.results[0].load[i], false);
 					}				
 				}
-				if (data.results[0].active) {
-					for (var i=0;i<data.results[0].active.length;i++) {
-						dat += addShowForm("active", persona, data.results[0].active[i], false);
+				if (data.results[0].background) {
+					for (var i=0;i<data.results[0].background.length;i++) {
+						dat += addShowForm("background", persona, data.results[0].active[i], false);
 					}
 				}
 				if (data.results[0].action) {
