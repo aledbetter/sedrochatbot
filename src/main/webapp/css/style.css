@@ -181,7 +181,7 @@ select.warn {
 	top: 0px;
 	left: 0px;
 	width:100%;
-	z-index: 1202;
+	z-index: 2001;
 	/*border-bottom: 5px solid #51a63f;*/	
 	text-align: left;
 	color: #555;
@@ -322,7 +322,7 @@ img.wash {
 	line-height:1.2em;
 	font-weight:bold;
 	font-size: 8px;
-	z-index: 50000;
+	z-index: 2000;
 	padding:2px;
 	padding-bottom:1px;
 	border: 1px solid #FFF;
