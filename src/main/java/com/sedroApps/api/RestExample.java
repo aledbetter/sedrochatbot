@@ -41,6 +41,7 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import main.java.com.sedroApps.SCServer;
 import main.java.com.sedroApps.util.HttpUtil;
 import main.java.com.sedroApps.util.RestResp;
 import main.java.com.sedroApps.util.RestUtil;
@@ -143,7 +144,6 @@ public class RestExample {
   //https://rapidapi.com/mvpcapi/api/geo-services-by-mvpc-com?endpoint=apiendpoint_65cc05bc-5f67-40b8-84cf-977da846af11			
     public static HashMap<String, Object> getLocationInfoGET(String key, double lat, double lon) { 
     	if (key == null || lat == 0 || lon == 0) return null;
-
     	return getWeatherGET(key, lon, lat);
     }
     
@@ -337,6 +337,105 @@ public class RestExample {
 	}
 
 	
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// TEST only for form post
+	@POST
+	@Path("/weather")
+	public String getWeatherPOST(@Context UriInfo info, 
+			@Context HttpServletRequest hsr,
+    		@CookieParam("atok") String cookie_access_key, 
+    		String body) {
+
+		//System.out.println("TEST_FORM_GET_POST: " + body);		
+		JSONObject obj = null, fobj = null;
+		JSONArray elem = null, relem = null;
+		double lon = 0, lat = 0;
+		
+		try {
+			obj = new JSONObject(body);
+			fobj = obj.getJSONObject("form");
+			elem = fobj.getJSONArray("elements");			
+			try {
+			String persona = obj.getString("persona");
+			String chid = obj.getString("chid");
+			String caller_token = obj.getString("ctok");
+			String ctype = obj.getString("type");
+			String lang = obj.getString("lang");
+			String fname = fobj.getString("name");
+			} catch (Throwable t) {}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+		
+		JSONObject reqobj = null;
+		try {			
+		reqobj = obj.getJSONObject("request");
+		relem = reqobj.getJSONArray("elements");	
+		////////////////////////////////////
+		// GET VALUES for params		
+		for (int i=0;i<relem.length();i++) {
+			JSONObject eo = relem.getJSONObject(i);
+			String name = RestUtil.getJStr(eo, "name");
+			String val = RestUtil.getJStr(eo, "val");
+			//String type = RestUtil.getJStr(eo, "type");
+			if (name.equals("latitude")) lat = Sutil.toDouble(val);
+			else if (name.equals("longitude")) lon = Sutil.toDouble(val);
+		}
+		} catch (Throwable t) {}
+
+
+		// get the KEY
+		String key = SCServer.getChatServer().getSedro_access_key();
+
+		////////////////////////////////////
+		// get externa info
+		HashMap<String, Object> winfo = getWeatherGET(key, lon, lat);		
+		
+		////////////////////////////////////
+		// MAP output params
+		try {		
+			elem = fobj.getJSONArray("elements");
+			for (int i=0;i<elem.length();i++) {
+				JSONObject eo = elem.getJSONObject(i);
+				try {
+				String name = RestUtil.getJStr(eo, "name");
+				//String type = RestUtil.getJStr(eo, "type");
+				//System.out.println("   ELEM: "+fname+"/"+name+" t:"+type);	
+				eo.remove("type");	
+				if (winfo == null) continue;
+				String val = null;
+				String val2 = null;
+				if (winfo.get(name) != null) {
+					val = (String)winfo.get(name);
+					if (winfo.get(name+"2") != null) val2 = (String)winfo.get(name+"2");
+				}
+				if (val != null) eo.put("val", val);
+				if (val2 != null) eo.put("val2", val2);
+				} catch (Throwable t) {}
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+
+		////////////////////////////////////
+		// CLEAN UP RESPONSE
+		try {	
+			obj.remove("ctok");
+			obj.remove("lang");
+			obj.remove("db_id");
+			obj.remove("type");
+			obj.put("type", "data");
+			obj.remove("request");
+		} catch (Throwable t) {}	
+		
+		if (obj != null) {
+			//System.out.println(" RESP: "+obj.toString());	
+			return obj.toString();
+		}
+		
+		return null;
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	// TEST only for form post
 	@POST
