@@ -28,7 +28,7 @@ import main.java.com.sedroApps.util.HttpUtil;
 import main.java.com.sedroApps.util.Sutil;
 
 
-public class Sedro {
+public class SCSedro {
 	private static String rapidapi_host = "inteligent-chatbots.p.rapidapi.com";
 
 	private String persona;
@@ -65,7 +65,7 @@ public class Sedro {
 	private String status = "wake";
 	
 
-	Sedro(boolean readPublic, boolean respPublic, boolean directMsg) {
+	SCSedro(boolean readPublic, boolean respPublic, boolean directMsg) {
 		this.status = "wake";
 		this.readPublic = readPublic;
 		this.respPublic = respPublic;

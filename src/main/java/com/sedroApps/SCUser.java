@@ -20,9 +20,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import main.java.com.sedroApps.adapter.ChatAdapter;
+import main.java.com.sedroApps.adapter.ChatFacebook;
+import main.java.com.sedroApps.adapter.ChatSMS;
+import main.java.com.sedroApps.adapter.ChatTwitter;
+import main.java.com.sedroApps.adapter.ChatWhatsapp;
+import main.java.com.sedroApps.msgcb.CbMessage;
 import main.java.com.sedroApps.util.Sutil;
 
-public class UserAccount {
+public class SCUser {
 	// chatbot info (name may be different accross services)
 	private String username;
 	private String sedro_persona;
@@ -31,12 +37,12 @@ public class UserAccount {
 	HashMap<String, HashMap<String, String>> service_info = null;
 	HashMap<String, HashMap<String, String>> service_state = null;
 	List<ChatAdapter> services = null;
-	List<Orator> orators = null;
+	List<SCOrator> orators = null;
 	
 	private CbMessage msgcb = null;
 	
 	
-	UserAccount(String username) {
+	SCUser(String username) {
 		this.username = username;
 	}
 		
@@ -157,19 +163,19 @@ public class UserAccount {
 	
 	////////////////////////////////////////
 	// Manage Orators
-	public void addOrator(Orator orator) {
+	public void addOrator(SCOrator orator) {
 		if (orators == null) orators = new ArrayList<>();
 		if (!orators.contains(orator)) orators.add(orator);
 	}
 	
-	public Orator findOratorForChatService(ChatAdapter cs) {
+	public SCOrator findOratorForChatService(ChatAdapter cs) {
 		if (orators == null || cs == null) return null;
-		for (Orator orat:orators) {
+		for (SCOrator orat:orators) {
 			if (orat.getChatService().equals(cs)) return orat;
 		}
 		return null;
 	}
-	public void removeOrator(Orator orat) {
+	public void removeOrator(SCOrator orat) {
 		if (orators == null || orat == null) return;
 		orat.close();
 		orators.remove(orat);
@@ -182,7 +188,7 @@ public class UserAccount {
 	public void process() {
 		// process the orators
 		if (orators != null && orators.size() > 0) {
-			for (Orator orat:orators) {
+			for (SCOrator orat:orators) {
 				orat.process();
 			}
 		}
@@ -220,7 +226,7 @@ public class UserAccount {
 					if (!cs.isPublicMsg()) {
 						readPublic = respPublic = false;
 					}
-					Orator orat = new Orator(SCServer.getChatServer(), cs, this, readPublic, respPublic);
+					SCOrator orat = new SCOrator(SCServer.getChatServer(), cs, this, readPublic, respPublic);
 					this.addOrator(orat);
 				} else {
 	// ?

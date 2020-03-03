@@ -59,7 +59,7 @@ function postChatWake(ctx, persona, txt, user, caller_token, context, channel_ty
 		});
 	}
 	var d = new Date();
-	var calltime = d.toString(); // Tue Mar 03 2020 06:48:13 GMT-0800 (Pacific Standard Time)
+	var calltime = d.toISOString(); // Tue Mar 03 2020 06:48:13 GMT-0800 (Pacific Standard Time)
 	var tzoffset = d.getTimezoneOffset();	// in min
 		
 	var ind = "{ \"text\": \"";
@@ -110,7 +110,7 @@ function postChatAsk(ctx, persona, txt, user, caller_token, context, channel_typ
 		});
 	}
 	var d = new Date();
-	var calltime = d.toString(); // Tue Mar 03 2020 06:48:13 GMT-0800 (Pacific Standard Time)
+	var calltime = d.toISOString(); // Tue Mar 03 2020 06:48:13 GMT-0800 (Pacific Standard Time)
 	var tzoffset = d.getTimezoneOffset();	// in min
 	
 	var ind = "{ \"text\": \"";
@@ -143,7 +143,7 @@ function postChatTell(ctx, persona, txt, user, caller_token, context, channel_ty
 		});
 	}
 	var d = new Date();
-	var calltime = d.toString(); // Tue Mar 03 2020 06:48:13 GMT-0800 (Pacific Standard Time)
+	var calltime = d.toISOString(); // Tue Mar 03 2020 06:48:13 GMT-0800 (Pacific Standard Time)
 	var tzoffset = d.getTimezoneOffset();	// in min
 	
 	var ind = "{ \"text\": \"";

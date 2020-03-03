@@ -25,6 +25,9 @@ import java.util.TimerTask;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import main.java.com.sedroApps.adapter.ChatAdapter;
+import main.java.com.sedroApps.msgcb.CbExample;
+import main.java.com.sedroApps.msgcb.CbMessage;
 import main.java.com.sedroApps.util.DButil;
 
 public class SCServer {
@@ -37,7 +40,7 @@ public class SCServer {
 	private boolean init = false;
 	private String sedro_access_key;
 
-	List<UserAccount> uaList;	// list of users
+	List<SCUser> uaList;	// list of users
 	
 	private HashMap<String, CbMessage> msgcbMap = null;
 	
@@ -155,30 +158,30 @@ public class SCServer {
 		// process users	
 		synchronized (uaList) {
 			if (uaList.size() > 0) {
-				for (UserAccount ua:uaList) {
+				for (SCUser ua:uaList) {
 					ua.process();
 				}
 			}
 		}
 	}
 	
-	public List<UserAccount> getUsers() {
+	public List<SCUser> getUsers() {
 		return uaList;
 	}
-	public UserAccount getUser(String username) {
+	public SCUser getUser(String username) {
 		if (uaList == null) return null;
 		synchronized (uaList) {
 			if (uaList.size() < 1) return null;
-			for (UserAccount ua: uaList) {
+			for (SCUser ua: uaList) {
 				if (ua.getCBUsername().equals(username)) return ua;
 			}
 		}
 		return null;
 	}
-	public UserAccount addUser(String username, boolean save) {
+	public SCUser addUser(String username, boolean save) {
 		if (uaList == null) uaList = new ArrayList<>();
 		synchronized (uaList) {
-			UserAccount ua = new UserAccount(username);
+			SCUser ua = new SCUser(username);
 			uaList.add(ua);
 			if (save) save();
 			return ua;
@@ -188,7 +191,7 @@ public class SCServer {
 		if (uaList == null) return false;
 		synchronized (uaList) {
 			if (uaList.size() < 1) return false;
-			for (UserAccount ua: uaList) {
+			for (SCUser ua: uaList) {
 				if (ua.getCBUsername().equals(username)) {
 					uaList.remove(ua);
 					save();
@@ -203,7 +206,7 @@ public class SCServer {
 		if (uaList == null) return null;
 		synchronized (uaList) {
 			if (uaList.size() < 1) return null;
-			for (UserAccount ua: uaList) {
+			for (SCUser ua: uaList) {
 				ChatAdapter ca = ua.findChatService(id);
 				if (ca != null) return ca;
 			}
@@ -222,7 +225,7 @@ public class SCServer {
 			synchronized (uaList) {
 				if (uaList.size() > 0) {
 					List<HashMap<String, Object>> sl = new ArrayList<>();
-					for (UserAccount ua:uaList) {
+					for (SCUser ua:uaList) {
 						HashMap<String, Object> um = ua.getMap();
 						sl.add(um);
 					}
@@ -252,7 +255,7 @@ public class SCServer {
 				for (HashMap<String, Object> um:uml) {
 				// load this user
 				String un = (String)um.get("username");
-				UserAccount ua = addUser(un, false);
+				SCUser ua = addUser(un, false);
 				ua.load(um);
 			}
 		}

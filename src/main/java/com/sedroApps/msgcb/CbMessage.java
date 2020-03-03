@@ -14,24 +14,27 @@
  * is strictly forbidden unless prior written permission is obtained
  * from Aaron Ledbetter.
  */
-package main.java.com.sedroApps;
+package main.java.com.sedroApps.msgcb;
 
 import java.util.HashMap;
 
+import main.java.com.sedroApps.SCSedro;
 
-public class CbExample extends CbMessage {
-
-	public CbExample(String name) {
-		super(name);
+abstract public class CbMessage {
+	private String name;
+	
+	public CbMessage(String name) {
+		this.setName(name);
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 	
-	@Override
-	public String getFinalMessage(String caname, Sedro processor, boolean msgPublic, 
-			HashMap<String, Object> msgInfo, String msg) {
-		// just a simple replace
-		msg.replaceAll("yes", "maybe");
-		
-		return null;
-	}
-
+	/////////////////////////////////////////////////////////
+	// implement and register this to make an override
+	public abstract String getFinalMessage(String caname, SCSedro processor, boolean msgPublic, 
+											HashMap<String, Object> msgInfo, String msg);
 }

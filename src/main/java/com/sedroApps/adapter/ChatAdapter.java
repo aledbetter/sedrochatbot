@@ -14,20 +14,23 @@
  * is strictly forbidden unless prior written permission is obtained
  * from Aaron Ledbetter.
  */
-package main.java.com.sedroApps;
+package main.java.com.sedroApps.adapter;
 
 import java.util.HashMap;
 import java.util.List;
 
+import main.java.com.sedroApps.SCOrator;
+import main.java.com.sedroApps.SCSedro;
+import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.util.Sutil;
 
 
 public class ChatAdapter {
-	private UserAccount user = null;
+	private SCUser user = null;
 	private String id = null;
-	private Orator orat = null;
+	private SCOrator orat = null;
 	
-	public ChatAdapter(UserAccount user, String id) {
+	public ChatAdapter(SCUser user, String id) {
 		this.user = user;
 		if (id != null) this.id = id;
 		else this.id = Sutil.getGUIDNoString();
@@ -45,17 +48,17 @@ public class ChatAdapter {
 	public String getLanguage() {
 		return null;	
 	}
-	public UserAccount getUser() {
+	public SCUser getUser() {
 		return user;
 	}	
 	public String getId() {
 		return id;	
 	}
 	
-	public void setOrator(Orator o) {
+	public void setOrator(SCOrator o) {
 		orat = o;
 	}
-	public Orator getOrator() {
+	public SCOrator getOrator() {
 		return orat;
 	}
 	
@@ -84,21 +87,21 @@ public class ChatAdapter {
 	}
 	
 	
-	public int init(UserAccount ua) {
+	public int init(SCUser ua) {
 		// over-ride for each service to set info needed
 		return 0;
 	}
 	
-	public int disconnnect(UserAccount ua) {
+	public int disconnnect(SCUser ua) {
 		// over-ride for each service to set info needed
 		return 0;
 	}
 	
-	public String postMessage(Sedro proc, String msg) {
+	public String postMessage(SCSedro proc, String msg) {
 		return "NOP";	
 	}
 
-	public String sendDirectMessage(Sedro proc, String touser, String msg) {
+	public String sendDirectMessage(SCSedro proc, String touser, String msg) {
 		return "NOP";			
 	}
 	
@@ -118,12 +121,12 @@ public class ChatAdapter {
 
 	// list of messages: from:from user / msg:message text
 	// Call identifier: "CID" in each
-	public List<HashMap<String, String>> getDirectMessages(Orator orat, Sedro processor) {
+	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedro processor) {
 		return null;
 	}
 	
 	// get new calls
-	public List<HashMap<String, String>> getDirectCall(Orator orat) {
+	public List<HashMap<String, String>> getDirectCall(SCOrator orat) {
 		return null;
 	}
 	

@@ -16,7 +16,7 @@
  */
 
 
-package main.java.com.sedroApps;
+package main.java.com.sedroApps.api;
 
 
 import java.sql.Timestamp;
@@ -42,6 +42,9 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import main.java.com.sedroApps.SCServer;
+import main.java.com.sedroApps.SCUser;
+import main.java.com.sedroApps.adapter.ChatAdapter;
 import main.java.com.sedroApps.util.DButil;
 import main.java.com.sedroApps.util.RestResp;
 import main.java.com.sedroApps.util.RestUtil;
@@ -204,11 +207,11 @@ public class RestAPI {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 		if (!rr.isAuth()) return rr.ret(401);
 		SCServer cs = SCServer.getChatServer();
-		List<UserAccount> ual = cs.getUsers();
+		List<SCUser> ual = cs.getUsers();
 		if (ual == null || ual.size() < 1) return rr.ret();
 		
 		List<HashMap<String, Object>> sl = new ArrayList<>();
-		for (UserAccount ua:ual) sl.add(ua.getMap());
+		for (SCUser ua:ual) sl.add(ua.getMap());
 		rr.addInfo("users", sl);
 		return rr.ret();
 	}
@@ -222,7 +225,7 @@ public class RestAPI {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 		if (!rr.isAuth()) return rr.ret(401);
 		SCServer cs = SCServer.getChatServer();
-		UserAccount ua = cs.getUser(user);
+		SCUser ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
 		rr.setInfo(ua.getMap());
 		return rr.ret();
@@ -251,7 +254,7 @@ public class RestAPI {
 		if (!RestUtil.paramHave(callback)) callback = null;
 
 		SCServer cs = SCServer.getChatServer();
-		UserAccount ua = cs.getUser(username);
+		SCUser ua = cs.getUser(username);
 		if (ua != null) return rr.ret(409);
 			
 		ua = cs.addUser(username, true);
@@ -274,7 +277,7 @@ public class RestAPI {
 		if (!rr.isAuth()) return rr.ret(401);
 
 		SCServer cs = SCServer.getChatServer();
-		UserAccount ua = cs.getUser(user);
+		SCUser ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
 		
 		cs.delUser(user);
@@ -312,7 +315,7 @@ public class RestAPI {
 		if (!rr.isAuth()) return rr.ret(401);
 
 		SCServer cs = SCServer.getChatServer();
-		UserAccount ua = cs.getUser(user);
+		SCUser ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
 		
 		//System.out.println("RESP: " + body);

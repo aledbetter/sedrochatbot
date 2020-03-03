@@ -15,47 +15,69 @@
  * from Aaron Ledbetter.
  */
 
-package main.java.com.sedroApps;
+package main.java.com.sedroApps.adapter;
 
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import main.java.com.sedroApps.SCOrator;
+import main.java.com.sedroApps.SCSedro;
+import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.util.Sutil;
 
 
 
-public class ChatWhatsapp extends ChatAdapter { 
-/*
- * https://www.twilio.com/docs/sms/whatsapp/quickstart/java
- * https://whatsmate.github.io/2016-02-17-send-whatsapp-message-java/
- */
+public class ChatFacebook extends ChatAdapter { 
+
 	// this is per user?
 	//private TwitterFactory factory = null;
 	private String pconsumer_key = null;  	// api_key
 	private String pconsumer_secret = null; // api_secret
 	private String paccess_token = null;
 	private String paccess_token_secret = null;
+	private String pdopublic = null;
+	private String pdoprivate = null;
 	
-	public ChatWhatsapp(UserAccount user, String id) {
+	public ChatFacebook(SCUser user, String id) {
 		super(user, id);
 	}
 	
 	@Override
 	public String getName() {
-		return "whatsapp";	
+		return "facebook";	
+	}
+	
+	@Override
+	public boolean isPublicMsg() {
+		if (pdoprivate != null) {
+			if (pdoprivate.equals("true")) return true;
+			return false;
+		}
+		return true;
+	}
+	@Override
+	public boolean isPrivateMsg() {
+		if (pdopublic != null) {
+			if (pdopublic.equals("true")) return true;
+			return false;
+		}
+		return true;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// EXTERNAL calls: init & processing
 	@Override
-	public int init(UserAccount ua) {
+	public int init(SCUser ua) {
 		super.init(ua);
 		String consumer_key = getServiceInfo("consumer_key");
 		String consumer_secret = getServiceInfo("consumer_secret");
 		String access_token = getServiceInfo("access_token");
 		String access_token_secret = getServiceInfo("access_token_secret");
+		String idopublic = getServiceInfo("dopublic");
+		String idoprivate = getServiceInfo("doprivate");
+
 		if (consumer_key == null || consumer_secret == null || access_token == null || access_token_secret == null) {
 			return -1; // not configured... remove
 		}
@@ -67,6 +89,8 @@ public class ChatWhatsapp extends ChatAdapter {
 			if (!pconsumer_secret.equals(consumer_secret)) change = true;
 			if (!paccess_token.equals(access_token)) change = true;
 			if (!paccess_token_secret.equals(access_token_secret)) change = true;
+			if (Sutil.compare(idopublic, pdopublic)) change = true;
+			if (Sutil.compare(idoprivate, pdoprivate)) change = true;
 			if (!change) return 0;
 		}
     	ConfigurationBuilder cb = new ConfigurationBuilder();
@@ -82,11 +106,14 @@ public class ChatWhatsapp extends ChatAdapter {
     	pconsumer_secret = consumer_secret;
     	paccess_token = access_token;
     	paccess_token_secret = access_token_secret;
+    	pdoprivate = idoprivate;
+    	pdopublic = idopublic;
+    	
     	return 0;
 	}
 	
 	@Override
-	public String postMessage(Sedro proc, String msg) {
+	public String postMessage(SCSedro proc, String msg) {
 		try {
 		
 		} catch (Throwable t) { }
@@ -94,17 +121,24 @@ public class ChatWhatsapp extends ChatAdapter {
 	}
 
 	@Override
-	public String sendDirectMessage(Sedro proc, String touser, String msg) {
+	public String sendDirectMessage(SCSedro proc, String touser, String msg) {
 		try {
 
 		} catch (Throwable t) { }
 		return "ERROR";			
 	}
+	
+	@Override
+	public List<String> getPublicMessages() {
+		try {
 
+		} catch (Throwable t) { }
+		return null;			
+	}
 	
 	// list of messages: from:from user / msg:message text
 	@Override	
-	public List<HashMap<String, String>> getDirectMessages(Orator orat, Sedro processor) {
+	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedro processor) {
 		return null;
 	}
 

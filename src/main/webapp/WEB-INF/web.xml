@@ -19,7 +19,7 @@
   
   <servlet>
     <servlet-name>LoadUtil</servlet-name>
-    <servlet-class>main.java.com.sedroApps.Servlet</servlet-class>
+    <servlet-class>main.java.com.sedroApps.SCServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   
@@ -28,7 +28,7 @@
     <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
     <init-param>
       <param-name>jersey.config.server.provider.packages</param-name>
-      <param-value>main.java.com.sedroApps</param-value>
+      <param-value>main.java.com.sedroApps.api</param-value>
     </init-param>  
     <load-on-startup>1</load-on-startup>
   </servlet>

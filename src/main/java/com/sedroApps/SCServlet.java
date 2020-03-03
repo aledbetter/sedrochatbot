@@ -33,17 +33,17 @@ import org.apache.log4j.Logger;
 /**
  * Initialize everything we need in the constructor
  */
-public class Servlet extends HttpServlet {
+public class SCServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private static SCServer chats = null;
-	static Logger logger = Logger.getLogger(Servlet.class);	
+	static Logger logger = Logger.getLogger(SCServlet.class);	
 
 	
     /**
      * @see HttpServlet#HttpServlet()
      */
-	public Servlet() {
+	public SCServlet() {
         super();
     	loadService(true);
     }

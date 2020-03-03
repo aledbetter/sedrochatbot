@@ -15,35 +15,46 @@
  * from Aaron Ledbetter.
  */
 
-package main.java.com.sedroApps;
+package main.java.com.sedroApps.adapter;
 
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import main.java.com.sedroApps.SCSedro;
+import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.util.Sutil;
+import twitter4j.DirectMessage;
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
 
 
-
-public class ChatFacebook extends ChatAdapter { 
+public class ChatTwitter extends ChatAdapter { 
 
 	// this is per user?
-	//private TwitterFactory factory = null;
+	private TwitterFactory factory = null;
 	private String pconsumer_key = null;  	// api_key
 	private String pconsumer_secret = null; // api_secret
 	private String paccess_token = null;
 	private String paccess_token_secret = null;
 	private String pdopublic = null;
 	private String pdoprivate = null;
-	
-	public ChatFacebook(UserAccount user, String id) {
+
+
+	public ChatTwitter(SCUser user, String id) {
 		super(user, id);
 	}
 	
 	@Override
 	public String getName() {
-		return "facebook";	
+		return "twitter";	
+	}
+	@Override
+	public String getChannel_type() {
+		if (isPublicMsg()) return "post";	
+		return "post_direct";
 	}
 	
 	@Override
@@ -66,7 +77,7 @@ public class ChatFacebook extends ChatAdapter {
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// EXTERNAL calls: init & processing
 	@Override
-	public int init(UserAccount ua) {
+	public int init(SCUser ua) {
 		super.init(ua);
 		String consumer_key = getServiceInfo("consumer_key");
 		String consumer_secret = getServiceInfo("consumer_secret");
@@ -78,7 +89,6 @@ public class ChatFacebook extends ChatAdapter {
 		if (consumer_key == null || consumer_secret == null || access_token == null || access_token_secret == null) {
 			return -1; // not configured... remove
 		}
-		/*
 		if (factory != null) {
 			// check for updates..
 			boolean change = false;
@@ -88,7 +98,7 @@ public class ChatFacebook extends ChatAdapter {
 			if (!paccess_token_secret.equals(access_token_secret)) change = true;
 			if (Sutil.compare(idopublic, pdopublic)) change = true;
 			if (Sutil.compare(idoprivate, pdoprivate)) change = true;
-			if (!change) return 0;
+			if (!change) return 1;
 		}
     	ConfigurationBuilder cb = new ConfigurationBuilder();
     	cb.setDebugEnabled(true);
@@ -97,7 +107,7 @@ public class ChatFacebook extends ChatAdapter {
     	cb.setOAuthAccessToken(access_token);
     	cb.setOAuthAccessTokenSecret(access_token_secret);
     	factory = new TwitterFactory(cb.build());
-    	*/
+    	
     	// retain config
     	pconsumer_key = consumer_key;
     	pconsumer_secret = consumer_secret;
@@ -105,22 +115,25 @@ public class ChatFacebook extends ChatAdapter {
     	paccess_token_secret = access_token_secret;
     	pdoprivate = idoprivate;
     	pdopublic = idopublic;
-    	
     	return 0;
 	}
 	
 	@Override
-	public String postMessage(Sedro proc, String msg) {
+	public String postMessage(SCSedro proc, String msg) {
 		try {
-		
+			Twitter twitter = getTwitterinstance();
+			Status status = twitter.updateStatus(msg);
+			return status.getText();
 		} catch (Throwable t) { }
 		return "ERROR";	
 	}
 
 	@Override
-	public String sendDirectMessage(Sedro proc, String touser, String msg) {
+	public String sendDirectMessage(SCSedro proc, String touser, String msg) {
 		try {
-
+		    Twitter twitter = getTwitterinstance();
+		    DirectMessage message = twitter.sendDirectMessage(touser, msg);
+		    return message.getText();
 		} catch (Throwable t) { }
 		return "ERROR";			
 	}
@@ -128,16 +141,62 @@ public class ChatFacebook extends ChatAdapter {
 	@Override
 	public List<String> getPublicMessages() {
 		try {
-
+		    Twitter twitter = getTwitterinstance();	     
+		    return twitter.getHomeTimeline().stream().map(item -> item.getText()).collect(Collectors.toList());
 		} catch (Throwable t) { }
 		return null;			
 	}
 	
-	// list of messages: from:from user / msg:message text
-	@Override	
-	public List<HashMap<String, String>> getDirectMessages(Orator orat, Sedro processor) {
-		return null;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////
+	// internal
+	private Twitter getTwitterinstance() {
+		Twitter twitter = factory.getInstance();
+		return twitter;
 	}
+	
+	
+	/*
+	private List<String> twitterSearchMessages(String user, String text) throws TwitterException {		  
+	    Twitter twitter = getTwitterinstance(user);
+	    Query query = new Query("source:twitter4j " + text);
+	    QueryResult result = twitter.search(query);
+	     
+	    return result.getTweets().stream().map(item -> item.getText()).collect(Collectors.toList());
+	}*/
+	/*
+	public static void twitterStream() {
+		 
+	    StatusListener listener = new StatusListener() {
+	 
+	        @Override
+	        public void onException(Exception e) {
+	            e.printStackTrace();
+	        }
+	        @Override
+	        public void onDeletionNotice(StatusDeletionNotice arg) {
+	        }
+	        @Override
+	        public void onScrubGeo(long userId, long upToStatusId) {
+	        }
+	        @Override
+	        public void onStallWarning(StallWarning warning) {
+	        }
+	        @Override
+	        public void onStatus(Status status) {
+	        }
+	        @Override
+	        public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
+	        }
+
+	    };
+	 
+	    TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
+	 
+	    twitterStream.addListener(listener);
+	 
+	    twitterStream.sample();
+	}*/
 
 
 }

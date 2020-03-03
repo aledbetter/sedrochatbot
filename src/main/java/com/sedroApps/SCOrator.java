@@ -22,9 +22,11 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import main.java.com.sedroApps.adapter.ChatAdapter;
+import main.java.com.sedroApps.msgcb.CbMessage;
 import main.java.com.sedroApps.util.Sutil;
 
-public class Orator {
+public class SCOrator {
 	private static final boolean debug = false;
 	
 		
@@ -33,20 +35,20 @@ public class Orator {
 	private static final boolean wake_text = false;
 	
 	
-	private List<Sedro> processors = null;
+	private List<SCSedro> processors = null;
 	
 	private ChatAdapter service = null;
 	private SCServer server = null;
-	private UserAccount user = null;
+	private SCUser user = null;
 	
 	// messages to send to users
 	private List<HashMap<String, Object>> msg_set = null;
 	private Timer msg_timer = null;
 
-	private Sedro processorPublic = null;
+	private SCSedro processorPublic = null;
 	boolean procPoll = false;
 	
-	Orator(SCServer server, ChatAdapter service, UserAccount user, boolean readPublic, boolean respPublic) {
+	SCOrator(SCServer server, ChatAdapter service, SCUser user, boolean readPublic, boolean respPublic) {
 		this.service = service;
 		this.server = server;
 		this.user = user;
@@ -111,7 +113,7 @@ public class Orator {
 	            	String txt = (String)m.get("msg");
 	            	String to = (String)m.get("to");
 	            	String from = (String)m.get("from");
-	            	Sedro processor = (Sedro)m.get("processor");
+	            	SCSedro processor = (SCSedro)m.get("processor");
 	               // System.out.println("TIMER Send("+sendList.size()+")["+service.getName()+"]["+from+"] => ["+to+"]: " + txt);
 
 					service.sendDirectMessage(processor, to, txt);
@@ -123,7 +125,7 @@ public class Orator {
 	// close 
 	public void close() {
 		if (getProcessorCount() > 0) {
-			for (Sedro s:processors) {
+			for (SCSedro s:processors) {
 				// close all processors
 				List<HashMap<String, Object>> msg = s.chatBye();
 			}
@@ -131,20 +133,20 @@ public class Orator {
 		if (msg_timer != null) msg_timer.cancel();
 	}
 	
-	public Sedro addProcessor(boolean readPublic, boolean respPublic, boolean directMsg) {
-		Sedro s = new Sedro(readPublic, respPublic, directMsg);
+	public SCSedro addProcessor(boolean readPublic, boolean respPublic, boolean directMsg) {
+		SCSedro s = new SCSedro(readPublic, respPublic, directMsg);
 		if (processors == null) processors = new ArrayList<>();
 		processors.add(s);
 		return s;
 	}
-	public void removeProcessor(Sedro s) {
+	public void removeProcessor(SCSedro s) {
 		if (processors == null) return;
 		processors.remove(s);
 	}
 	
-	public Sedro findProcessor(String caller_handle) {
+	public SCSedro findProcessor(String caller_handle) {
 		if (getProcessorCount() > 0) {
-			for (Sedro s:processors) {
+			for (SCSedro s:processors) {
 				// close all processors
 				if (Sutil.compare(s.getCaller_handle(), caller_handle)) return s;
 			}
@@ -154,7 +156,7 @@ public class Orator {
 	
 	//////////////////////////////////////////////////////	
 	// check callbacks for message override
-	private String getFinalMessage(String caname, Sedro processor, boolean msgPublic, 
+	private String getFinalMessage(String caname, SCSedro processor, boolean msgPublic, 
 			HashMap<String, Object> msgInfo, String msg) {
 		if (msg == null || msg.equals("null") || msg.isEmpty()) return null;
 		CbMessage cb = this.user.getMessageCb();
@@ -164,9 +166,9 @@ public class Orator {
 	
 	//////////////////////////////////////////////////////
 	// Add processor for new call
-	private Sedro addNewCall(HashMap<String, String> call) {
+	private SCSedro addNewCall(HashMap<String, String> call) {
 		// ADD NEW channels...Processors
-		Sedro proc = addProcessor(false, false, true);
+		SCSedro proc = addProcessor(false, false, true);
 		// add information to it
 		proc.setChannel_type(service.getChannel_type());
 		proc.setLanguage(service.getLanguage());
@@ -194,6 +196,7 @@ public class Orator {
 		
 		// resolve timezone / time
 // FIXME
+		// "yyyy-MM-dd'T'HH:mm:ss.SSSZ"; 
 		//proc.setCalltime(calltime, tzoffset);
 		
 		// check  admin[chan/value] OR whitelist/blacklist[chan/value]
@@ -222,7 +225,7 @@ public class Orator {
 		
 		if (getProcessorCount() > 0) {
 			// if there are any conversations ... deal
-			for (Sedro s:processors) process(s);
+			for (SCSedro s:processors) process(s);
 		}	
 		
 		// clear the cache
@@ -232,7 +235,7 @@ public class Orator {
 	}
 	
 	
-	private void process(Sedro processor) {
+	private void process(SCSedro processor) {
 		int procCnt = 0;
 
 		if (debug) System.out.println("\nPROCESS_["+processor.getStatus()+"]["+processor.getPersona()+"] => ["+processor.getCaller_handle()+"]");
@@ -358,7 +361,7 @@ public class Orator {
 	
 	
 	// Add message to the message QUEUE
-	private void addMsg(String txt, String event, Object pre_wait, Object post_wait, String to, String from, Sedro processor) {
+	private void addMsg(String txt, String event, Object pre_wait, Object post_wait, String to, String from, SCSedro processor) {
 		HashMap<String, Object> smsg = new HashMap<>();
 		
 		Integer wi = 0, pwi = 0;
@@ -402,7 +405,7 @@ public class Orator {
 	public void processMessage(HashMap<String, String> call) {
 		String hd = (String)call.get("caller_handle");
 		String wmsg = (String)call.get("msg");
-		Sedro processor = this.findProcessor(hd);
+		SCSedro processor = this.findProcessor(hd);
 		if (processor == null) {
 			System.out.println("ORAT: new session: " + hd);
 			processor = addNewCall(call);

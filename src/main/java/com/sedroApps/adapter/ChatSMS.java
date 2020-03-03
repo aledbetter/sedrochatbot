@@ -15,7 +15,7 @@
  * from Aaron Ledbetter.
  */
 
-package main.java.com.sedroApps;
+package main.java.com.sedroApps.adapter;
 
 
 import java.net.URI;
@@ -35,8 +35,9 @@ import com.twilio.rest.api.v2010.account.IncomingPhoneNumber;
 import com.twilio.rest.api.v2010.account.IncomingPhoneNumberUpdater;
 import com.twilio.type.PhoneNumber;
 
-
-
+import main.java.com.sedroApps.SCOrator;
+import main.java.com.sedroApps.SCSedro;
+import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.util.Sutil;
 
 
@@ -61,7 +62,7 @@ public class ChatSMS extends ChatAdapter {
 	private List<HashMap<String, String>> msg_set = null;
 
 	
-	public ChatSMS(UserAccount user, String id) {
+	public ChatSMS(SCUser user, String id) {
 		super(user, id);
 	}
 
@@ -96,7 +97,7 @@ public class ChatSMS extends ChatAdapter {
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// EXTERNAL calls: init & processing
 	@Override
-	public int init(UserAccount ua) {
+	public int init(SCUser ua) {
 		super.init(ua);
 
 		String provider = getServiceInfo("provider");
@@ -167,7 +168,7 @@ public class ChatSMS extends ChatAdapter {
 	}
 	
 	@Override
-	public String sendDirectMessage(Sedro proc, String touser, String msg) {
+	public String sendDirectMessage(SCSedro proc, String touser, String msg) {
 		try {
 			if (isProvider("twilio")) {
 				String caller_phone = makePhoneNumber(proc.getCaller_handle());
@@ -199,14 +200,14 @@ public class ChatSMS extends ChatAdapter {
 	// list of messages: from:from user / msg:message text
 	//https://api.twilio.com/2010-04-01/Accounts/{AccountSid}/Messages.json
 	@Override	
-	public List<HashMap<String, String>> getDirectCall(Orator orat) {	
+	public List<HashMap<String, String>> getDirectCall(SCOrator orat) {	
 		List<HashMap<String, String>> ml = getMessages(orat);
 		if (ml == null || ml.size() < 1) return null;
 		List<HashMap<String, String>> cl = null;
 		for (HashMap<String, String> msg:ml) {
 			// find session...					
 			String from = msg.get("from");
-			Sedro proc = orat.findProcessor(from);					
+			SCSedro proc = orat.findProcessor(from);					
 			if (proc != null) continue; // check for new calls only	
 			if (cl != null) {
 				// check if accounted for
@@ -231,7 +232,7 @@ public class ChatSMS extends ChatAdapter {
 
 	// get new calls
 	@Override	
-	public List<HashMap<String, String>> getDirectMessages(Orator orat, Sedro processor) {	
+	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedro processor) {	
 		List<HashMap<String, String>> ml = getMessages(orat);
 		if (ml == null || ml.size() < 1) return null;	
 		
@@ -253,7 +254,7 @@ public class ChatSMS extends ChatAdapter {
 	}
 
 	// get and cache the messages
-	private List<HashMap<String, String>> getMessages(Orator orat) {		
+	private List<HashMap<String, String>> getMessages(SCOrator orat) {		
 		// check if use cache
 		if (msg_set != null) return msg_set;
 		
@@ -290,7 +291,7 @@ public class ChatSMS extends ChatAdapter {
 		return dl;
 	}
 	
-	private static List<HashMap<String, String>> parseTwillioMessages(Orator orat, ResourceSet<Message> messages) {
+	private static List<HashMap<String, String>> parseTwillioMessages(SCOrator orat, ResourceSet<Message> messages) {
 		List<HashMap<String, String>> msgList = null;
 		if (messages == null) return null;
 		
