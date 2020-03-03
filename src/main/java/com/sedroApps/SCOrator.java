@@ -31,6 +31,7 @@ import main.java.com.sedroApps.util.Sutil;
 
 public class SCOrator {
 	private static final boolean debug = false;
+	private static final boolean debug_callinfo = false;
 	
 		
 	// wake with text
@@ -194,7 +195,6 @@ public class SCOrator {
 		//System.out.println("CALL: " + call.toString());
 
 		if (slatitude == null || slongitude == null || stz == null) {	
-			System.out.println("try: " );
 			// api resolve[phone number/ipaddress]
 			String phonenumber = call.get("phonenumber");
 			String ip = call.get("ip_address");
@@ -206,11 +206,11 @@ public class SCOrator {
 				li = RestExample.getIPInfoGET(key, ip);			
 			}
 			if (li != null) {
-				lat = (Double)li.get("latitude");
-				lon = (Double)li.get("longitude");
-				location = (String)li.get("location");
-				tzoffset = (Integer)li.get("tzoffset");
-				if (stz == null) stz = (String)li.get("tz");
+				if (li.get("latitude") != null) lat = (Double)li.get("latitude");
+				if (li.get("longitude") != null) lon = (Double)li.get("longitude");
+				if (li.get("location") != null) location = (String)li.get("location");
+				if (li.get("tzoffset") != null) tzoffset = (Integer)li.get("tzoffset");
+				if (stz == null && li.get("tz") != null) stz = (String)li.get("tz");
 				//System.out.println("GOT INFO: " + li.toString());
 			}
 		} else {
@@ -218,21 +218,26 @@ public class SCOrator {
 			lon = Sutil.toDouble(slongitude);
 		}		
 		proc.setLocation(lat, lon, location);
-		System.out.println("NEW_CONN: lat: " + lat + " lon: " + lon + "  location: " + location);
+		if (debug_callinfo) System.out.println("NEW_CONN: lat: " + lat + " lon: " + lon + "  location: " + location);
 
 
 		// resolve timezone / time
+		if (tzoffset == -1 && stz == null) {
+			// need to resolve from location
+			String key = SCServer.getChatServer().getSedro_access_key();
+			HashMap<String, Object> li = RestExample.getLocationInfoGET(key, lat, lon);	
+			if (li != null) {
+				if (li.get("tzoffset") != null) tzoffset = (Integer)li.get("tzoffset");
+				if (stz == null && li.get("tz") != null) stz = (String)li.get("tz");	
+			}			
+		}
 		if (tzoffset == -1 && stz != null) {
 			TimeZone tz = TimeZone.getTimeZone(stz);
 			tzoffset = tz.getOffset(new Date().getTime()) / 1000 / 60;   //yields +120 minutes
-		} else {
-			// need to resolve from location
-//https://rapidapi.com/mvpcapi/api/geo-services-by-mvpc-com?endpoint=apiendpoint_65cc05bc-5f67-40b8-84cf-977da846af11			
-//FIXME			
-		}
+		} 
 
 		proc.setCalltime(stime, tzoffset);
-		System.out.println("NEW_CONN: tzoff: " + tzoffset + " tz: " + stz + "  time: " + stime);
+		if (debug_callinfo) System.out.println("NEW_CONN: tzoff: " + tzoffset + " tz: " + stz + "  time: " + stime);
 		
 
 		// what to do with other info?

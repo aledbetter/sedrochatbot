@@ -53,6 +53,8 @@ import main.java.com.sedroApps.util.Sutil;
 public class RestExample {
 
     public static HashMap<String, Object> getPhoneInfoGET(String key, String phonenumber) { 
+    	if (key == null || phonenumber == null) return null;
+
     	HashMap<String, Object> info = null;
 		
 		String rapidapi_host = "f-sm-jorquera-phone-insights-v1.p.rapidapi.com";
@@ -93,6 +95,8 @@ public class RestExample {
 	}
 
     public static HashMap<String, Object> getIPInfoGET(String key, String ipaddress) { 
+    	if (key == null || ipaddress == null) return null;
+
     	HashMap<String, Object> info = null;		
 		String rapidapi_host = "ip1.p.rapidapi.com";
 		String url = getUrl(rapidapi_host, "/"+ipaddress);
@@ -136,64 +140,84 @@ public class RestExample {
 		return info;
 	}
     
+  //https://rapidapi.com/mvpcapi/api/geo-services-by-mvpc-com?endpoint=apiendpoint_65cc05bc-5f67-40b8-84cf-977da846af11			
+    public static HashMap<String, Object> getLocationInfoGET(String key, double lat, double lon) { 
+    	if (key == null || lat == 0 || lon == 0) return null;
+
+    	return getWeatherGET(key, lon, lat);
+    }
+    
     
     public static HashMap<String, Object> getWeatherGET(String key, double lon, double lat) { 
+    	if (key == null || lat == 0 || lon == 0) return null;
+
     	HashMap<String, Object> info = null;
 		
 		String rapidapi_host = "weatherbit-v1-mashape.p.rapidapi.com";
-		String url = getUrl(rapidapi_host, "/current");	
-		String reqData = "{\"lang\": \"en\"";
-		reqData += "\", lon\": \"" + lon + "\"";
-		reqData += "\", lat\": \"" + lat + "\"";
-		reqData += "\"}";
 		
+		String url = getUrl(rapidapi_host, "/current?lang=en&lon="+lon+"&lat="+lat+"&units=imperial");	
+
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("x-rapidapi-key", key);
 		headers.put("x-rapidapi-host", rapidapi_host);
 		headers.put("Accept", "application/json");
-		//System.out.println("PHONE: " + reqData);
-		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
+		
+		String line = HttpUtil.getURLContent(url, headers);
+		if (line == null) return null;
+		
+		//String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
 		try {
 			//System.out.println("GOT: " + line);
 			JSONObject jobj = new JSONObject(line);
 			JSONArray jl = jobj.getJSONArray("data");
 			for (int i=0;i<jl.length();i++) {
 				JSONObject we = jl.getJSONObject(i);
-				String state_code = RestUtil.getJStr(jobj, "state_code"); // "state_code":"VA"
-				String country_code = RestUtil.getJStr(jobj, "country_code"); // "country_code":"US"
-				String city_name = RestUtil.getJStr(jobj, "city_name"); // "city_name":"Blackstone"
-				String timezone = RestUtil.getJStr(jobj, "timezone"); // "timezone":"America/New_York"
+				String state_code = RestUtil.getJStr(we, "state_code"); // "state_code":"VA"
+				String country_code = RestUtil.getJStr(we, "country_code"); // "country_code":"US"
+				String city_name = RestUtil.getJStr(we, "city_name"); // "city_name":"Blackstone"
+				String timezone = RestUtil.getJStr(we, "timezone"); // "timezone":"America/New_York"
+				//solar_rad 774.1
+				//snow: 0
+				// "uv":7.59013,
+				int rh = RestUtil.getInt(we, "rh"); // "rh":18
+				int vis = RestUtil.getInt(we, "vis"); // "vis":10  > kilometer
 				
-				int rh = RestUtil.getInt(jobj, "rh"); // "rh":18
-				int vis = RestUtil.getInt(jobj, "vis"); // "vis":10  > kilometer
-				
-				double wind_spd = RestUtil.getDouble(jobj, "wind_spd"); // "wind_spd":1.5
-				String wind_cdir_full = RestUtil.getJStr(jobj, "wind_cdir_full"); // "wind_cdir_full":"west"
-				double app_temp = RestUtil.getDouble(jobj, "app_temp"); // "app_temp":26.75
-				double temp = RestUtil.getDouble(jobj, "temp"); // "temp":28.1
+				double wind_spd = RestUtil.getDouble(we, "wind_spd"); // "wind_spd":1.5
+				String wind_cdir_full = RestUtil.getJStr(we, "wind_cdir_full"); // "wind_cdir_full":"west"
+				double app_temp = RestUtil.getDouble(we, "app_temp"); // "app_temp":26.75
+				double temp = RestUtil.getDouble(we, "temp"); // "temp":28.1
 
-				String precip = RestUtil.getJStr(jobj, "precip"); // "precip":"??"
+				String precip = RestUtil.getJStr(we, "precip"); // "precip":"??"
 				//String precip3h = RestUtil.getJStr(jobj, "precip3h"); // "precip3h":"??"
-				int clouds = RestUtil.getInt(jobj, "clouds"); // "clouds":0
+				int clouds = RestUtil.getInt(we, "clouds"); // "clouds":0
 				
-				String sunrise = RestUtil.getJStr(jobj, "sunrise"); //"sunrise":"09:52:17"
-				String sunset = RestUtil.getJStr(jobj, "precip"); // "sunset":"00:27:46"
+				String sunrise = RestUtil.getJStr(we, "sunrise"); //"sunrise":"09:52:17"
+				String sunset = RestUtil.getJStr(we, "precip"); // "sunset":"00:27:46"
+				// weather / description "clear sky"
+				JSONObject weather = we.getJSONObject("weather");
+				String conditions = null;
+				if (weather != null) conditions = RestUtil.getJStr(we, "description");
+				
+				int aqi = RestUtil.getInt(we, "aqi"); //"aqi":35  -> air quality
 
+				
 				info = new HashMap<>();
 				info.put("country_code", country_code);
 				info.put("province_code", state_code);
 				if (city_name != null) info.put("location", city_name);
-				info.put("timezone", timezone);
+				info.put("tz", timezone);
 				
 				info.put("sunrise", sunrise);
 				info.put("sunset", sunset);
 				
 				info.put("precipitation", precip);
+				info.put("aqi", aqi);
 				info.put("temperature", temp);
 				info.put("app_temperature", app_temp);
 				info.put("visability", vis);
 				info.put("wind", wind_cdir_full + " " + wind_spd);
-				info.put("clounds", 0);
+				info.put("clouds", clouds);
+				info.put("conditions", conditions);
 
 				// just the first one
 				break;
