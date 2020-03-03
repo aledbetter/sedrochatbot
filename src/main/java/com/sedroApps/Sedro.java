@@ -48,6 +48,11 @@ public class Sedro {
 	private String channel_type = null;
 	private String caller_token = null;
 	private int max_qn = -1;
+	private long latitude = 0;
+	private long longitude = 0;
+	private String location = null;
+	private String calltime = null;
+	private int tzoffset = -1;
 	
 	private int msg_num_last = 0;	
 	private int msg_num = 0;	
@@ -55,13 +60,11 @@ public class Sedro {
 	private boolean respPublic = false;
 	private boolean directMsg = false;
 	
-	private List<HashMap<String, Object>> msg = null;
+	//private List<HashMap<String, Object>> msg = null;
 	
 	private String status = "wake";
 	
-	
-	
-	
+
 	Sedro(boolean readPublic, boolean respPublic, boolean directMsg) {
 		this.status = "wake";
 		this.readPublic = readPublic;
@@ -95,6 +98,15 @@ public class Sedro {
 	}	
 	public void setPersona_handle(String persona_handle) {
 		this.persona_handle = persona_handle;
+	}
+	public void setLocation(long latitude, long longitude, String location) {
+		this.location = location;
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
+	public void setCalltime(String calltime, int tzoffset) {
+		this.calltime = calltime;
+		this.tzoffset = tzoffset;
 	}
 	
 	public String getCaller() {
@@ -191,7 +203,8 @@ public class Sedro {
 		} catch (Throwable tt) {}		
 		return null;
 	}
-		
+
+	
 	public List<HashMap<String, Object>> chatWake(String key, String text) {
 		if (!getStatus().equals("wake") && !getStatus().equals("bye")) return null;
 		//System.out.println(" **CHAT_WAKE");
@@ -209,7 +222,12 @@ public class Sedro {
 	    if (channel_type != null) reqData += ", \"channel_type\": \"" + channel_type  + "\""; 
 	 //   if (save) ind += ", \"save\": \"" + save + "\"";  
 	    if (max_qn >= 0) reqData += ", \"max_qn\": \"" + max_qn + "\"";
-
+	    if (latitude > 0) reqData += ", \"latitude\": \"" + latitude + "\"";
+	    if (longitude > 0) reqData += ", \"longitude\": \"" + longitude + "\"";
+	    if (location != null) reqData += ", \"location\": \"" + location + "\"";
+	    if (calltime != null) reqData += ", \"calltime\": \"" + calltime + "\"";
+	    if (tzoffset >= 0) reqData += ", \"tz\": \"" + tzoffset + "\"";
+	    
 		reqData += "}";
 		
 		HashMap<String, String> headers = new HashMap<String, String>();

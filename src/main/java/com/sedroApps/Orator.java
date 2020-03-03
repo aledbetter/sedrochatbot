@@ -189,9 +189,12 @@ public class Orator {
 		String phonenumber = call.get("phonenumber");
 		String ip = call.get("ip_address");
 // FIXME
-				
+		//proc.setLocation(latitude, longitude, location);
+
+		
 		// resolve timezone / time
 // FIXME
+		//proc.setCalltime(calltime, tzoffset);
 		
 		// check  admin[chan/value] OR whitelist/blacklist[chan/value]
 // FIXME

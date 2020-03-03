@@ -166,9 +166,9 @@ $(document).ready(function() {
 			$("#update_settings_bt").html("Cancel");
 		}		
 	});
+	
 	$("#save_settings_bt").on('click', function (e) {
 		$("#set_password2, #set_password").removeClass("error");
-
 		var sak = $("#set_sedro_access_key").val();
 		var u = $("#set_username").val();
 		var p = $("#set_password").val();
@@ -178,8 +178,6 @@ $(document).ready(function() {
 			return;
 		}
 		var pi = $("#set_poll_interval").val();
-
-		
 		scsUpdateSettings(u, p, sak, pi, function(data) {
 			getSettings();
 			$("#update_settings_bt").click();
@@ -200,15 +198,14 @@ $(document).ready(function() {
 			$("#userlist").hide();
 		}
 	});
+	
 	$("#save_add_user_bt").on('click', function (e) {
 		var u = $("#add_username").val();
 		if (!u) return;
 		var up = $("#user_sedro_persona").val();
 		if (!up) return;
 		var cbup = $("#user_callback").val();
-		if (cbup && cbup != "") return;
-		
-		
+		if (cbup && cbup != "") return;				
 		scsAddUser(u, up, cbup, function(data) {
 			getUsers();
 			$("#add_user_bt").click();
