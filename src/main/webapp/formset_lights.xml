@@ -1,0 +1,94 @@
+<doc>
+
+	<!-- test for Action/Info handler -->
+	<form name='light' role='action' data-type='action'>
+		<input name="status" data-type="input"/>
+		<input name="location" data-type="input" value='kitchen'/>	
+			
+		<input name="read" data-type="post" data-formname='light' data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
+		<label for="read" state='verify'>You want to %current/cmd_action% the lights status?</label>
+		<label for="read" state='done'>The light is %current/status%</label>
+		
+		<input name="modify" data-type="post" data-formname='light' data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
+		<label for="modify" state='verify'>You would like to %current/cmd_action% the lights?</label>
+		<label for="modify" state='done'>Updated, the light is now %current/status%</label>
+		
+		<input name="create" data-type="post" data-formname='light' data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
+		<label for="create" state='done'>Create is complete</label>
+		
+		<input name="destroy" data-type="post" data-formname='light' data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
+		<label for="destroy" state='done'>Destroy is complete</label>		
+	</form>
+	
+	<!-- TEST for Action/Info handler -->
+	<form name='kitchen light' role='action' data-type='action'
+			data-classifier='light' 			
+			data-object-type='thing' 
+			data-seq='%action% X:lights:%' 			
+			data-alias='my kitchen light' data-ref='big kitchen light'
+			>
+		<input name="status" data-type="input" data-value-type='range' data-value-min='0' data-value-max='10'/>
+		<input name="location" data-type="input" value='kitchen'/>	
+				
+		<input name="answer" data-crmd='comment' data-ability='touch' data-type="comment" />
+		<label for="answer" state='wake'>You want me to %current/cmd_action% the %current/cmd_object_instance%?</label>
+			
+		<input name="read" data-crmd='read' 
+			data-ability='status, level, brightness, is'
+			data-type="post" data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
+		<label for="read" state='done'>The light is %current/status%</label>
+				
+		<input name="modify" data-crmd='modify' data-task='adjust kitchen light'
+			data-mod='up, down, brighter, darker, dimmer, lower, higher'
+			data-ability='turn, shut, dim, raise, hit, get, flip, toggle, switch'
+			data-state='bright, dark, dim, high, low'
+			data-type="post" data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
+		<label for="modify" state='verify'>You would like to %current/cmd_action% the lights?</label>
+		<label for="modify" state='done'>Updated, the light is now %current/status%</label>
+		
+		<input name="on" data-crmd='modify' data-task='kitchen light on'
+			data-task-prerequisit='account test' 
+			data-ability='turn, raise, flip, toggle, switch'
+			data-state='on, bright, open'
+			data-status-value='10' data-status-op='set'
+			data-type="post" data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
+		<label for="on" state='verify'>You would like to %current/cmd_action% the lights on?</label>
+		<label for="on" state='done'>Updated, the light is now on</label>
+		
+		<input name="off" data-crmd='modify' data-task='kitchen light off'
+			data-ability='turn, shut, dim, flip, toggle, switch'
+			data-state='off, dark, closed'
+			data-status-value='0' data-status-op='set'
+			data-type="post" data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
+		<label for="off" state='verify'>You would like to %current/cmd_action% the lights off?</label>
+		<label for="off" state='done'>Updated, the light is now off</label>
+	</form>
+
+
+	<!-- story definition for loose TUI.. -->
+	<form name='_support_' role='main' data-type='form'>
+		<input name="intro" data-type="intro"/>
+		<label for="intro" state='wake'>Good %_time_period_of_day% how can I help you?</label>
+
+
+	<!-- task set is always a loop IF "verify".. with question about done at the end ( -->
+		<input name="taskset" data-type="tasks" 
+			data-task-show='update phone number, get balance, send money'
+		/>	
+		<label for="taskset" state='wake' data-pre-wait='10'>What can I help you with this %_time_period_of_day%?</label>
+		<label for="taskset" state='wake' data-channel='sms'>What do you need?</label>
+		<label for="taskset" state='verify' data-pre-wait='10'>Now that %_last_task% is %_last_outcome%, is there anything else I can help you with?</label>
+		<label for="taskset" state='canceled' data-pre-wait='6'>Is there anything else I can help you with?</label>
+		<label for="taskset" state='prerequisit' data-post-wait='20'>First we will need to %_next_task% now as well?</label>
+		<label for="taskset" state='recommend'>Perhaps you would like to %_recomend% now as well?</label>
+		<label for="taskset" state='complete' data-post-wait='30'>That was interesting</label>
+
+		<input name="outro" data-type="outro"/>
+		<label for="outro" state='wake' data-pre-wait='10'>Thank you, hope you have a great %_time_period_of_day%</label>	
+		
+		<input name="bye" data-type="event" data-event='bye' />
+	</form>
+	
+	
+</doc>
+

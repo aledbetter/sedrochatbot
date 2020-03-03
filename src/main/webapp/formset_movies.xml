@@ -1,0 +1,113 @@
+<doc>
+
+
+	<!-- Test external data use -->
+	<form name='_getexternaccount_' data-type='form'>
+		<input name="account number" data-type="input" data-seq="X:%any%:(lx_number):sz[large]" data-fmt='^[0-9]{6}$'/>
+		<label for="account number" state='wake'>What is your account number?</label>
+		<label for="account number" state='incomplete'>Account number is 6 digits</label>
+		<label for="account number" state='verify'>Is %account number% correct?</label>
+		<label for="account number" state='complete'>Retrieving account information...</label>
+ 
+ 		<input name="get_account" data-type="post" data-resp-formname="account" data-posturl="http://api.sedro.xyz/api/1.0/depots/testformgetpost"/>
+		<label for="get_account" state='incomplete'>Still waiting for account information</label>
+		
+		<input name="account holder" data-type="content" />
+		<label for="account holder" state='wake'>Account Holder: %current:account/full name%</label>	
+		
+		<input name="account addr" data-type="content" />
+		<label for="account addr" state='wake'>Address: %current:account/address%</label>	
+			
+		<input name="account phone" data-type="content" />
+		<label for="account phone" state='wake'>Phone: %current:account/home phone%</label>		
+	</form>
+	
+	<!-- Test external data use INFO form: dataform -->	
+	<form name='account' data-type='dataform' data-link='caller=possesses'>
+		<input name="full name" data-type="input" data-alias='full name, account holder, account holder name'/>
+		<input name="address" data-type="input" data-alias='home address, address, mailing address'/>
+		<input name="home phone" data-type="input" data-alias='home phone number, home phone, phone number'/>
+		<input name="account number" data-type="input" data-alias='acctnum' data-fmt='^[0-9]{6}$'/>
+	</form>
+
+		
+	<!-- Test data input external form / conditional message  -->
+	<form name='_getname_' data-type='form'>
+		<input name="intro" data-type="content"/>
+		<label for="intro" state='wake'>We need a bit of information from you</label>
+		
+		<input name="full name" data-type="input" data-seq="X:%any%:(lx_person_name):sz[large]"/>
+		<label for="full name" state='wake'>What is your full name?</label>
+		<label for="full name" state='incomplete'>Your full legal name please</label>
+		<label for="full name" state='verify'>Is %full name% your full name?</label>
+		<label for="full name" state='verify' data-seq='P:%any%:length[1]'>%full name%, you have only 1 name?</label>
+		<label for="full name" state='complete'>nice to meet you %full name%.</label>
+				 
+		<input name="test_form" data-type="form" data-formname='http://api.sedro.xyz/w/00_DEV_00/testform.xml'/>		
+		<input name="home phone" data-type="form" data-task='get phone number' data-formname="_getphonenumber_"/>
+		
+		<input name="exit" data-type="content" />
+		<label for="exit" state='wake'>Thank you for your information.</label>
+			
+		<input name="bye" data-type="event" data-event='bye'/>
+	</form>
+
+	<!-- TEST for filter param type -->
+	<form name='_getmany_' data-type='form'>
+		<input name="filter" data-type="filter" data-seq="X:%any%:(lx_person_name):sz[large]"/>
+		<label for="filter" state='wake'>Add a person for your search?</label>
+		<label for="filter" state='wake' data-channel='sms'>Add a person?</label>
+		<label for="filter" state='incomplete'>Add a person?</label>
+		<label for="filter" state='add'>Have %filter_txt%. Any additional people?</label>
+		<label for="filter" state='verify'>Add person %filter%?</label>
+		<label for="filter" state='clear'>Filters cleared</label>
+		<label for="filter" state='complete'>Got %filter_txt%</label>
+		<label for="filter" state='nomatch'>Not a good response: %filter%</label>
+		
+		<input name="exit" data-type="content" />
+		<label for="exit" state='wake'>Thank you</label>
+	</form>
+
+	<!-- TEST prereq / folloup tasks -->
+	<form name='_test_sets_' data-type='form'>
+		<input name="ask again" data-type="content" data-task='ask again'/>
+		<label for="ask again" state='wake'>Are you sure?</label>
+		
+		<input name="ask yet again" data-type="content" data-task='ask yet again'/>
+		<label for="ask yet again" state='wake'>Are you sure you are sure?</label>
+		
+		<input name="maybe this" data-type="content" data-task='maybe this too'/>
+		<label for="maybe this" state='wake'>You want this too don't you.</label>	
+		
+		<input name="account test" data-type="content" data-task='account test'/>
+		<label for="account test" state='wake'>Your account exists.</label>
+	</form>
+
+
+	<!-- story definition for loose TUI.. -->
+	<form name='_support_' role='main' data-type='form'>
+		<input name="intro" data-type="intro"/>
+		<label for="intro" state='wake'>Good %_time_period_of_day% how can I help you?</label>
+
+
+	<!-- task set is always a loop IF "verify".. with question about done at the end ( -->
+		<input name="taskset" data-type="tasks" 
+			data-task-show='update phone number, get balance, send money'
+		/>	
+		<label for="taskset" state='wake' data-pre-wait='10'>What can I help you with this %_time_period_of_day%?</label>
+		<label for="taskset" state='wake' data-channel='sms'>What do you need?</label>
+		<label for="taskset" state='verify' data-pre-wait='10'>Now that %_last_task% is %_last_outcome%, is there anything else I can help you with?</label>
+		<label for="taskset" state='canceled' data-pre-wait='6'>Is there anything else I can help you with?</label>
+		<label for="taskset" state='prerequisit' data-post-wait='20'>First we will need to %_next_task% now as well?</label>
+		<label for="taskset" state='recommend'>Perhaps you would like to %_recomend% now as well?</label>
+		<label for="taskset" state='complete' data-post-wait='30'>That was interesting</label>
+
+		<input name="outro" data-type="outro"/>
+		<label for="outro" state='wake' data-pre-wait='10'>Thank you, hope you have a great %_time_period_of_day%</label>	
+		
+		<input name="bye" data-type="event" data-event='bye' />
+	</form>
+	
+	
+</doc>
+
