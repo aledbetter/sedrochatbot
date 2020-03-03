@@ -392,7 +392,9 @@ public class RestExample {
 		HashMap<String, Object> winfo = getWeatherGET(key, lon, lat);		
 		
 		////////////////////////////////////
-		// MAP output params
+		// MAP output params FOR SINGLE OBJECT
+		// OPTION 1: only what they ask for
+		// OPTION 2: everything  we have
 		try {		
 			elem = fobj.getJSONArray("elements");
 			for (int i=0;i<elem.length();i++) {

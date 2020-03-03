@@ -27,6 +27,15 @@ function getSedroVersion() {
 	return sedro_api_version; 
 }
 
+// get location
+var glatitude = null;
+var glongitude = null;	
+if (navigator.geolocation) {
+	navigator.geolocation.getCurrentPosition(function(position) {
+		glatitude = position.coords.latitude;
+		glongitude = position.coords.longitude;
+	});
+}
 $(document).ready(function() {
 	$(".sedro_version").html(getSedroVersion()); // add version
 });
@@ -48,16 +57,7 @@ function getUrl(url) {
 //
 function postChatWake(ctx, persona, txt, user, caller_token, context, channel_type, language, save, max_qn, cb) {
     if (!persona) return;
-	
-	// get location
-	var glatitude = null;
-	var glongitude = null;	
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(function(position) {
-			glatitude = position.coords.latitude;
-			glongitude = position.coords.longitude;
-		});
-	}
+
 	var d = new Date();
 	var calltime = d.toISOString(); // Tue Mar 03 2020 06:48:13 GMT-0800 (Pacific Standard Time)
 	var tzoffset = d.getTimezoneOffset();	// in min
@@ -78,6 +78,8 @@ function postChatWake(ctx, persona, txt, user, caller_token, context, channel_ty
     if (glongitude) ind += ", \"longitude\": \"" + glongitude + "\"";
     if (calltime) ind += ", \"calltime\": \"" + calltime + "\"";
     if (tzoffset) ind += ", \"tz\": \"" + tzoffset + "\"";
+	var tzn = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tzn) ind += ", \"tzn\": \"" + tzn + "\"";
     ind += "}";
     postChat_api(ctx, "/persona/chat/wake", txt, ind, cb);
 }
@@ -100,15 +102,7 @@ function postChatBye(ctx, chid, cb) {
 //single get response OR do command, no session
 function postChatAsk(ctx, persona, txt, user, caller_token, context, channel_type, language, cb) {
     if (!persona) return;
-	// get location
-	var glatitude = null;
-	var glongitude = null;	
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(function(position) {
-			glatitude = position.coords.latitude;
-			glongitude = position.coords.longitude;
-		});
-	}
+
 	var d = new Date();
 	var calltime = d.toISOString(); // Tue Mar 03 2020 06:48:13 GMT-0800 (Pacific Standard Time)
 	var tzoffset = d.getTimezoneOffset();	// in min
@@ -127,21 +121,15 @@ function postChatAsk(ctx, persona, txt, user, caller_token, context, channel_typ
     if (glongitude) ind += ", \"longitude\": \"" + glongitude + "\"";
     if (calltime) ind += ", \"calltime\": \"" + calltime + "\"";
     if (tzoffset) ind += ", \"tz\": \"" + tzoffset + "\"";
+	var tzn = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tzn) ind += ", \"tzn\": \"" + tzn + "\"";
     ind += "}";
     postChat_api(ctx, "/persona/ask", txt, ind, cb);
 }
 // single add to knowledge
 function postChatTell(ctx, persona, txt, user, caller_token, context, channel_type, language, cb) {
     if (!persona) return;
-	// get location
-	var glatitude = null;
-	var glongitude = null;	
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(function(position) {
-			glatitude = position.coords.latitude;
-			glongitude = position.coords.longitude;
-		});
-	}
+
 	var d = new Date();
 	var calltime = d.toISOString(); // Tue Mar 03 2020 06:48:13 GMT-0800 (Pacific Standard Time)
 	var tzoffset = d.getTimezoneOffset();	// in min
@@ -160,6 +148,8 @@ function postChatTell(ctx, persona, txt, user, caller_token, context, channel_ty
     if (glongitude) ind += ", \"longitude\": \"" + glongitude + "\"";
     if (calltime) ind += ", \"calltime\": \"" + calltime + "\"";
     if (tzoffset) ind += ", \"tz\": \"" + tzoffset + "\"";
+	var tzn = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tzn) ind += ", \"tzn\": \"" + tzn + "\"";
     ind += "}";
     postChat_api(ctx, "/persona/tell", txt, ind, cb);
 }
