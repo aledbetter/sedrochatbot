@@ -178,6 +178,26 @@ public class Orator {
 		proc.setCaller(call.get("caller"));
 		proc.setCaller_handle(call.get("caller_handle"));
 		
+		// resolve location		
+		String latitude = call.get("latitude");
+		String longitude = call.get("longitude");
+		String location = call.get("location");
+		String tz = call.get("timezone");
+		String time = call.get("time");
+		
+		// api resolve[phone number/ipaddress]
+		String phonenumber = call.get("phonenumber");
+		String ip = call.get("ip_address");
+// FIXME
+				
+		// resolve timezone / time
+// FIXME
+		
+		// check  admin[chan/value] OR whitelist/blacklist[chan/value]
+// FIXME
+			// alternate auth: if admin
+			// question
+		
 		// what to do with other info?
 		proc.setCall_info(call);
 		return proc;
