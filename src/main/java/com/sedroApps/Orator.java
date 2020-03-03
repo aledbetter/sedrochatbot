@@ -40,8 +40,8 @@ public class Orator {
 	private UserAccount user = null;
 	
 	// messages to send to users
-	static List<HashMap<String, Object>> msg_set = null;
-	private static Timer msg_timer = null;
+	private List<HashMap<String, Object>> msg_set = null;
+	private Timer msg_timer = null;
 
 	private Sedro processorPublic = null;
 	boolean procPoll = false;
@@ -106,13 +106,14 @@ public class Orator {
         			}
         		}
         		if (sendList == null) return; // nothing to send
-      System.out.println("TIMER Send: " + sendList.size());
         		// Send all MESSAGEs
     			for (HashMap<String, Object> m:sendList) {	            	
 	            	String txt = (String)m.get("msg");
 	            	String to = (String)m.get("to");
 	            	String from = (String)m.get("from");
 	            	Sedro processor = (Sedro)m.get("processor");
+	               // System.out.println("TIMER Send("+sendList.size()+")["+service.getName()+"]["+from+"] => ["+to+"]: " + txt);
+
 					service.sendDirectMessage(processor, to, txt);
     			}
             }
@@ -260,7 +261,7 @@ public class Orator {
 					if (debug) System.out.println("    outWMSG["+processor.getCaller_handle()+"]: " + smsg);
 					String to = null;
 					if (send_timed) {
-						addMsg(smsg, (String)m.get("event"), (Integer)m.get("pre_wait"), (Integer)m.get("post_wait"), processor.getCaller_handle(), to, processor);
+						addMsg(smsg, (String)m.get("event"), m.get("pre_wait"), m.get("post_wait"), processor.getCaller_handle(), to, processor);
 					} else {
 						service.sendDirectMessage(processor, processor.getCaller_handle(), smsg);
 					}
@@ -285,7 +286,7 @@ public class Orator {
 							if (debug) System.out.println("    outMSG["+from+"]: " + smsg);
 							// NOTE: from/to reverse
 							if (send_timed) {
-								addMsg(smsg, (String)m.get("event"), (Integer)m.get("pre_wait"), (Integer)m.get("post_wait"), from, to, processor);
+								addMsg(smsg, (String)m.get("event"), m.get("pre_wait"), m.get("post_wait"), from, to, processor);
 							} else {
 								// send direct message
 								service.sendDirectMessage(processor, from, smsg);
@@ -300,10 +301,29 @@ public class Orator {
 		//////////////////////////////////////////////////////	
 		// poll for new messages to post/send
 		if (procPoll && procCnt == 0) {
-			List<HashMap<String, Object>> rmsg = processor.chatPoll();
-			if (rmsg != null) {
-				// where to send these messages?
-				// FIXME
+			List<HashMap<String, Object>> dml = processor.chatPoll();
+			for (HashMap<String, Object> mm:dml) {
+				String msg = (String)mm.get("msg");
+				String from = (String)mm.get("from");
+				if (debug) System.out.println(" inMSG["+from+"]: " + msg);
+				// private direct messages => private direct response
+				procCnt++;
+				List<HashMap<String, Object>> rmsg = processor.chatMsg(msg);
+				if (rmsg != null) {
+					for (HashMap<String, Object> m:rmsg) {
+						String smsg = getFinalMessage(service.getName(), processor, false, m, (String)m.get("msg"));
+						if (smsg == null) continue;
+						String to = null;
+						if (debug) System.out.println("    outPMSG["+from+"]: " + smsg);
+						// NOTE: from/to reverse
+						if (send_timed) {
+							addMsg(smsg, (String)m.get("event"), m.get("pre_wait"), m.get("post_wait"), from, to, processor);
+						} else {
+							// send direct message
+							service.sendDirectMessage(processor, from, smsg);
+						}
+					}
+				}
 			}
 		}
 		
@@ -315,11 +335,18 @@ public class Orator {
 	
 	
 	// Add message to the message QUEUE
-	private void addMsg(String txt, String event, Integer pre_wait, Integer post_wait, String to, String from, Sedro processor) {
+	private void addMsg(String txt, String event, Object pre_wait, Object post_wait, String to, String from, Sedro processor) {
 		HashMap<String, Object> smsg = new HashMap<>();
-		smsg.put("msg", txt);		
-		smsg.put("pre_wait", pre_wait);
-		smsg.put("post_wait", post_wait);		
+		
+		Integer wi = 0, pwi = 0;
+		if (post_wait instanceof Integer) wi = (Integer)post_wait;
+		else if (post_wait instanceof String) wi = Sutil.toInt((String)post_wait);		
+		if (pre_wait instanceof Integer) wi = (Integer)pre_wait;
+		else if (pre_wait instanceof String) wi = Sutil.toInt((String)pre_wait);			
+		smsg.put("pre_wait", wi);
+		smsg.put("post_wait", pwi);		
+		
+		smsg.put("msg", txt);	
 		smsg.put("event", event);
 		smsg.put("to", to);
 		smsg.put("from", from);

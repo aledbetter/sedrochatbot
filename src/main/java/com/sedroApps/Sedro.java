@@ -279,6 +279,7 @@ public class Sedro {
 		if (resp == null) return null;
 
 		msg_num_last = msg_num;
+		//System.out.println(resp);
 		
 		List<HashMap<String, Object>> rl = null;
 		try {
