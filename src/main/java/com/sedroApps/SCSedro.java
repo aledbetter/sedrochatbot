@@ -48,8 +48,8 @@ public class SCSedro {
 	private String channel_type = null;
 	private String caller_token = null;
 	private int max_qn = -1;
-	private long latitude = 0;
-	private long longitude = 0;
+	private double latitude = 0;
+	private double longitude = 0;
 	private String location = null;
 	private String calltime = null;
 	private int tzoffset = -1;
@@ -99,10 +99,14 @@ public class SCSedro {
 	public void setPersona_handle(String persona_handle) {
 		this.persona_handle = persona_handle;
 	}
-	public void setLocation(long latitude, long longitude, String location) {
+	public void setLocation(double latitude, double longitude, String location) {
 		this.location = location;
 		this.latitude = latitude;
 		this.longitude = longitude;
+		if (this.latitude <= 0 || this.longitude <= 0) {
+			this.latitude = 0;
+			this.longitude = 0;
+		}
 	}
 	public void setCalltime(String calltime, int tzoffset) {
 		this.calltime = calltime;

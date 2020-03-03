@@ -23,6 +23,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import main.java.com.sedroApps.adapter.ChatAdapter;
+import main.java.com.sedroApps.api.RestExample;
 import main.java.com.sedroApps.msgcb.CbMessage;
 import main.java.com.sedroApps.util.Sutil;
 
@@ -181,19 +182,41 @@ public class SCOrator {
 		proc.setCaller_handle(call.get("caller_handle"));
 		
 		// resolve location		
-		String latitude = call.get("latitude");
-		String longitude = call.get("longitude");
+		String slatitude = call.get("latitude");
+		String slongitude = call.get("longitude");
 		String location = call.get("location");
-		String tz = call.get("timezone");
-		String time = call.get("time");
-		
-		// api resolve[phone number/ipaddress]
-		String phonenumber = call.get("phonenumber");
-		String ip = call.get("ip_address");
-// FIXME
-		//proc.setLocation(latitude, longitude, location);
+		String stz = call.get("timezone");
+		String stime = call.get("time");
+		double lon = 0, lat = 0;
+		int tzoffset = 0;
+		//System.out.println("CALL: " + call.toString());
 
-		
+		if (slatitude == null || slongitude == null || stz == null) {	
+			System.out.println("try: " );
+			// api resolve[phone number/ipaddress]
+			String phonenumber = call.get("phonenumber");
+			String ip = call.get("ip_address");
+			String key = SCServer.getChatServer().getSedro_access_key();
+			HashMap<String, Object> li = null;
+			if (phonenumber != null) {
+				li = RestExample.getPhoneInfoGET(key, phonenumber);			
+			} else if (ip != null) {
+				li = RestExample.getIPInfoGET(key, ip);			
+			}
+			if (li != null) {
+				lat = (Double)li.get("latitude");
+				lon = (Double)li.get("longitude");
+				location = (String)li.get("location");
+				System.out.println("GOT INFO: " + li.toString());
+			}
+		} else {
+			lat = Sutil.toDouble(slatitude);
+			lon = Sutil.toDouble(slongitude);
+		}		
+		proc.setLocation(lat, lon, location);
+System.out.println("NEW_CONN: lat: " + lat + " lon: " + lon + "  location: " + location);
+System.out.println("NEW_CONN: tzoff: " + tzoffset + " tz: " + stz + "  time: " + stime);
+
 		// resolve timezone / time
 // FIXME
 		// "yyyy-MM-dd'T'HH:mm:ss.SSSZ"; 

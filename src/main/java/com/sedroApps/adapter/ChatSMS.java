@@ -317,6 +317,7 @@ public class ChatSMS extends ChatAdapter {
 						
 			mm.put("caller_handle", from);
 			mm.put("caller", from);
+			mm.put("phonenumber", from);
 		//	mm.put("caller_token", status);
 	//		System.out.println(" MSG txt: " + mm.get("msg"));
 

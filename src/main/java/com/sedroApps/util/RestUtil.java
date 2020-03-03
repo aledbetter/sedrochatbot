@@ -126,6 +126,24 @@ public class RestUtil {
 		return str;
 	}
 	
+	public static double getDouble(JSONObject obj, String name) {
+		try {
+		return obj.getDouble(name);
+		} catch (Throwable t) {}	
+		return -1;
+	}
+	public static boolean getBoolean(JSONObject obj, String name) {
+		try {
+		return obj.getBoolean(name);
+		} catch (Throwable t) {}	
+		return false;
+	}	
+	public static int getInt(JSONObject obj, String name) {
+		try {
+		return obj.getInt(name);
+		} catch (Throwable t) {}	
+		return -1;
+	}	
 	
 	public static int getJInt(JSONObject obj, String name) {
 		try {
