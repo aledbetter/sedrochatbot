@@ -137,53 +137,76 @@ public class RestExample {
 	}
     
     
-    /* WEATHER
-     * weatherbit-v1-mashape.p.rapidapi.com
-     * var req = unirest("GET", "https://weatherbit-v1-mashape.p.rapidapi.com/current");
+    public static HashMap<String, Object> getWeatherGET(String key, double lon, double lat) { 
+    	HashMap<String, Object> info = null;
+		
+		String rapidapi_host = "weatherbit-v1-mashape.p.rapidapi.com";
+		String url = getUrl(rapidapi_host, "/current");	
+		String reqData = "{\"lang\": \"en\"";
+		reqData += "\", lon\": \"" + lon + "\"";
+		reqData += "\", lat\": \"" + lat + "\"";
+		reqData += "\"}";
+		
+		HashMap<String, String> headers = new HashMap<String, String>();
+		headers.put("x-rapidapi-key", key);
+		headers.put("x-rapidapi-host", rapidapi_host);
+		headers.put("Accept", "application/json");
+		//System.out.println("PHONE: " + reqData);
+		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
+		try {
+			//System.out.println("GOT: " + line);
+			JSONObject jobj = new JSONObject(line);
+			JSONArray jl = jobj.getJSONArray("data");
+			for (int i=0;i<jl.length();i++) {
+				JSONObject we = jl.getJSONObject(i);
+				String state_code = RestUtil.getJStr(jobj, "state_code"); // "state_code":"VA"
+				String country_code = RestUtil.getJStr(jobj, "country_code"); // "country_code":"US"
+				String city_name = RestUtil.getJStr(jobj, "city_name"); // "city_name":"Blackstone"
+				String timezone = RestUtil.getJStr(jobj, "timezone"); // "timezone":"America/New_York"
+				
+				int rh = RestUtil.getInt(jobj, "rh"); // "rh":18
+				int vis = RestUtil.getInt(jobj, "vis"); // "vis":10  > kilometer
+				
+				double wind_spd = RestUtil.getDouble(jobj, "wind_spd"); // "wind_spd":1.5
+				String wind_cdir_full = RestUtil.getJStr(jobj, "wind_cdir_full"); // "wind_cdir_full":"west"
+				double app_temp = RestUtil.getDouble(jobj, "app_temp"); // "app_temp":26.75
+				double temp = RestUtil.getDouble(jobj, "temp"); // "temp":28.1
 
-  {
-	"lang": "en",
-	"lon": "<required>",
-	"lat": "<required>"
-}
-{
-"data":[1 item
-0:{30 items
-"wind_cdir":"W"
-"state_code":"VA"
-"city_name":"Blackstone"
-"rh":18
-"wind_spd":1.5
-"lat":"37"
-"wind_cdir_full":"west"
-"lon":"-78"
-"app_temp":26.75
-"dewpt":1.65
-"vis":10
-"uv":3
-"pres":1000.3
-"ob_time":"2017-06-03 22:35"
-"visibility_val":10000
-"sunrise":"09:52:17"
-"precip3h":NULL
-"timezone":"America/New_York"
-"wind_dir":260
-"weather":{...}3 items
-"datetime":"2017-06-03:22"
-"precip":NULL
-"station":"KBKT"
-"country_code":"US"
-"slp":1015.6
-"sunset":"00:27:46"
-"temp":28.1
-"visibility":"10000 Meters"
-"clouds":0
-"ts":1496527200
-}
-]
-"count":1
-}     
-     */
+				String precip = RestUtil.getJStr(jobj, "precip"); // "precip":"??"
+				//String precip3h = RestUtil.getJStr(jobj, "precip3h"); // "precip3h":"??"
+				int clouds = RestUtil.getInt(jobj, "clouds"); // "clouds":0
+				
+				String sunrise = RestUtil.getJStr(jobj, "sunrise"); //"sunrise":"09:52:17"
+				String sunset = RestUtil.getJStr(jobj, "precip"); // "sunset":"00:27:46"
+
+				info = new HashMap<>();
+				info.put("country_code", country_code);
+				info.put("province_code", state_code);
+				if (city_name != null) info.put("location", city_name);
+				info.put("timezone", timezone);
+				
+				info.put("sunrise", sunrise);
+				info.put("sunset", sunset);
+				
+				info.put("precipitation", precip);
+				info.put("temperature", temp);
+				info.put("app_temperature", app_temp);
+				info.put("visability", vis);
+				info.put("wind", wind_cdir_full + " " + wind_spd);
+				info.put("clounds", 0);
+
+				// just the first one
+				break;
+			}
+			
+		} catch (Throwable tt) {
+			tt.printStackTrace();
+		}	
+
+		return info;
+	}
+
+    
 /* MOVIE
  * imdb8.p.rapidapi.com
  * var req = unirest("GET", "https://imdb8.p.rapidapi.com/title/find");

@@ -17,8 +17,10 @@
 package main.java.com.sedroApps;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -188,7 +190,7 @@ public class SCOrator {
 		String stz = call.get("timezone");
 		String stime = call.get("time");
 		double lon = 0, lat = 0;
-		int tzoffset = 0;
+		int tzoffset = -1;
 		//System.out.println("CALL: " + call.toString());
 
 		if (slatitude == null || slongitude == null || stz == null) {	
@@ -207,26 +209,32 @@ public class SCOrator {
 				lat = (Double)li.get("latitude");
 				lon = (Double)li.get("longitude");
 				location = (String)li.get("location");
-				System.out.println("GOT INFO: " + li.toString());
+				tzoffset = (Integer)li.get("tzoffset");
+				if (stz == null) stz = (String)li.get("tz");
+				//System.out.println("GOT INFO: " + li.toString());
 			}
 		} else {
 			lat = Sutil.toDouble(slatitude);
 			lon = Sutil.toDouble(slongitude);
 		}		
 		proc.setLocation(lat, lon, location);
-System.out.println("NEW_CONN: lat: " + lat + " lon: " + lon + "  location: " + location);
-System.out.println("NEW_CONN: tzoff: " + tzoffset + " tz: " + stz + "  time: " + stime);
+		System.out.println("NEW_CONN: lat: " + lat + " lon: " + lon + "  location: " + location);
+
 
 		// resolve timezone / time
-// FIXME
-		// "yyyy-MM-dd'T'HH:mm:ss.SSSZ"; 
-		//proc.setCalltime(calltime, tzoffset);
+		if (tzoffset == -1 && stz != null) {
+			TimeZone tz = TimeZone.getTimeZone(stz);
+			tzoffset = tz.getOffset(new Date().getTime()) / 1000 / 60;   //yields +120 minutes
+		} else {
+			// need to resolve from location
+//https://rapidapi.com/mvpcapi/api/geo-services-by-mvpc-com?endpoint=apiendpoint_65cc05bc-5f67-40b8-84cf-977da846af11			
+//FIXME			
+		}
+
+		proc.setCalltime(stime, tzoffset);
+		System.out.println("NEW_CONN: tzoff: " + tzoffset + " tz: " + stz + "  time: " + stime);
 		
-		// check  admin[chan/value] OR whitelist/blacklist[chan/value]
-// FIXME
-			// alternate auth: if admin
-			// question
-		
+
 		// what to do with other info?
 		proc.setCall_info(call);
 		return proc;
