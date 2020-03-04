@@ -302,7 +302,7 @@ public class ChatSMS extends ChatAdapter {
 			cnt++;
 			if (!"inbound".equals(""+record.getDirection())) continue;
 			if (!"received".equals(""+record.getStatus())) continue;
-
+			
 			String from = record.getFrom().toString();
 			HashMap<String, String> mm = new HashMap<>();
 

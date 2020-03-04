@@ -29,8 +29,7 @@ import main.java.com.sedroApps.util.Sutil;
 
 
 public class SCSedro {
-	private static String rapidapi_host = "inteligent-chatbots.p.rapidapi.com";
-
+	
 	private String persona;
 	private String persona_full_name;
 	private String persona_handle;	// email/phone/id
@@ -170,8 +169,11 @@ public class SCSedro {
 		return max_qn;
 	}
 	
+	private static String getAPIHost() {
+		return SCServer.getChatServer().getSedro_host();
+	}
 	private static String getUrl(String ending) {
-		return "https://"+ rapidapi_host+ending;
+		return "https://"+ getAPIHost()+ending;
 	}
 
 	//////////////////////////////////////////////////
@@ -190,7 +192,7 @@ public class SCSedro {
 				
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("x-rapidapi-key", key);
-		headers.put("x-rapidapi-host", rapidapi_host);
+		headers.put("x-rapidapi-host", getAPIHost());
 		headers.put("Accept", "application/json");
 		String line = HttpUtil.getURLContent(url, headers);
 		if (line == null) return null;
@@ -239,7 +241,7 @@ public class SCSedro {
 		
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("x-rapidapi-key", key);
-		headers.put("x-rapidapi-host", rapidapi_host);
+		headers.put("x-rapidapi-host", getAPIHost());
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
@@ -257,7 +259,7 @@ public class SCSedro {
 		String reqData = "{ \"chid\": \"" + this.chid  + "\", \"event\": \"poll\"}";
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("x-rapidapi-key", this.key);
-		headers.put("x-rapidapi-host", rapidapi_host);
+		headers.put("x-rapidapi-host", getAPIHost());
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
@@ -276,7 +278,7 @@ public class SCSedro {
 	    reqData += "\", \"chid\": \"" + this.chid  + "\"}";
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("x-rapidapi-key", this.key);
-		headers.put("x-rapidapi-host", rapidapi_host);
+		headers.put("x-rapidapi-host", getAPIHost());
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
@@ -291,7 +293,7 @@ public class SCSedro {
 		String reqData = "{ \"chid\": \"" + this.chid  + "\", \"event\": \"bye\"}";
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("x-rapidapi-key", this.key);
-		headers.put("x-rapidapi-host", rapidapi_host);
+		headers.put("x-rapidapi-host", getAPIHost());
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);

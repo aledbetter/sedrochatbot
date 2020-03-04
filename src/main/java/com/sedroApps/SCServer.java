@@ -42,6 +42,9 @@ public class SCServer {
 
 	List<SCUser> uaList;	// list of users
 	
+	private String sedro_host = "inteligent-chatbots.p.rapidapi.com";
+//	private String sedro_host = "localhost:8080/api/1.0";
+
 	private HashMap<String, CbMessage> msgcbMap = null;
 	
 	private static SCServer cs = null;
@@ -74,6 +77,13 @@ public class SCServer {
 	public void setSedro_access_key(String sedro_access_key) {
 		this.sedro_access_key = sedro_access_key;
 	}
+	public String getSedro_host() {
+		return sedro_host;
+	}
+	public void setSedro_host(String sedro_host) {
+		this.sedro_host = sedro_host;
+	}
+	
 	public String getUsername() {
 		return username;
 	}
@@ -245,6 +255,8 @@ public class SCServer {
 			this.password = (String)sm.get("password");
 			this.username = (String)sm.get("username");
 			this.sedro_access_key = (String)sm.get("sedro_access_key");
+			String host = (String)sm.get("sedro_host");
+			if (host != null) this.sedro_host = host;
 			setPoll_interval((Integer)sm.get("poll_interval"));
 		}
 		List<HashMap<String, Object>> uml = (List<HashMap<String, Object>>)sm.get("users");
@@ -268,6 +280,7 @@ public class SCServer {
 			m.put("username", this.username);
 			m.put("poll_interval", this.poll_interval);
 			m.put("sedro_access_key", this.sedro_access_key);
+			m.put("sedro_host", this.sedro_host);
 			m.put("database", DButil.haveDB());
 			m.put("database_path", DButil.getRDBPath());
 		}

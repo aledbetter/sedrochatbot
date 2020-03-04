@@ -15,6 +15,13 @@
  * from Aaron Ledbetter.
  */
 var sedro_api_version =  "A.6265677228"; // **VERSION** keep in sync with pom.xml
+var glob_api_sedro_host = "inteligent-chatbots.p.rapidapi.com";
+//var glob_api_sedro_host = "localhost:8080/api/1.0";
+var glob_api_key = null;
+
+
+
+
 var sedro_api_prod = true; // is in production (for tracking)
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname === "") {
 	sedro_api_prod = false;
@@ -39,16 +46,18 @@ if (navigator.geolocation) {
 $(document).ready(function() {
 	$(".sedro_version").html(getSedroVersion()); // add version
 });
-var glob_api_host_persona = "inteligent-chatbots.p.rapidapi.com";
-var glob_api_key = null;
+
 
 // set the API Key for all the calls
 function setAPIKey(key) {
 	glob_api_key = key;
 }
+function setAPIHost(host) {
+	glob_api_sedro_host = host;
+}
 
 function getUrl(url) {
-	return "https://"+glob_api_host_persona+url;
+	return "https://"+glob_api_sedro_host+url;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -156,7 +165,7 @@ function postChatTell(ctx, persona, txt, user, caller_token, context, channel_ty
 function postChat_api(ctx, turl, txt, ind, cb) {
 	if (!glob_api_key) return;
 	$.ajax({url: getUrl(turl), type: 'POST', dataType: "json", crossDomain: true, contentType: 'application/json', data: ind, 
-	  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+	  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  if (data.code == 200) {
 			  cb(txt, data);
@@ -178,7 +187,7 @@ function sedroGetAccount(cb) {
 	if (!glob_api_key) return;
 	var turl = "/tenant/get";
 	$.ajax({url: getUrl(turl), type: 'POST', async: true, crossDomain: true, contentType: 'application/x-www-form-urlencoded', 
-	  headers: { 'accept': 'application/json', 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+	  headers: { 'accept': 'application/json', 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  "data": {},
 	  success: function(data){
 		  cb(data);
@@ -193,7 +202,7 @@ function sedroGetPersonas(cb) {
 	if (!glob_api_key) return;
 	var turl = "/tenant/personas";
 	$.ajax({url: getUrl(turl), type: 'GET', dataType: "json", crossDomain: true, contentType: 'application/json', 
-	  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+	  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(data);
 	  }, error: function(xhr) {
@@ -208,7 +217,7 @@ function sedroGeneratePersona(definition, cb) {
 	var turl = "/tenant/persona/add";
 	var ind = "{ \"definition\": \"" + definition.escapeSpecialChars() + "\"}"; 
 	$.ajax({url: getUrl(turl), type: 'POST', dataType: "json", crossDomain: true, contentType: 'application/json', data: ind, 
-	  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+	  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(ctx, data);
 	  }, error: function(xhr) {
@@ -230,7 +239,7 @@ function sedroGeneratePersonaMap(ctx, nvlist, cb) {
 	}	
 	ind += "]}"; 
 	$.ajax({url: getUrl(turl), type: 'POST', dataType: "json", crossDomain: true, contentType: 'application/json', data: ind, 
-	  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+	  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(ctx, data);
 	  }, error: function(xhr) {
@@ -243,7 +252,7 @@ function sedroRemovePersona(ctx, persona, cb) {
 	if (!glob_api_key) return;
 	var turl = "/tenant/persona/remove/"+persona;
 	$.ajax({url: getUrl(turl), type: 'POST', dataType: "json", crossDomain: true, contentType: 'application/json', 
-	  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+	  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(ctx, data);
 	  }, error: function(xhr) {
@@ -256,7 +265,7 @@ function sedroGetPersonaRaw(ctx, persona, cb) {
 	if (!glob_api_key) return;
 	var turl = "/tenant/persona/"+persona+"/getraw";
 	$.ajax({url: getUrl(turl), type: 'GET', dataType: "json", crossDomain: true, contentType: 'application/json',
-		  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+		  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(ctx, persona, data);
 	  }, error: function(xhr) {
@@ -270,7 +279,7 @@ function sedroPersonaGenerateDb(ctx, persona, content, cb) {
 	var ind = "{ \"content\": \"" + content.escapeSpecialChars() + "\""; 
     ind += ", \"persona\": \"" + persona + "\"}";
 	$.ajax({url: getUrl(turl), type: 'POST', dataType: "json", crossDomain: true, data: ind,
-		  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+		  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(ctx, persona, content, data);
 	  }, error: function(xhr) {
@@ -284,7 +293,7 @@ function sedroPersonaGetForms(ctx, persona, cb) {
 	if (!glob_api_key || !persona) return;
 	var turl = "/tenant/persona/"+persona+"/forms";
 	$.ajax({url: getUrl(turl), type: 'GET', dataType: "json", crossDomain: true, contentType: 'application/json', 
-		  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+		  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(ctx, persona, data);
 	  }, error: function(xhr) {
@@ -302,7 +311,7 @@ function sedroPersonaAddForm(ctx, persona, form, type, main, cb) {
     if (main == "true") ind += ", \"main\": \"true\"";
     ind += "}";
 	$.ajax({url: getUrl(turl), type: 'POST', dataType: "json", crossDomain: true, data: ind, 
-		  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+		  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(ctx, persona, data);
 	  }, error: function(xhr) {
@@ -319,7 +328,7 @@ function sedroPersonaAddFormRemote(ctx, persona, url, type, cb) {
   ind += "}";
 
 	$.ajax({url: getUrl(turl), type: 'POST', dataType: "json", crossDomain: true, data: ind, 
-		  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+		  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(ctx, persona, url, data);
 	  }, error: function(xhr) {
@@ -334,7 +343,7 @@ function sedroPersonaGetFormRaw(ctx, persona, form, cb) {
 	form = form.escapeSpecialChars();
 	var turl = "/tenant/persona/"+persona+"/form/"+form+"/getraw";
 	$.ajax({url: getUrl(turl), type: 'GET', dataType: "json", crossDomain: true, contentType: 'application/json', 
-		  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+		  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(ctx, persona, form, data);
 	  }, error: function(xhr) {
@@ -349,7 +358,7 @@ function sedroPersonaRemoveForm(ctx, persona, form, cb) {
 
 	var turl = "/tenant/persona/"+persona+"/form/"+form+"/remove";
 	$.ajax({url: getUrl(turl), type: 'POST', dataType: "json", crossDomain: true, data: ind,
-		  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+		  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(ctx, persona, data);
 	  }, error: function(xhr) {
@@ -359,12 +368,12 @@ function sedroPersonaRemoveForm(ctx, persona, form, cb) {
 }
 function sedroPersonaClearForms(ctx, persona, cb) {
 	if (!glob_api_key) return;
-	if (!persona || !form) return;
+	if (!persona) return;
 	var ind = "{\"persona\": \"" + persona + "\"}";
 
 	var turl = "/tenant/persona/"+persona+"/forms/clear";
 	$.ajax({url: getUrl(turl), type: 'POST', dataType: "json", crossDomain: true, data: ind,
-		  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+		  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(ctx, persona, data);
 	  }, error: function(xhr) {
@@ -378,7 +387,7 @@ function sedroPersonaUpdateForm(ctx, persona, form, type, cb) {
 	var turl = "/tenant/persona/"+persona+"/form/"+form;
 	var ind = "{\"type\": \"" + type + "\"}";
 	$.ajax({url: getUrl(turl), type: 'POST', dataType: "json", crossDomain: true, data: ind,
-		  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+		  headers: { 'x-rapidapi-host': glob_api_sedro_host, 'x-rapidapi-key': glob_api_key},
 	  success: function(data){
 		  cb(ctx, persona, data);
 	  }, error: function(xhr) {

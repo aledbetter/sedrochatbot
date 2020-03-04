@@ -68,7 +68,9 @@ $(document).ready(function() {
 		if (data && data.info && data.info.sedro_access_key) {
 			glob_api_key = data.info.sedro_access_key;
 			$("#api_key").val(data.info.sedro_access_key); 
-			setAPIKey(glob_api_key);
+			setAPIKey(data.info.sedro_access_key);
+			setAPIHost(data.info.sedro_host);
+
 			sedroGetAccount(function (data) {
 				var pselect = "";
 				if (data.results[0].personas) {

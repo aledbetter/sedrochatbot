@@ -84,7 +84,8 @@ $(document).ready(function() {
 		if (data && data.info && data.info.sedro_access_key) {
 			glob_api_key = data.info.sedro_access_key;
 			$("#api_key").val(data.info.sedro_access_key); 
-			setAPIKey(glob_api_key);
+			setAPIKey(data.info.sedro_access_key);
+			setAPIHost(data.info.sedro_host);
 			sedroGetAccount(function (data) {
 				if (data) showTenant(data.results[0]);
 				else $("#xtenant_action").html("ERROR: Adding Account for: " + glob_api_key);
@@ -167,6 +168,7 @@ $(document).ready(function() {
 			$("#xpersona_action").html("Persona Saved: " + persona);
 			$("#first_name, #last_name, #sex, #email").val("");
 			getTenant();
+			$("#add_persona_bt").click();
 		});
 
 	});		
@@ -270,7 +272,7 @@ function showTenant(tenant) {
 			hp += "<b>" + tenant.personas[i]+"</b></span>";
 			hp += "<div class='bslink' onClick='showChat(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Chat</div>";		
 			hp += "<div class='bslink' onClick='removePersona(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Remove</div>";				
-			hp += "<div class='bslink' onClick='sedroPersonaClearForms(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Clear Forms</div>";				
+			hp += "<div class='bslink' onClick='sedroPersonaClearRForms(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Clear Forms</div>";				
 			hp += "<div class='bslink' onClick='showPresonaForm(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Add Form</div>";		
 			hp += "<div class='bslink' onClick='showPersonaRaw(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Raw</div>";				
 			
@@ -457,7 +459,7 @@ function sedroPersonaRForm(persona, name) {
 		}
 	});
 }
-function sedroPersonaClearForms(persona) {
+function sedroPersonaClearRForms(persona) {
 	var ctx = $("#ctx").val();
 	$(".poolCount").html("Removeing all persona Form["+persona+"]...");
 	sedroPersonaClearForms(ctx, persona, function (rctx, persona, data) {

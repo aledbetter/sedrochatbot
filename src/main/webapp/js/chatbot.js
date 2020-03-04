@@ -170,6 +170,7 @@ $(document).ready(function() {
 	$("#save_settings_bt").on('click', function (e) {
 		$("#set_password2, #set_password").removeClass("error");
 		var sak = $("#set_sedro_access_key").val();
+		var shost = $("#set_sedro_host").val();
 		var u = $("#set_username").val();
 		var p = $("#set_password").val();
 		var p2 = $("#set_password2").val();
@@ -228,7 +229,7 @@ function logout() {
 	
 
 function getSettings() {
-	$("#setting_username, #setting_poll_interval, #setting_sedro_access_key, #setting_database_path").html("..."); 
+	$("#setting_username, #setting_poll_interval, #setting_sedro_access_key, #setting_sedro_host, #setting_database_path").html("..."); 
 
 	scsGetSettings(function(data) {
 		if (data == null || data.code == 401) {
@@ -245,10 +246,16 @@ function getSettings() {
 		} else {
 			$("#setting_database_path").html("NONE"); 
 		}
+		if (data.info.sedro_host) {
+			$("#set_sedro_host").val(data.info.sedro_host); 
+			$("#setting_sedro_host").html(data.info.sedro_host); 			
+		}
 		if (data.info.sedro_access_key) {
 			$("#set_sedro_access_key").val(data.info.sedro_access_key); 
 			$("#setting_sedro_access_key").html(data.info.sedro_access_key); 
 			glob_api_key = data.info.sedro_access_key;
+			setAPIKey(data.info.sedro_access_key);
+			setAPIHost(data.info.sedro_host);
 			sedroGetPersonas(function (data) {
 				var pselect = "";
 				var pUser = "";
