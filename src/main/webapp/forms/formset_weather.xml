@@ -1,253 +1,87 @@
 <doc>
-	<!-- 
-	background / action / main / 
-	
-	 -->
-	<!-- simple hello world -->
-	<form name='_helloworld_' data-type='form'>
-		<input name="intro" data-type="content"/>
-		<label for="intro" state='wake'>Hello World!</label>
-		<label for="intro" state='wake'>(from your form)</label>
+	<!-- http://localhost:8081/forms/formset_weather.xml -->
+	<!-- The DATA we get -->	
+	<form name='location weather' data-type='dataform' data-link='location=possesses'>
+		<input name="location" data-type="input"/>
+		<input name="sunrise" data-type="input" data-alias='sunrise time'/>
+		<input name="sunset" data-type="input" data-alias='sunset time'/>
+		<input name="precipitation" data-type="input"/>
+		<input name="aqi" data-type="input" data-alias='Air Quality Index'/>
+		<input name="temperature" data-type="input"/>
+		<input name="visibility" data-type="input"/>
+		<input name="wind" data-type="input"/>
+		<input name="conditions" data-type="input"/>		
 	</form>
-
-	<form name='_helloworld2_' data-type='form'>
-		<input name="intro" data-type="content" />
-		<label for="intro" state='wake'>Hello World!</label>
-		<input name="intro2" data-type="content" />
-		<label for="intro2" state='wake'>(from your form)</label>
+	
+	<!-- Explicit get and show -->
+	<form name='_getweather_' data-type='form'>
+		<!-- for location weather a request form OR here with longitude/latitued could be added -->
+		<input name="get_weather" data-type="post" data-resp-formname='weather' data-posturl='http://localhost:8081/api/1.0/x/weather'/>
+		<label for="get_weather" state='incomplete'>Still waiting for the weather service</label>
 		
-		<input name="exit" data-type="content" />
-		<label for="exit" state='any'>That is all.</label>	
-		<input name="exit2" data-type="content" />
-		<label for="exit2" state='any'>Good Bye</label>	
-				
-		<input name="bye" data-type="event" data-event='bye' />
+		<input name="weather sum" data-type="content" />
+		<label for="weather sum" state='wake'>Currently it is %current:location weather/conditions% in %current:location weather/location%</label>	
+		
+		<input name="weather sum1" data-type="content" />
+		<label for="weather sum1" state='wake'>Sunrise is at %current:location weather/sunrise%</label>	
 	</form>
-
-	<!-- simple hello world -->
-	<form name='_remotehelloworld_' data-type='form'>
-		<input name='remote_form' data-type='form' data-formname='http://api.sedro.xyz/w/00_DEV_00/testform.xml' />
-	</form>
+<!-- 
+FIXME: how to show info in action form after getting it. 
+	- want multiple follow on comments
+	- show with display form for reuse?
+FIXME: how to have task with followon subtask (get then show)
+	- like followup but imidiatly
 	
-
-	<!-- Test for Invoking active (background) form to forground .. then back -->
+ -->	
+	<!-- Casual get and show -->
+	<form name='weather' role='action' data-type='action' data-object-type='thing' data-ref="caller's weather">
+		<input name="intro" data-type="comment"/>
+		<label for="intro" state='wake'>I am %current/cmd_action% the %current/cmd_object_instance%</label>
+		
+		<input name="status" data-type="input"/>			
+		<input name="read" data-crmd='read' data-type="post" data-formname='weather' 
+			data-task-name='weather report'
+			data-ability='status, is, get, tell'
+			data-posturl='http://localhost:8081/api/1.0/x/weather'/>
+		<label for="read" state='done'>The weather is %current:location weather/conditions%</label>
+	</form>
+		
+	
+	<!-- Wake from background to tell the weather -->
 	<form name='_invoke_' data-type='form' >
-		<input name="listen" data-type="invoke" data-seq="X:woolley:%"/>
-				
+		<input name="listen" data-type="invoke" data-seq="the/my:% X:weather:%"/>				
 		<input name="intro" data-type="content" />
-		<label for="intro" state='wake'>This is Woolley!</label>
+		<label for="intro" state='wake'>Getting the current weather</label>	
 		
+		<input name="weather report" data-type="form" data-formname="_getweather_"/>
+			
 		<input name="background" data-type="event" data-event='background_reset' />
 	</form>
-	
-	<!-- Test for backgound data collection -->
-	<form name='_watch_' data-type='form'>
-		<input name="string" data-type="input" data-opt='wait' data-seq="X:when:% 7:%" data-bnd="o[0]r[link] o[1]r[link]"/>
-		<input name="save" data-type="event" data-event='save_post' data-posturl='http://api.sedro.xyz/api/depots/testformdatapost'/>
-	</form>
-	
-	<!-- Test external data use -->
-	<form name='_getexternaccount_' data-type='form'>
-		<input name="account number" data-type="input" data-seq="X:%any%:(lx_number):sz[large]" data-fmt='^[0-9]{6}$'/>
-		<label for="account number" state='wake'>What is your account number?</label>
-		<label for="account number" state='incomplete'>Account number is 6 digits</label>
-		<label for="account number" state='verify'>Is %account number% correct?</label>
-		<label for="account number" state='complete'>Retrieving account information...</label>
- 
- 		<input name="get_account" data-type="post" data-resp-formname="account" data-posturl="http://api.sedro.xyz/api/1.0/depots/testformgetpost"/>
-		<label for="get_account" state='incomplete'>Still waiting for account information</label>
-		
-		<input name="account holder" data-type="content" />
-		<label for="account holder" state='wake'>Account Holder: %current:account/full name%</label>	
-		
-		<input name="account addr" data-type="content" />
-		<label for="account addr" state='wake'>Address: %current:account/address%</label>	
-			
-		<input name="account phone" data-type="content" />
-		<label for="account phone" state='wake'>Phone: %current:account/home phone%</label>		
-	</form>
-	
-	<!-- Test external data use INFO form: dataform -->	
-	<form name='account' data-type='dataform' data-link='caller=possesses'>
-		<input name="full name" data-type="input" data-alias='full name, account holder, account holder name'/>
-		<input name="address" data-type="input" data-alias='home address, address, mailing address'/>
-		<input name="home phone" data-type="input" data-alias='home phone number, home phone, phone number'/>
-		<input name="account number" data-type="input" data-alias='acctnum' data-fmt='^[0-9]{6}$'/>
-	</form>
-	
-	<!-- test for Action/Info handler -->
-	<form name='light' role='action' data-type='action'>
-		<input name="status" data-type="input"/>
-		<input name="location" data-type="input" value='kitchen'/>	
-			
-		<input name="read" data-type="post" data-formname='light' data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
-		<label for="read" state='verify'>You want to %current/cmd_action% the lights status?</label>
-		<label for="read" state='done'>The light is %current/status%</label>
-		
-		<input name="modify" data-type="post" data-formname='light' data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
-		<label for="modify" state='verify'>You would like to %current/cmd_action% the lights?</label>
-		<label for="modify" state='done'>Updated, the light is now %current/status%</label>
-		
-		<input name="create" data-type="post" data-formname='light' data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
-		<label for="create" state='done'>Create is complete</label>
-		
-		<input name="destroy" data-type="post" data-formname='light' data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
-		<label for="destroy" state='done'>Destroy is complete</label>		
-	</form>
-	
-	<!-- TEST for Action/Info handler -->
-	<form name='kitchen light' role='action' data-type='action'
-			data-classifier='light' 			
-			data-object-type='thing' 
-			data-seq='%action% X:lights:%' 			
-			data-alias='my kitchen light' data-ref='big kitchen light'
-			>
-		<input name="status" data-type="input" data-value-type='range' data-value-min='0' data-value-max='10'/>
-		<input name="location" data-type="input" value='kitchen'/>	
-				
-		<input name="answer" data-crmd='comment' data-ability='touch' data-type="comment" />
-		<label for="answer" state='wake'>You want me to %current/cmd_action% the %current/cmd_object_instance%?</label>
-			
-		<input name="read" data-crmd='read' 
-			data-ability='status, level, brightness, is'
-			data-type="post" data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
-		<label for="read" state='done'>The light is %current/status%</label>
-				
-		<input name="modify" data-crmd='modify' data-task='adjust kitchen light'
-			data-mod='up, down, brighter, darker, dimmer, lower, higher'
-			data-ability='turn, shut, dim, raise, hit, get, flip, toggle, switch'
-			data-state='bright, dark, dim, high, low'
-			data-type="post" data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
-		<label for="modify" state='verify'>You would like to %current/cmd_action% the lights?</label>
-		<label for="modify" state='done'>Updated, the light is now %current/status%</label>
-		
-		<input name="on" data-crmd='modify' data-task='kitchen light on'
-			data-task-prerequisit='account test' 
-			data-ability='turn, raise, flip, toggle, switch'
-			data-state='on, bright, open'
-			data-status-value='10' data-status-op='set'
-			data-type="post" data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
-		<label for="on" state='verify'>You would like to %current/cmd_action% the lights on?</label>
-		<label for="on" state='done'>Updated, the light is now on</label>
-		
-		<input name="off" data-crmd='modify' data-task='kitchen light off'
-			data-ability='turn, shut, dim, flip, toggle, switch'
-			data-state='off, dark, closed'
-			data-status-value='0' data-status-op='set'
-			data-type="post" data-posturl='http://api.sedro.xyz/api/1.0/depots/testformgetpost'/>
-		<label for="off" state='verify'>You would like to %current/cmd_action% the lights off?</label>
-		<label for="off" state='done'>Updated, the light is now off</label>
-	</form>
 
+	<!-- Bot (or sub element) that just gets the weather -->
+	<form name='_weather_bot_' data-type='form'>
+		<input name="intro" data-type="intro"/>
+		<label for="intro" state='wake'>Getting the current weather</label>	
+				
+		<input name="weather report" data-type="form" data-formname="_getweather_"/>
 		
-	<!-- Test data input external form / conditional message  -->
-	<form name='_getname_' data-type='form'>
-		<input name="intro" data-type="content"/>
-		<label for="intro" state='wake'>We need a bit of information from you</label>
-		
-		<input name="full name" data-type="input" data-seq="X:%any%:(lx_person_name):sz[large]"/>
-		<label for="full name" state='wake'>What is your full name?</label>
-		<label for="full name" state='incomplete'>Your full legal name please</label>
-		<label for="full name" state='verify'>Is %full name% your full name?</label>
-		<label for="full name" state='verify' data-seq='P:%any%:length[1]'>%full name%, you have only 1 name?</label>
-		<label for="full name" state='complete'>nice to meet you %full name%.</label>
-				 
-		<input name="test_form" data-type="form" data-formname='http://api.sedro.xyz/w/00_DEV_00/testform.xml'/>		
-		<input name="home phone" data-type="form" data-task='get phone number' data-formname="_getphonenumber_"/>
-		
-		<input name="exit" data-type="content" />
-		<label for="exit" state='wake'>Thank you for your information.</label>
+		<input name="outro" data-type="outro" />
+		<label for="outro" state='wake'>Good bye</label>
 			
 		<input name="bye" data-type="event" data-event='bye'/>
 	</form>
-	<form name='_getinfo_' data-type='form'>
-		<input name="intro" data-type="content"/>
-		<label for="intro" state='wake'>We need a bit of information from you</label>
-				
-		<input name="home phone" data-type="form" data-formname="_getphonenumber_"/>
-		
-		<input name="exit" data-type="content" />
-		<label for="exit" state='wake'>Thank you for your information.</label>
-			
-		<input name="bye" data-type="event" data-event='bye'/>
-	</form>
-	<form name='_getphonenumber_' data-type='form'>
-		<input name="phone number" data-type="input" data-seq="X:%any%:(lx_phone number):sz[large]"/>
-		<label for="phone number" state='wake'>What is your phone number?</label>	
-		<label for="phone number" state='incomplete'>Full phone number please, including area code</label>
-		<label for="phone number" state='verify'>Is %phone number% correct?</label>
-		<label for="phone number" state='nomatch'>%phone number% isn't a phone number</label>		
-		<label for="phone number" state='complete'>got %phone number%</label>
-	</form>
-	
-	<!-- TEST for menus -->
-	<form name='_submenu_' data-type='form'>
-		<input name="intro" data-type="content"/>
-		<label for="intro" state='wake'>Select an option from this list</label>
-	
-		<input name="select" data-type="menu"/>
-		<label for="select" state='option' value='1'>option 1</label>
-		<label for="select" state='option' value='2'>option 2</label>
-		<label for="select" state='option' value='3'>option 3</label>
-		<label for="select" state='option' value='4' data-formname='cancel'>Go back</label>
-		<label for="select" state='incomplete'>Please select an option or cancel</label>
-		<label for="select" state='verify'>You would like option %select% %select_txt%?</label>
-		<label for="select" state='done'>You selected option %select% %select_txt%</label>
-		
-		<input name="exit" data-type="content" />
-		<label for="exit" state='wake'>Thank you</label>
-	</form>
-	
-	
-	<!-- TEST for filter param type -->
-	<form name='_getmany_' data-type='form'>
-		<input name="filter" data-type="filter" data-seq="X:%any%:(lx_person_name):sz[large]"/>
-		<label for="filter" state='wake'>Add a person for your search?</label>
-		<label for="filter" state='wake' data-channel='sms'>Add a person?</label>
-		<label for="filter" state='incomplete'>Add a person?</label>
-		<label for="filter" state='add'>Have %filter_txt%. Any additional people?</label>
-		<label for="filter" state='verify'>Add person %filter%?</label>
-		<label for="filter" state='clear'>Filters cleared</label>
-		<label for="filter" state='complete'>Got %filter_txt%</label>
-		<label for="filter" state='nomatch'>Not a good response: %filter%</label>
-		
-		<input name="exit" data-type="content" />
-		<label for="exit" state='wake'>Thank you</label>
-	</form>
-
-	<!-- TEST prereq / folloup tasks -->
-	<form name='_test_sets_' data-type='form'>
-		<input name="ask again" data-type="content" data-task='ask again'/>
-		<label for="ask again" state='wake'>Are you sure?</label>
-		
-		<input name="ask yet again" data-type="content" data-task='ask yet again'/>
-		<label for="ask yet again" state='wake'>Are you sure you are sure?</label>
-		
-		<input name="maybe this" data-type="content" data-task='maybe this too'/>
-		<label for="maybe this" state='wake'>You want this too don't you.</label>	
-		
-		<input name="account test" data-type="content" data-task='account test'/>
-		<label for="account test" state='wake'>Your account exists.</label>
-	</form>
 
 
-	<!-- story definition for loose TUI.. -->
-	<form name='_support_' role='main' data-type='form'>
+	<!-- Bot: Could do more but mostly is weather -->
+	<form name='_taskbot_' role='main' data-type='form'>
 		<input name="intro" data-type="intro"/>
 		<label for="intro" state='wake'>Good %_time_period_of_day% how can I help you?</label>
 
-
-	<!-- task set is always a loop IF "verify".. with question about done at the end ( -->
-		<input name="taskset" data-type="tasks" 
-			data-task-show='update phone number, get balance, send money'
-		/>	
+		<input name="taskset" data-type="tasks" data-task-show='weather report' />	
 		<label for="taskset" state='wake' data-pre-wait='10'>What can I help you with this %_time_period_of_day%?</label>
-		<label for="taskset" state='wake' data-channel='sms'>What do you need?</label>
+		<label for="taskset" state='wake' data-channel='sms'>What do you want this time?</label>
 		<label for="taskset" state='verify' data-pre-wait='10'>Now that %_last_task% is %_last_outcome%, is there anything else I can help you with?</label>
 		<label for="taskset" state='canceled' data-pre-wait='6'>Is there anything else I can help you with?</label>
-		<label for="taskset" state='prerequisit' data-post-wait='20'>First we will need to %_next_task% now as well?</label>
-		<label for="taskset" state='recommend'>Perhaps you would like to %_recomend% now as well?</label>
-		<label for="taskset" state='complete' data-post-wait='30'>That was interesting</label>
 
 		<input name="outro" data-type="outro"/>
 		<label for="outro" state='wake' data-pre-wait='10'>Thank you, hope you have a great %_time_period_of_day%</label>	

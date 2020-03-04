@@ -251,26 +251,30 @@ function getTenant() {
 
 function showTenant(tenant) {
 	$("#ctx").val(tenant.ctx);
-	$("#xtenant_action").html("Added Tenant: " + name);
 	
-	var hh = "<div class='fLn'>&nbsp;Name: <b>" + tenant.name+"</b></div>";
-	hh += "<div class='fLn'>&nbsp;Language: <b>" + tenant.language+"</b></div>";
-	if (tenant.email) hh += "<div class='fLn'>&nbsp;Email: <b>" + tenant.email+"</b></div>";
-	if (tenant.username) hh += "<div class='fLn'>&nbsp;Username: <b>" + tenant.username+"</b></div>";
-	hh += "<div class='fLn'>&nbsp;Subscription: <b>" + tenant.subscription+"</b></div>";
-	hh += "<div class='fLn'>&nbsp;&nbsp;&nbsp;Max persona: <b>" + tenant.max_persona+"</b> db: <b>" + tenant.max_db+"</b></div>";
-		
+	var hh = "<div class='fLn' style='font-size:16px;line-height:1.6em;padding-left:15px'>";
+	if (tenant.username) hh += "<div class='fLn'>Username: <b>" + tenant.username+"</b></div>";
+	if (tenant.name != tenant.username) hh += "<div class='fLn'>Name: <b>" + tenant.name+"</b></div>";
+	hh += "<div class='fLn'>Language: <b>" + tenant.language+"</b></div>";
+	if (tenant.email) hh += "<div class='fLn'>Email: <b>" + tenant.email+"</b></div>";
+	hh += "<div class='fLn'>Subscription: <b>" + tenant.subscription+"</b> ";
+	hh += "&nbsp;&nbsp;&gt;&gt;&nbsp;&nbsp;max persona: <b>" + tenant.max_persona+"</b> max db: <b>" + tenant.max_db+"</b></div>";
+	hh += "</div>"
+	
 	var pselect = "";
 	if (tenant.personas) {
-		hh += "<div class='fLn personas' style='margin-top:15px;padding-bottom:10px;border-bottom:solid 2px #555;font-size:18px'>&nbsp;Tenant Personas: " + tenant.personas.length+ "</div>";
+		hh += "<div class='fLn personas' style='margin-top:15px;padding-bottom:8px;padding-top:8px;border-top:solid 2px #555;border-bottom:solid 2px #555;font-size:18px'>&nbsp;Personas: " + tenant.personas.length+ "</div>";
 		var hp = "";
 		for (var i=0;i<tenant.personas.length;i++) {
-			hp += "<div class='fLn' style='padding-top:8px;padding-bottom:4px;font-size:16px;margin-top:4px;border-bottom:solid 1px #555;'><span>&nbsp;&nbsp;&nbsp;&nbsp;";
+			hp += "<div class='fLn' style='padding-top:8px;padding-bottom:6px;font-size:16px;margin-top:4px;border-bottom:solid 1px #555'><span>&nbsp;&nbsp;&nbsp;&nbsp;";
 			hp += "<b>" + tenant.personas[i]+"</b></span>";
 			hp += "<div class='bslink' onClick='showChat(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Chat</div>";		
+			hp += "<div class='bslink' onClick='removePersona(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Remove</div>";				
+			hp += "<div class='bslink' onClick='sedroPersonaClearForms(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Clear Forms</div>";				
 			hp += "<div class='bslink' onClick='showPresonaForm(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Add Form</div>";		
 			hp += "<div class='bslink' onClick='showPersonaRaw(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Raw</div>";				
-			hp += "<div id='pform_"+tenant.personas[i]+"' class='fLn'></div>";
+			
+			hp += "<div id='pform_"+tenant.personas[i]+"' class='fLn' style='margin-top:5px'></div>";
 			hp += "</div>";
 			pselect += "<option value='"+tenant.personas[i]+"'>"+tenant.personas[i]+"</option>";						
 		}
@@ -441,12 +445,24 @@ function addPersonaForm() {
 		});
 	}
 }
+
 function sedroPersonaRForm(persona, name) {
 	var ctx = $("#ctx").val();
 	$(".poolCount").html("Removeing persona Form["+persona+"] form["+name+"]...");
 	sedroPersonaRemoveForm(ctx, persona, name, function (rctx, persona, data) {
 		if (data) {
 			$("#xpool_action").html("removed persona form: " + name + " / " + persona);
+			getTenant();		
+		} else {	
+		}
+	});
+}
+function sedroPersonaClearForms(persona) {
+	var ctx = $("#ctx").val();
+	$(".poolCount").html("Removeing all persona Form["+persona+"]...");
+	sedroPersonaClearForms(ctx, persona, function (rctx, persona, data) {
+		if (data) {
+			$("#xpool_action").html("removed all persona form: " + persona);
 			getTenant();		
 		} else {	
 		}
@@ -491,7 +507,12 @@ function showPersonaRaw(persona) {
 		}
 	});
 }
-
+function removePersona(persona) {
+	var ctx = $("#ctx").val();
+	sedroRemovePersona(ctx, persona, function (rctx, persona, data) {
+		getTenant();
+	});
+}
 function findPersonaPool(pools, persona) {
 	if (!pools) return null;
 	for (var i=0;i<pools.length;i++) {

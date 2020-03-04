@@ -357,6 +357,21 @@ function sedroPersonaRemoveForm(ctx, persona, form, cb) {
 	  }
 	});	
 }
+function sedroPersonaClearForms(ctx, persona, cb) {
+	if (!glob_api_key) return;
+	if (!persona || !form) return;
+	var ind = "{\"persona\": \"" + persona + "\"}";
+
+	var turl = "/tenant/persona/"+persona+"/forms/clear";
+	$.ajax({url: getUrl(turl), type: 'POST', dataType: "json", crossDomain: true, data: ind,
+		  headers: { 'x-rapidapi-host': glob_api_host_persona, 'x-rapidapi-key': glob_api_key},
+	  success: function(data){
+		  cb(ctx, persona, data);
+	  }, error: function(xhr) {
+		  cb(ctx, persona, null);
+	  }
+	});	
+}
 
 function sedroPersonaUpdateForm(ctx, persona, form, type, cb) {
 	if (!persona || !form) return;

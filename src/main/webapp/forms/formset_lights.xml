@@ -1,4 +1,5 @@
 <doc>
+	<!-- http://localhost:8081/forms/formset_lights.xml -->
 
 	<!-- test for Action/Info handler -->
 	<form name='light' role='action' data-type='action'>

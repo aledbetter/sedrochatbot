@@ -19,19 +19,14 @@
 package main.java.com.sedroApps.api;
 
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.CookieParam;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -220,9 +215,9 @@ public class RestExample {
 				info.put("aqi", aqi);
 				info.put("temperature", temp);
 				info.put("app_temperature", app_temp);
-				info.put("visability", vis);
+				info.put("visibility", vis);
 				info.put("wind", wind_cdir_full + " " + wind_spd);
-				info.put("clouds", clouds);
+				info.put("clouds", ""+clouds);
 				info.put("conditions", conditions);
 
 				// just the first one
