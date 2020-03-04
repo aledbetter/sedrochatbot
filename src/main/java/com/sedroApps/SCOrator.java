@@ -236,9 +236,10 @@ public class SCOrator {
 			tzoffset = tz.getOffset(new Date().getTime()) / 1000 / 60;   //yields +120 minutes
 		} 
 
-		proc.setCalltime(stime, tzoffset);
+		proc.setCalltime(stime, stz, tzoffset);
 		if (debug_callinfo) System.out.println("NEW_CONN: tzoff: " + tzoffset + " tz: " + stz + "  time: " + stime);
 		
+	
 
 		// what to do with other info?
 		proc.setCall_info(call);

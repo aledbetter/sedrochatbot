@@ -53,6 +53,7 @@ public class SCSedro {
 	private String location = null;
 	private String calltime = null;
 	private int tzoffset = -1;
+	private String tzn = null;
 	
 	private int msg_num_last = 0;	
 	private int msg_num = 0;	
@@ -108,9 +109,10 @@ public class SCSedro {
 			this.longitude = 0;
 		}
 	}
-	public void setCalltime(String calltime, int tzoffset) {
+	public void setCalltime(String calltime, String tzn, int tzoffset) {
 		this.calltime = calltime;
 		this.tzoffset = tzoffset;
+		this.tzn = tzn;
 	}
 	
 	public String getCaller() {
@@ -231,6 +233,7 @@ public class SCSedro {
 	    if (location != null) reqData += ", \"location\": \"" + location + "\"";
 	    if (calltime != null) reqData += ", \"calltime\": \"" + calltime + "\"";
 	    if (tzoffset >= 0) reqData += ", \"tz\": \"" + tzoffset + "\"";
+	    if (tzn != null) reqData += ", \"tzn\": \"" + tzn + "\"";
 	    
 		reqData += "}";
 		
