@@ -18,6 +18,9 @@
 package main.java.com.sedroApps.util;
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -45,7 +48,15 @@ public class RestUtil {
 		}
 		return true;
 	}
-
+	
+	public static String encode(String str) {
+	    try {
+	        return URLEncoder.encode(str.trim(), StandardCharsets.UTF_8.toString());
+	    } catch (UnsupportedEncodingException ex) {
+	        return str;
+	    }
+	}
+    
 	/*
 	public static boolean paramGUID(String param) {
 		if (ValidUtil.isGUID(param)) {

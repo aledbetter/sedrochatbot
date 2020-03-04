@@ -193,12 +193,12 @@ public class SCOrator {
 		double lon = 0, lat = 0;
 		int tzoffset = -1;
 		//System.out.println("CALL: " + call.toString());
-
+		
+		String key = SCServer.getChatServer().getSedro_access_key();
 		if (slatitude == null || slongitude == null || stz == null) {	
 			// api resolve[phone number/ipaddress]
 			String phonenumber = call.get("phonenumber");
 			String ip = call.get("ip_address");
-			String key = SCServer.getChatServer().getSedro_access_key();
 			HashMap<String, Object> li = null;
 			if (phonenumber != null) {
 				li = RestExample.getPhoneInfoGET(key, phonenumber);			
@@ -224,7 +224,6 @@ public class SCOrator {
 		// resolve timezone / time
 		if (tzoffset == -1 && stz == null) {
 			// need to resolve from location
-			String key = SCServer.getChatServer().getSedro_access_key();
 			HashMap<String, Object> li = RestExample.getLocationInfoGET(key, lat, lon);	
 			if (li != null) {
 				if (li.get("tzoffset") != null) tzoffset = (Integer)li.get("tzoffset");
@@ -238,9 +237,7 @@ public class SCOrator {
 
 		proc.setCalltime(stime, stz, tzoffset);
 		if (debug_callinfo) System.out.println("NEW_CONN: tzoff: " + tzoffset + " tz: " + stz + "  time: " + stime);
-		
-	
-
+			   
 		// what to do with other info?
 		proc.setCall_info(call);
 		return proc;
