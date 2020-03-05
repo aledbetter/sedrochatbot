@@ -230,6 +230,7 @@ $(document).ready(function() {
 				$("#xdb_action").html("Knowledge generated: " + rctx + " / " + rname);
 				$("#knowledge_text").val(""); 
 				getTenant();
+				$("#add_knowledge_bt").click();
 			} else {
 				$("#xdb_action").html("ERRORO: Knowledge generation: " + rctx + " / " + rname);
 			}

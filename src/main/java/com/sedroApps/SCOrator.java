@@ -224,9 +224,13 @@ public class SCOrator {
 		// resolve timezone / time
 		if (tzoffset == -1 && stz == null) {
 			// need to resolve from location
-			HashMap<String, Object> li = RestExample.getLocationInfoGET(key, lat, lon);	
+			HashMap<String, String> li = RestExample.getLocationInfoGET(key, lat, lon);	
 			if (li != null) {
-				if (li.get("tzoffset") != null) tzoffset = (Integer)li.get("tzoffset");
+				Object o = li.get("tzoffset");
+				if (o != null) {
+					if (o instanceof Integer) tzoffset = (Integer)o;
+					else if (o instanceof String) tzoffset = Sutil.toInt((String)o);
+				}
 				if (stz == null && li.get("tz") != null) stz = (String)li.get("tz");	
 			}			
 		}
@@ -416,7 +420,7 @@ public class SCOrator {
 			HashMap<String, Object> lmsg = null;
 			if (msg_set.size() > 0) lmsg = msg_set.get(msg_set.size()-1);	
 			long stime = 0;
-			if (lmsg != null) {
+			if (lmsg != null && smsg.get("stime") != null) {
 				stime = (Long)smsg.get("stime");
 				Integer lw = (Integer)smsg.get("post_wait");
 				if (lw != null) stime += lw;

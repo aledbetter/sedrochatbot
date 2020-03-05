@@ -143,16 +143,16 @@ public class RestExample {
     
     // GET TIMEZONE for LOCATION
   //https://rapidapi.com/mvpcapi/api/geo-services-by-mvpc-com?endpoint=apiendpoint_65cc05bc-5f67-40b8-84cf-977da846af11			
-    public static HashMap<String, Object> getLocationInfoGET(String key, double lat, double lon) { 
+    public static HashMap<String, String> getLocationInfoGET(String key, double lat, double lon) { 
     	if (key == null || lat == 0 || lon == 0) return null;
     	return getWeatherInfo(key, lon, lat);
     }
       
     // GET WEATHER INFORMATION
-    public static HashMap<String, Object> getWeatherInfo(String key, double lon, double lat) { 
+    public static HashMap<String, String> getWeatherInfo(String key, double lon, double lat) { 
     	if (key == null || lat == 0 || lon == 0) return null;
 
-    	HashMap<String, Object> info = null;
+    	HashMap<String, String> info = null;
 		
 		String rapidapi_host = "weatherbit-v1-mashape.p.rapidapi.com";
 		
@@ -165,21 +165,22 @@ public class RestExample {
 		
 		String line = HttpUtil.getURLContent(url, headers);
 		if (line == null) return null;
-		
-		//String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
+
 		try {
 			//System.out.println("GOT: " + line);
 			JSONObject jobj = new JSONObject(line);
 			JSONArray jl = jobj.getJSONArray("data");
+			//System.out.println("GOT_WEAT["+jl.length()+"]: " + line);
+
 			for (int i=0;i<jl.length();i++) {
 				JSONObject we = jl.getJSONObject(i);
 				String state_code = RestUtil.getJStr(we, "state_code"); // "state_code":"VA"
 				String country_code = RestUtil.getJStr(we, "country_code"); // "country_code":"US"
 				String city_name = RestUtil.getJStr(we, "city_name"); // "city_name":"Blackstone"
 				String timezone = RestUtil.getJStr(we, "timezone"); // "timezone":"America/New_York"
-				//solar_rad 774.1
-				//snow: 0
-				// "uv":7.59013,
+
+				int uv = RestUtil.getInt(we, "uv"); // "rh":18
+				int solar_rad = RestUtil.getInt(we, "solar_rad"); // "rh":18
 				int rh = RestUtil.getInt(we, "rh"); // "rh":18
 				int vis = RestUtil.getInt(we, "vis"); // "vis":10  > kilometer
 				
@@ -187,20 +188,17 @@ public class RestExample {
 				String wind_cdir_full = RestUtil.getJStr(we, "wind_cdir_full"); // "wind_cdir_full":"west"
 				double app_temp = RestUtil.getDouble(we, "app_temp"); // "app_temp":26.75
 				double temp = RestUtil.getDouble(we, "temp"); // "temp":28.1
-
 				String precip = RestUtil.getJStr(we, "precip"); // "precip":"??"
-				//String precip3h = RestUtil.getJStr(jobj, "precip3h"); // "precip3h":"??"
-				int clouds = RestUtil.getInt(we, "clouds"); // "clouds":0
-				
+				int clouds = RestUtil.getInt(we, "clouds"); // "clouds":0				
+				int snow = RestUtil.getInt(we, "snow"); // "clouds":0				
 				String sunrise = RestUtil.getJStr(we, "sunrise"); //"sunrise":"09:52:17"
-				String sunset = RestUtil.getJStr(we, "precip"); // "sunset":"00:27:46"
+				String sunset = RestUtil.getJStr(we, "sunset"); // "sunset":"00:27:46"
+				int aqi = RestUtil.getInt(we, "aqi"); //"aqi":35  -> air quality
+
 				// weather / description "clear sky"
 				JSONObject weather = we.getJSONObject("weather");
 				String conditions = null;
-				if (weather != null) conditions = RestUtil.getJStr(we, "description");
-				
-				int aqi = RestUtil.getInt(we, "aqi"); //"aqi":35  -> air quality
-
+				if (weather != null) conditions = RestUtil.getJStr(weather, "description");
 				
 				info = new HashMap<>();
 				info.put("country_code", country_code);
@@ -211,13 +209,17 @@ public class RestExample {
 				info.put("sunrise", sunrise);
 				info.put("sunset", sunset);
 				
-				info.put("precipitation", precip);
-				info.put("aqi", aqi);
-				info.put("temperature", temp);
-				info.put("app_temperature", app_temp);
-				info.put("visibility", vis);
+				info.put("precipitation", ""+precip);
+				info.put("aqi", ""+aqi);
+				info.put("rh", ""+rh);
+				info.put("uv", ""+uv);
+				info.put("solar_radiation", ""+solar_rad);
+				info.put("temperature", ""+temp);
+				info.put("app_temperature", ""+app_temp);
+				info.put("visibility", ""+vis);
 				info.put("wind", wind_cdir_full + " " + wind_spd);
 				info.put("clouds", ""+clouds);
+				info.put("snow", ""+snow);
 				info.put("conditions", conditions);
 
 				// just the first one
@@ -227,9 +229,9 @@ public class RestExample {
 		} catch (Throwable tt) {
 			tt.printStackTrace();
 		}	
-
 		return info;
 	}
+    
     
     // GET MOVIE LIST 
     // https://rapidapi.com/apidojo/api/imdb8 (500 per month)
@@ -377,7 +379,7 @@ public class RestExample {
 
 		////////////////////////////////////
 		// get externa info
-		HashMap<String, Object> winfo = getWeatherInfo(key, lon, lat);		
+		HashMap<String, String> winfo = getWeatherInfo(key, lon, lat);		
 		
 		////////////////////////////////////
 		// MAP output params FOR SINGLE OBJECT

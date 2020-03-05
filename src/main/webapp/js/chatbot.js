@@ -179,7 +179,7 @@ $(document).ready(function() {
 			return;
 		}
 		var pi = $("#set_poll_interval").val();
-		scsUpdateSettings(u, p, sak, pi, function(data) {
+		scsUpdateSettings(u, p, sak, pi, shost, function(data) {
 			getSettings();
 			$("#update_settings_bt").click();
 		});
@@ -478,12 +478,13 @@ function scsGetSettings(cb) {
 	});
 }
 
-function scsUpdateSettings(username, password, sedro_access_key, poll_interval, cb) {	
+function scsUpdateSettings(username, password, sedro_access_key, poll_interval, sedro_host, cb) {	
 	var dat = "{ "; 
     if (username) dat += "\"username\": \"" + username + "\"";
     if (password) dat += ", \"password\": \"" + password + "\"";
     if (poll_interval) dat += ", \"poll_interval\": \"" + poll_interval + "\"";
     if (sedro_access_key) dat += ", \"sedro_access_key\": \"" + sedro_access_key + "\"";
+    if (sedro_host) dat += ", \"sedro_host\": \"" + sedro_host + "\"";
     dat += "}";
 	
 	$.ajax({url: "/api/1.0/settings", type: 'POST', async: true, data: dat, contentType: 'application/json', 

@@ -383,6 +383,7 @@ public class SCSedro {
 			} catch (Throwable t) {}
 		} catch (JSONException e) {
 			e.printStackTrace();
+			System.out.println("RESP: " + resp);
 		}
 
 		return rl;

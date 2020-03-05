@@ -134,11 +134,12 @@ public class RestAPI {
 		if (!rr.isAuth()) return rr.ret(401);
 		SCServer cs = SCServer.getChatServer();
 
-		String sedro_access_key = null, username = null, password = null, poll_interval = null;
+		String sedro_access_key = null, sedro_host = null, username = null, password = null, poll_interval = null;
 
 		try {
 			JSONObject obj = new JSONObject(body);
 			sedro_access_key = RestUtil.getJStr(obj, "sedro_access_key");
+			sedro_host = RestUtil.getJStr(obj, "sedro_host");
 			poll_interval = RestUtil.getJStr(obj, "poll_interval");
 			username = RestUtil.getJStr(obj, "username");
 			password = RestUtil.getJStr(obj, "password");			
@@ -148,9 +149,11 @@ public class RestAPI {
 		if (!RestUtil.paramHave(password)) password = null;
 		if (!RestUtil.paramHave(username)) username = null;
 		if (!RestUtil.paramHave(sedro_access_key)) sedro_access_key = null;
+		if (!RestUtil.paramHave(sedro_host)) sedro_host = null;
 		if (!RestUtil.paramHave(poll_interval)) poll_interval = null;
 		if (password != null) cs.setPassword(password);
 		if (username != null) cs.setUsername(username);
+		if (sedro_host != null) cs.setSedro_host(sedro_host);
 		if (sedro_access_key != null) cs.setSedro_access_key(sedro_access_key);
 		if (poll_interval != null) {
 			cs.setPoll_interval(Sutil.toInt(poll_interval));
