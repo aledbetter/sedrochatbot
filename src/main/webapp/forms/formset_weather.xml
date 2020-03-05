@@ -1,5 +1,6 @@
 <doc>
 	<!-- http://localhost:8081/forms/formset_weather.xml -->
+	
 	<!-- The DATA we get -->	
 	<form name='location weather' data-type='dataform' data-link='location=possesses'>
 		<input name="location" data-type="input"/>
@@ -15,8 +16,16 @@
 	
 	<!-- input -->
 	<form name='location' data-type='dataform'>
-		<input name="latitude" data-type="input"/>
-		<input name="longitude" data-type="input"/>
+		<input name="latitude" data-type="input" value="%caller/latitude%"/>
+		<input name="longitude" data-type="input" value="%caller/longitude%"/>
+	</form>
+	
+	<!-- FORM to show the weather -->
+	<form name='_show_weather_' data-type='form' >
+		<input name="weather sum" data-type="content" />
+		<label for="weather sum" state='wake'>Currently it is %current:location weather/conditions% in %current:location weather/location%</label>			
+		<input name="weather sum1" data-type="content" />
+		<label for="weather sum1" state='wake'>Sunrise is at %current:location weather/sunrise%</label>	
 	</form>
 	
 	<!-- Explicit get and show -->
@@ -27,13 +36,7 @@
 		
 		<input name="show report" data-type="form" data-formname="_show_weather_" data-task-name='weather report'/>	
 	</form>
-<!-- 
-FIXME: how to show info in action form after getting it. 
-	- want multiple follow on comments
-FIXME: how to have task with followon subtask (get then show)
-	- like followup but imidiatly
-	
- -->	
+
 	<!-- Casual get and show -->
 	<form name='weather' role='action' data-type='action' data-object-type='thing' data-ref="caller's weather">
 		<input name="intro" data-type="comment"/>
@@ -45,16 +48,9 @@ FIXME: how to have task with followon subtask (get then show)
 			data-ability='status, is, get, tell'
 			data-followup='weather report'
 			data-posturl='http://localhost:8080/api/1.0/test/weather'/>
-		<label for="read" state='done'>The weather is %current:location weather/conditions%</label>
 	</form>
 	
-	<!-- FORM to just show the weather -->
-	<form name='_show_weather_' data-type='form' >
-		<input name="weather sum" data-type="content" />
-		<label for="weather sum" state='wake'>Currently it is %current:location weather/conditions% in %current:location weather/location%</label>			
-		<input name="weather sum1" data-type="content" />
-		<label for="weather sum1" state='wake'>Sunrise is at %current:location weather/sunrise%</label>	
-	</form>
+
 	
 	<!-- Wake from background to tell the weather -->
 	<form name='_weather_invoke_' data-type='form' >
@@ -82,7 +78,7 @@ FIXME: how to have task with followon subtask (get then show)
 
 
 	<!-- Bot: Could do more but mostly is weather -->
-	<form name='_taskbot_' role='main' data-type='form'>
+	<form name='_weather_taskbot_' role='main' data-type='form'>
 		<input name="intro" data-type="intro"/>
 		<label for="intro" state='wake'>Good %_time_period_of_day% how can I help you?</label>
 

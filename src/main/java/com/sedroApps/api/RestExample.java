@@ -235,7 +235,7 @@ public class RestExample {
     
     // GET MOVIE LIST 
     // https://rapidapi.com/apidojo/api/imdb8 (500 per month)
-    public static List<HashMap<String, String>> getMovieList(String key, String qstr) { 
+    public List<HashMap<String, String>> getMovieList(String key, String qstr) { 
     	if (key == null || qstr == null || qstr.isEmpty()) return null;
 		
 		String rapidapi_host = "imdb8.p.rapidapi.com";
@@ -260,10 +260,19 @@ public class RestExample {
 			JSONArray jl = jobj.getJSONArray("results");
 			for (int i=0;i<jl.length();i++) {
 				JSONObject we = jl.getJSONObject(i);
+
+				
 				String id = RestUtil.getJStr(we, "id"); // "id":"/title/tt6857128/"
 				String title = RestUtil.getJStr(we, "title"); // "title":"Unaired Game of Thrones Prequel Pilot"
-				System.out.println("  opt: " + title);
+				if (title == null) continue; // ignore the people list after
+				//System.out.println("  opt: " + title);
 				String titleType = RestUtil.getJStr(we, "titleType"); // "titleType":"tvMovie"
+				//"nextEpisode": "/title/tt0070816/",
+				//"numberOfEpisodes": 23,
+				//"seriesEndYear": 1974,
+				//"seriesStartYear": 1973,				
+				
+				
 				int year = RestUtil.getInt(we, "year"); // "year":2019
 				int runningTimeInMinutes = RestUtil.getInt(we, "runningTimeInMinutes"); //"runningTimeInMinutes":127
 				String image_url = null, primp = null, role = null;
@@ -429,7 +438,7 @@ public class RestExample {
 
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	// Get Weather via form
+	// Get Movies via form
 	@POST
 	@Path("/movies")
 	public String getMoviesPOST(@Context UriInfo info, 
@@ -437,22 +446,24 @@ public class RestExample {
     		@CookieParam("atok") String cookie_access_key, 
     		String body) {
 
-		//System.out.println("TEST_FORM_GET_POST: " + body);		
+		//System.out.println("MOVIES: " + body);		
+		
 		JSONObject obj = null, fobj = null;
 		JSONArray elem = null, relem = null;
 		String qstr = null;
+		String fname = null;
 		
 		try {
 			obj = new JSONObject(body);
 			fobj = obj.getJSONObject("form");
 			elem = fobj.getJSONArray("elements");			
 			try {
+			fname = fobj.getString("name");
 			String persona = obj.getString("persona");
 			String chid = obj.getString("chid");
 			String caller_token = obj.getString("ctok");
 			String ctype = obj.getString("type");
 			String lang = obj.getString("lang");
-			String fname = fobj.getString("name");
 			} catch (Throwable t) {}
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -472,7 +483,7 @@ public class RestExample {
 			if (name.equals("title")) qstr = val;
 		}
 		} catch (Throwable t) {}
-
+		//System.out.println("SEACH["+fname+"]: " + qstr);
 
 		// get the KEY
 		String key = SCServer.getChatServer().getSedro_access_key();
@@ -485,48 +496,64 @@ public class RestExample {
 		// MAP output params FOR SINGLE OBJECT
 		// OPTION 1: only what they ask for
 		// OPTION 2: everything  we have
-		try {		
-			JSONArray nfl = new JSONArray();
+	    int formcount = 0;
+	    if (ml != null && ml.size() > 0) {
+			try {		
+				JSONArray nfl = new JSONArray();	
+				elem = fobj.getJSONArray("elements");
+				
+				for (HashMap<String, String> winfo:ml) {
+					JSONObject nf = new JSONObject();
+					nf.put("name", fname);
+					nf.put("id", ""+(formcount+1));
 
-			elem = fobj.getJSONArray("elements");
-			
-			for (HashMap<String, String> winfo:ml) {
-				// for each
-				JSONObject nf = new JSONObject();	
-				for (int i=0;i<elem.length();i++) {
-					JSONObject eo = elem.getJSONObject(i);	
-					try {
-					String name = RestUtil.getJStr(eo, "name");
-					nf.put("name", name);
-					//System.out.println("   ELEM: "+fname+"/"+name+" t:"+type);					
-					String val = null;
-					String val2 = null;
-					if (winfo.get(name) != null) {
-						val = (String)winfo.get(name);
-						if (winfo.get(name+"2") != null) val2 = (String)winfo.get(name+"2");
+					JSONArray nelem = new JSONArray();	
+					nf.put("elements", nelem);
+					for (int i=0;i<elem.length();i++) {
+						JSONObject eo = elem.getJSONObject(i);	
+						try {
+						String name = RestUtil.getJStr(eo, "name");
+						JSONObject nef = new JSONObject();
+
+						nef.put("name", name);
+						//System.out.println("   ELEM["+name+"] t:"+type);					
+						String val = null;
+						String val2 = null;
+						if (winfo.get(name) != null) {
+							val = (String)winfo.get(name);
+							if (winfo.get(name+"2") != null) val2 = (String)winfo.get(name+"2");
+						}
+						if (val != null) nef.put("val", val);
+						if (val2 != null) nef.put("val2", val2);
+						nelem.put(nef);
+
+						} catch (Throwable t) {}
 					}
-					if (val != null) nf.put("val", val);
-					if (val2 != null) nf.put("val2", val2);
-					} catch (Throwable t) {}
+					
+					// add to formList
+					nfl.put(nf);
+					formcount++;
 				}
-				// add to form
-				nfl.put(nf);
-			}
-			// remove old param set, add new list
-			obj.remove("form");
-			obj.put("form", nfl);
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}	
-
+				// remove old param set, add new list
+				obj.put("forms", nfl);
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}	
+	    }
 		////////////////////////////////////
 		// CLEAN UP RESPONSE
 		try {	
+			obj.remove("form");
+			obj.put("type", "data");
+			// pagination info... always one page here
+			obj.put("count", ""+formcount);
+			obj.put("start", "1");
+			obj.put("end", ""+(formcount+1));
+			
 			obj.remove("ctok");
 			obj.remove("lang");
 			obj.remove("db_id");
 			obj.remove("type");
-			obj.put("type", "data");
 			obj.remove("request");
 		} catch (Throwable t) {}	
 		
@@ -536,8 +563,6 @@ public class RestExample {
 		}		
 		return null;
 	}	
-	
-
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
