@@ -3,7 +3,7 @@
 	
 	<!-- The DATA we get -->	
 	<form name='location weather' data-type='dataform' data-link='location=possesses'>
-		<input name="location" data-type="input"/>
+		<input name="location" data-type="input" data-thought="no"/>
 		<input name="sunrise" data-type="input" data-alias='sunrise time'/>
 		<input name="sunset" data-type="input" data-alias='sunset time'/>
 		<input name="precipitation" data-type="input"/>
@@ -23,7 +23,7 @@
 	<!-- FORM to show the weather -->
 	<form name='_show_weather_' data-type='form' >
 		<input name="weather sum" data-type="content" />
-		<label for="weather sum" state='wake'>Currently it is %current:location weather/conditions% in %current:location weather/location%</label>			
+		<label for="weather sum" state='wake'>Currently it is %current:location weather/conditions% %current:location weather/temperature% and in %current:location weather/location%</label>			
 		<input name="weather sum1" data-type="content" />
 		<label for="weather sum1" state='wake'>Sunrise is at %current:location weather/sunrise%</label>	
 	</form>
@@ -31,22 +31,20 @@
 	<!-- Explicit get and show -->
 	<form name='_getweather_' data-type='form'>
 		<!-- for location weather a request form OR here with longitude/latitued could be added -->
-		<input name="get_weather" data-type="post" data-req-formname='location' data-resp-formname='location weather' data-posturl='http://localhost:8080/api/1.0/test/weather'/>
-		<label for="get_weather" state='incomplete'>Still waiting for the weather service</label>
-		
-		<input name="show report" data-type="form" data-formname="_show_weather_" data-task-name='weather report'/>	
+		<input name="get_weather" data-type="post" data-req-formname='location' data-resp-formname='location weather' data-posturl='http://localhost:8080/api/1.0/test/weather'/>		
+		<input name="show report" data-type="form" data-formname="_show_weather_" data-task='weather report'/>	
 	</form>
 
-	<!-- Casual get and show -->
+	<!-- ACTION -->
 	<form name='weather' role='action' data-type='action' data-object-type='thing' data-ref="caller's weather">
 		<input name="intro" data-type="comment"/>
-		<label for="intro" state='wake'>I am %current/cmd_action% the %current/cmd_object_instance%</label>
+		<label for="intro" state='wake'>Getting the current weather</label>
 		
 		<input name="status" data-type="input"/>			
-		<input name="read" data-crmd='read' data-type="post" data-formname='location weather' 
-			data-task-name='show weather'
-			data-ability='status, is, get, tell'
-			data-followup='weather report'
+		<input name="read" data-crmd='read' data-type="post"
+			data-req-formname='location' data-resp-formname='location weather' 
+			data-task='show weather' data-task-followup='weather report'
+			data-ability='is, get, tell'			
 			data-posturl='http://localhost:8080/api/1.0/test/weather'/>
 	</form>
 	
@@ -54,7 +52,8 @@
 	
 	<!-- Wake from background to tell the weather -->
 	<form name='_weather_invoke_' data-type='form' >
-		<input name="listen" data-type="invoke" data-seq="the/my:% X:weather:%"/>				
+		<input name="listen" data-type="invoke" data-seq="the/my:% X:weather:%"/>	
+					
 		<input name="intro" data-type="content" />
 		<label for="intro" state='wake'>Getting the current weather</label>	
 		
@@ -75,7 +74,6 @@
 			
 		<input name="bye" data-type="event" data-event='bye'/>
 	</form>
-
 
 	<!-- Bot: Could do more but mostly is weather -->
 	<form name='_weather_taskbot_' role='main' data-type='form'>

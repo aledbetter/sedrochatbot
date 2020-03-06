@@ -4,46 +4,34 @@
 	<!-- The DATA we get -->	
 	<form name='show information' data-type='dataform' data-link='show=possesses'>
 		<input name="title" data-type="input"/>
-		<input name="title_type" data-type="input" data-alias='show type'/>
+		<input name="title_type" data-type="input" data-thought="alias" data-alias='show type'/>
 		<input name="year" data-type="input" data-alias='year released'/>
-		<input name="length" data-type="input"/>		
-		<input name="image" data-type="input"/>
-		<input name="image_width" data-type="input"/>
-		<input name="image_height" data-type="input"/>
-		<input name="person_name" data-type="input"/>
-		<input name="person_role" data-type="input"/>
+		<input name="length" data-type="input" data-alias='run time'/>		
+		<input name="image" data-type="input" data-thought="no"/>
+		<input name="image_width" data-type="input" data-thought="no"/>
+		<input name="image_height" data-type="input" data-thought="no"/>
+		<input name="person_name" data-type="input" data-thought="alais" data-alias='with person'/>
+		<input name="person_role" data-type="input" data-thought="no"/>
 	</form>
 	
 	<!-- FORM to show a show -->
 	<form name='_show_show_' data-type='form' >
 		<input name="show sum" data-type="content" />
-		<label for="show sum" state='wake'>Show: %current:show information/title% from %current:show information/year%</label>			
+		<label for="show sum" state='wake'>Show: %iterator:get_shows/title% from %iterator:get_shows/year%</label>			
 		<input name="show sum1" data-type="content" />
-		<label for="show sum1" state='wake'>With %current:show information/person_role% %current:show information/person_name%</label>	
+		<label for="show sum1" state='wake'>With %iterator:get_shows/person_role% %iterator:get_shows/person_name%</label>	
 	</form>
-<!-- 
-set itorator number, resolve in resolvePhraseSelector()
-%iterator:show information/
 
-need iterator <input> must access name/start/end
-
-- save must retain: name, start, end
- -->	
-	
 	<!-- Test external data use -->
 	<form name='_getmovies_' data-type='form'>
 	<!-- FIXME get multiple tokens... -->	
 		<input name="title" data-type="input" data-seq="X:%any%:%"/>
 		<label for="title" state='wake'>What show would you like to find?</label>
 		<label for="title" state='incomplete'>I didn't get that</label>
-		<label for="title" state='complete'>Finding what I can...</label>
+		<label for="title" state='complete' data-post-wait='1'>Finding what I can...</label>
 		
  		<input name="get_shows" data-type="post" data-resp-formname='show information' data-posturl='http://localhost:8080/api/1.0/test/movies'/>
-		<label for="get_shows" state='incomplete'>Still waiting for the movie service</label>
-<!-- FIXME show list: 1, first N, or ALL 
-set of forms saved ?
--->		
-		<input name="show show" data-type="form" data-formname="_show_show_" data-task-name='show results'/>	 
+		<input name="show shows" data-tag='get_shows' data-iterate='all' data-type="form" data-formname="_show_show_" data-task='show results'/>	 
 	</form>
 	
 	<!-- Casual get and show -->
@@ -54,7 +42,7 @@ set of forms saved ?
 		
 		<input name="status" data-type="input"/>			
 		<input name="read" data-crmd='read' data-type="post" data-formname='show information' 
-			data-task-name='find shows'
+			data-task='find shows'
 			data-ability='find'
 			data-followup='show results'
 			data-posturl='http://localhost:8080/api/1.0/test/movies'/>
