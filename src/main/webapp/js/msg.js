@@ -104,8 +104,7 @@ $(document).ready(function() {
 	function pollChidBase(init) {
 		if (glob_chid == null) return; // end
 	    if (!(anz_in_progress || init)) {
-		    anz_in_progress = false;
-			postChatPoll(g_tenant, glob_chid, chatHandler);
+	    	pollChatMsg();
 	    }
         setTimeout(pollChid, 1000*30); // poll every 30 seconds
 	}
@@ -295,6 +294,12 @@ var chatHandler = function (words, resp) {
 	processMsgs("#interact_msg");
 }
 
+//do the poll for new messages
+function pollChatMsg() {
+	if (anz_in_progress) return;
+    anz_in_progress = false;
+	postChatPoll(g_tenant, glob_chid, chatHandler);
+}
 
 function addRemoteMsg(msg) {
 	var cmsg = "<div class='s_msg' data-num='"+msg.num+"' data-qn='"+msg.qn+"' data-event='"+msg.event+"' data-time='"+msg.time+" 'data-from='"+msg.from+"' ";
@@ -316,12 +321,17 @@ function processMsgs(tag) {
 	waitPreWriteMessage(tag, m);
 }
 function waitPreWriteMessage(tag, msg) {
-	if (msg.msg != null && msg.pre_wait > 0) {
-		$(tag).append("<div class='s_msg s_typeing' style='font-weight:bold'>...</div>");
+	if (msg.pre_wait > 0) {
+		var mt = "...";
+		if (msg.event == 'typing' && msg.msg != null) mt = msg.msg;
+		$(tag).append("<div class='s_msg s_typeing' style='font-weight:bold'>"+msg+"</div>");
 		$("#interact_msg").scrollTop($("#interact_msg")[0].scrollHeight);
 	} 
-
     setTimeout(function () {	
+		if (msg.event == 'typing') {												
+			pollChatMsg();	// make callback 
+			return;
+		}
 		if (msg.msg != null) {
 			$(tag + " .s_typeing").hide();
 			$(tag).append(msg.msg); // write message

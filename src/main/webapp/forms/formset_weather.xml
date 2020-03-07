@@ -37,9 +37,6 @@
 
 	<!-- ACTION -->
 	<form name='weather' role='action' data-type='action' data-object-type='thing' data-ref="caller's weather">
-		<input name="intro" data-type="comment"/>
-		<label for="intro" state='wake'>Getting the current weather</label>
-		
 		<input name="status" data-type="input"/>			
 		<input name="read" data-crmd='read' data-type="post"
 			data-req-formname='location' data-resp-formname='location weather' 
@@ -53,12 +50,9 @@
 	<!-- Wake from background to tell the weather -->
 	<form name='_weather_invoke_' data-type='form' >
 		<input name="listen" data-type="invoke" data-seq="the/my:% X:weather:%"/>	
-					
 		<input name="intro" data-type="content" />
 		<label for="intro" state='wake'>Getting the current weather</label>	
-		
 		<input name="weather report" data-type="form" data-formname="_getweather_"/>
-			
 		<input name="background" data-type="event" data-event='background_reset' />
 	</form>
 
@@ -70,7 +64,7 @@
 		<input name="weather report" data-type="form" data-formname="_getweather_"/>
 		
 		<input name="outro" data-type="outro" />
-		<label for="outro" state='wake'>Good bye</label>
+		<label for="outro" state='wake' data-pre-wait='10' data-post-wait='10'>Good bye</label>
 			
 		<input name="bye" data-type="event" data-event='bye'/>
 	</form>

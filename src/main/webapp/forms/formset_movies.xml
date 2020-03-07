@@ -14,52 +14,45 @@
 		<input name="person_role" data-type="input" data-thought="no"/>
 	</form>
 	
-	<!-- FORM to show a show -->
+	<!-- FORM to show a shows -->
 	<form name='_show_show_' data-type='form' >
 		<input name="show sum" data-type="content" />
-		<label for="show sum" state='wake'>Show: %iterator:get_shows/title% from %iterator:get_shows/year%</label>			
-		<input name="show sum1" data-type="content" />
-		<label for="show sum1" state='wake'>With %iterator:get_shows/person_role% %iterator:get_shows/person_name%</label>	
+		<label for="show sum" state='wake'>Show: %iterator:get_shows/title% from %iterator:get_shows/year%, with %iterator:get_shows/person_role% %iterator:get_shows/person_name%</label>	
 	</form>
 
-	<!-- Test external data use -->
-	<form name='_getmovies_' data-type='form'>
-	<!-- FIXME get multiple tokens... -->	
-		<input name="title" data-type="input" data-seq="X:%any%:%"/>
+	<!-- request input -->
+	<form name='_get_request_' data-type='form'>
+		<input name="title" data-type="input" data-task='get request' data-seq="[SENTENCE]"/>
 		<label for="title" state='wake'>What show would you like to find?</label>
 		<label for="title" state='incomplete'>I didn't get that</label>
-		<label for="title" state='complete' data-post-wait='1'>Finding what I can...</label>
+	</form>
+	
+	<!-- Explicit get and show -->
+	<form name='_getmovies_' data-type='form'>		
+		<input name="get_req" data-type="form" data-formname="_get_request_"/>	
+						
+ 		<input name="get_shows" data-type="post" data-async="true" data-req-formname='_get_request_' data-resp-formname='show information' data-posturl='http://localhost:8080/api/1.0/test/movies'/>
+		<label for="get_shows" state='wake' data-msg-event='typing' data-pre-wait='30'>Finding what I can...</label>
 		
- 		<input name="get_shows" data-type="post" data-resp-formname='show information' data-posturl='http://localhost:8080/api/1.0/test/movies'/>
 		<input name="show shows" data-tag='get_shows' data-iterate='all' data-type="form" data-formname="_show_show_" data-task='show results'/>	 
 	</form>
 	
-	<!-- Casual get and show -->
+	<!-- ACTION -->
 	<form name='show' role='action' data-type='action' data-object-type='thing'>
-<!-- FIXME input setup? -->	
-		<input name="intro" data-type="comment"/>
-		<label for="intro" state='wake'>I am %current/cmd_action% the %current/cmd_object_instance%</label>
-		
 		<input name="status" data-type="input"/>			
-		<input name="read" data-crmd='read' data-type="post" data-formname='show information' 
-			data-task='find shows'
-			data-ability='find'
-			data-followup='show results'
+		<input name="read" data-crmd='read' data-type="post" 
+			data-resp-formname='show information'  
+			data-prerequisite='get request' data-task='find shows' data-followup='show results'
+			data-ability='find, get, lookup, search'
 			data-posturl='http://localhost:8080/api/1.0/test/movies'/>
 	</form>
 
 
 
-
-	<!-- Wake from background to tell the weather -->
+	<!-- Wake from background to find stuff -->
 	<form name='_show_invoke_' data-type='form' >
 		<input name="listen" data-type="invoke" data-seq="find:% X:show/shows/movie/movies:%"/>				
-		
-		<input name="intro" data-type="content" />
-		<label for="intro" state='wake'>Getting the shows</label>	
-		
-		<input name="show list" data-type="form" data-formname="_getmovies_"/>
-			
+		<input name="show list" data-type="form" data-formname="_getmovies_"/>			
 		<input name="background" data-type="event" data-event='background_reset' />
 	</form>
 
@@ -68,8 +61,8 @@
 		<input name="show list" data-type="form" data-formname="_getmovies_"/>
 		
 		<input name="outro" data-type="outro" />
-		<label for="outro" state='wake'>Good bye</label>
-			
+		<label for="outro" state='wake' data-pre-wait='20' data-post-wait='10'>Good bye</label>
+	
 		<input name="bye" data-type="event" data-event='bye'/>
 	</form>
 
@@ -79,7 +72,7 @@
 		<input name="intro" data-type="intro"/>
 		<label for="intro" state='wake'>Good %_time_period_of_day% how can I help you?</label>
 
-		<input name="taskset" data-type="tasks" data-task-show='weather report' />	
+		<input name="taskset" data-type="tasks" data-task-show='find shows' />	
 		<label for="taskset" state='wake' data-pre-wait='10'>What can I help you with this %_time_period_of_day%?</label>
 		<label for="taskset" state='wake' data-channel='sms'>What do you want this time?</label>
 		<label for="taskset" state='verify' data-pre-wait='10'>Now that %_last_task% is %_last_outcome%, is there anything else I can help you with?</label>
