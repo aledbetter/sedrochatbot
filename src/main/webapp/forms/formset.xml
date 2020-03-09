@@ -124,7 +124,7 @@
 		<label for="modify" state='done'>Updated, the light is now %current/status%</label>
 		
 		<input name="on" data-crmd='modify' data-task='kitchen light on'
-			data-task-prerequisit='account test' 
+			data-task-pre='account test' 
 			data-ability='turn, raise, flip, toggle, switch'
 			data-state='on, bright, open'
 			data-status-value='10' data-status-op='set'
@@ -247,7 +247,7 @@
 		<label for="taskset" state='wake' data-channel='sms'>What do you need?</label>
 		<label for="taskset" state='verify' data-pre-wait='10'>Now that %_last_task% is %_last_outcome%, is there anything else I can help you with?</label>
 		<label for="taskset" state='canceled' data-pre-wait='6'>Is there anything else I can help you with?</label>
-		<label for="taskset" state='prerequisit' data-post-wait='20'>First we will need to %_next_task% now as well?</label>
+		<label for="taskset" state='task_pre' data-post-wait='20'>First we will need to %_next_task% now as well?</label>
 		<label for="taskset" state='recommend'>Perhaps you would like to %_recomend% now as well?</label>
 		<label for="taskset" state='complete' data-post-wait='30'>That was interesting</label>
 

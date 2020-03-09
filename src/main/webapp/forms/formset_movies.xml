@@ -22,14 +22,14 @@
 
 	<!-- request input -->
 	<form name='_get_request_' data-type='form'>
-		<input name="title" data-type="input" data-task='get request' data-seq="[SENTENCE]"/>
+		<input name="title" data-type="input" data-seq="[SENTENCE]"/>
 		<label for="title" state='wake'>What show would you like to find?</label>
 		<label for="title" state='incomplete'>I didn't get that</label>
 	</form>
 	
 	<!-- Explicit get and show -->
 	<form name='_getmovies_' data-type='form'>		
-		<input name="get_req" data-type="form" data-formname="_get_request_"/>	
+		<input name="get_req" data-type="form" data-task='get request' data-formname="_get_request_"/>	
 						
  		<input name="get_shows" data-type="post" data-async="true" data-req-formname='_get_request_' data-resp-formname='show information' data-posturl='http://localhost:8080/api/1.0/test/movies'/>
 		<label for="get_shows" state='wake' data-msg-event='typing' data-pre-wait='30'>Finding what I can...</label>
@@ -38,25 +38,27 @@
 	</form>
 	
 	<!-- ACTION -->
-	<form name='show' role='action' data-type='action' data-object-type='thing'>
+	<form name='show' role='action' data-type='action' data-object-type='thing'
+			data-synonym='film, movie, TV show'>
 		<input name="status" data-type="input"/>			
-		<input name="read" data-crmd='read' data-type="post" 
-			data-resp-formname='show information'  
-			data-prerequisite='get request' data-task='find shows' data-followup='show results'
-			data-ability='find, get, lookup, search'
+		<input name="get_shows" data-type="post" data-async="true"
+			data-req-formname='_get_request_' data-resp-formname='show information'  
+			data-task-pre='get request' data-task='find shows' data-task-post='show results'
+			data-ability='find, get, lookup, search, list'
 			data-posturl='http://localhost:8080/api/1.0/test/movies'/>
+		<label for="get_shows" state='wake' data-msg-event='typing' data-pre-wait='30'>Finding what I can...</label>
 	</form>
 
 
 
-	<!-- Wake from background to find stuff -->
+	<!-- Bot: Wake from background to find stuff -->
 	<form name='_show_invoke_' data-type='form' >
 		<input name="listen" data-type="invoke" data-seq="find:% X:show/shows/movie/movies:%"/>				
 		<input name="show list" data-type="form" data-formname="_getmovies_"/>			
 		<input name="background" data-type="event" data-event='background_reset' />
 	</form>
 
-	<!-- Bot (or sub element) that just gets the weather -->
+	<!-- Bot: (or sub element) that just gets the weather -->
 	<form name='_show_bot_' data-type='form'>
 		<input name="show list" data-type="form" data-formname="_getmovies_"/>
 		
@@ -65,7 +67,6 @@
 	
 		<input name="bye" data-type="event" data-event='bye'/>
 	</form>
-
 
 	<!-- Bot: Could do more but mostly is weather -->
 	<form name='_show_taskbot_' role='main' data-type='form'>

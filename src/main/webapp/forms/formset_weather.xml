@@ -38,9 +38,9 @@
 	<!-- ACTION -->
 	<form name='weather' role='action' data-type='action' data-object-type='thing' data-ref="caller's weather">
 		<input name="status" data-type="input"/>			
-		<input name="read" data-crmd='read' data-type="post"
+		<input name="read" data-type="post"
 			data-req-formname='location' data-resp-formname='location weather' 
-			data-task='show weather' data-task-followup='weather report'
+			data-task='show weather' data-task-post='weather report'
 			data-ability='is, get, tell'			
 			data-posturl='http://localhost:8080/api/1.0/test/weather'/>
 	</form>
