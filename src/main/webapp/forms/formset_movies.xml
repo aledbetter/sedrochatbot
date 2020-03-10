@@ -44,7 +44,7 @@
 		<input name="get_shows" data-type="post" data-async="true"
 			data-req-formname='_get_request_' data-resp-formname='show information'  
 			data-task-pre='get request' data-task='find shows' data-task-post='show results'
-			data-ability='find, get, lookup, search, list'
+			data-ability='find, get, look up, search, list'
 			data-posturl='http://localhost:8080/api/1.0/test/movies'/>
 		<label for="get_shows" state='wake' data-msg-event='typing' data-pre-wait='30'>Finding what I can...</label>
 	</form>
