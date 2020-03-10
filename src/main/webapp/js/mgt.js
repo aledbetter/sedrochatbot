@@ -417,7 +417,6 @@ function addPersonaForm() {
 	var ctx = $("#ctx").val();
 
 	var ftype = $("#form_type").val(); // select
-	var fmain = $("#form_main").val(); // select
 	var persona = $("#form_persona").val();
 	var fcontent = $("#form_content").val();
 
@@ -438,7 +437,7 @@ function addPersonaForm() {
 			return;
 		}
 		// do it
-		sedroPersonaAddForm(ctx, persona, fcontent, ftype, fmain, function (rctx, persona, data) {
+		sedroPersonaAddForm(ctx, persona, fcontent, ftype, function (rctx, persona, data) {
 			if (data) {
 				//$("#xpool_action").html("removed persona form: " + rctx + " / " + persona);
 				getTenant();
