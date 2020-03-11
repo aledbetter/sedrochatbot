@@ -57,6 +57,7 @@
 		<label for="account number" state='complete'>Retrieving account information...</label>
  
  		<input name="get_account" data-type="post" data-resp-formname="account" data-posturl="http://api.sedro.xyz/api/1.0/depots/testformgetpost"/>
+		<label for="get_account" state='wake' data-msg-event='typing' data-pre-wait='5'>Getting Account...</label>
 		<label for="get_account" state='incomplete'>Still waiting for account information</label>
 		
 		<input name="account holder" data-type="content" />
