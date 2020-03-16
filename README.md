@@ -3,9 +3,20 @@ build and run locally stand alone
 	1. go to base directory of branch, this will build the package with everything in it
 	3. prompt# brew install maven                                          ==> install maven
 	4. prompt# mvn package -Dmaven.test.skip=true                          ==> build and package
-	5. prompt# java -jar target/dependency/jetty-runner.jar target/*.war   ==> should run (classpath issue common for corenlp..)
+	5. prompt# java -jar jetty-runner.jar ./sedroChatbot-1.0.9999.war   ==> should run (classpath issue common for corenlp..)
        prompt# mvn exec:java                                               ==> run as server
        prompt# mvn jetty:run                                               ==> run as reader
+
+
+	1. go to base directory of branch, this will build the package with everything in it
+	2. prompt# brew install maven
+	3. mvn clean
+	4. mvn install
+	5. cd web
+	6. mvn jetty:run
+	   mvn jetty:run -Djetty.port=8081
+	   old: mvn jetty:run -Dhttp.port=8081
+	   old: mvn jetty:run -Djetty.http.port=8081   
 
 build distribution
 
@@ -17,7 +28,7 @@ run distribution
 
 	1) cd target
 	2) unzip sedroChatbot-1.0.9999-bundle.zip 
-	3) java -Xmx3G -jar jetty-runner.jar ./sedroChatbot-1.0.9999.war
+	3) java -jar jetty-runner.jar ./sedroChatbot-1.0.9999.war
 	
 Server pages
 

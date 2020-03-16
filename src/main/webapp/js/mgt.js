@@ -261,7 +261,7 @@ function showTenant(tenant) {
 	hh += "<div class='fLn'>Language: <b>" + tenant.language+"</b></div>";
 	if (tenant.email) hh += "<div class='fLn'>Email: <b>" + tenant.email+"</b></div>";
 	hh += "<div class='fLn'>Subscription: <b>" + tenant.subscription+"</b> ";
-	hh += "&nbsp;&nbsp;&gt;&gt;&nbsp;&nbsp;max persona: <b>" + tenant.max_persona+"</b> max db: <b>" + tenant.max_db+"</b></div>";
+	hh += "&nbsp;&nbsp;&gt;&gt;&nbsp;&nbsp;max persona: <b>" + tenant.max_persona+"</b> max db: <b>" + tenant.max_db+"</b> max session: <b>" + tenant.max_session+"</b></div>";
 	hh += "</div>"
 	
 	var pselect = "";
