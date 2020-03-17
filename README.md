@@ -1,5 +1,4 @@
-
-Sedro Chatbot Server
+# Sedro Chatbot Server
 
 For conversational chatbots, digital assistants and chat interfaces.
 Manage, configure and integrate chatbots for the Sedro Chatbot API. 
@@ -9,15 +8,27 @@ Manage, configure and integrate chatbots for the Sedro Chatbot API.
 - Provides configuration GUI for managing Sedro Personas, Chatbots and testing with Web Chat.
 - Deploy no code chatbots, or extend with Java or your favorite language.
 
+## Sedro Chatbot API documentation
+Documentation on Sedro APIs, examples and live tests can be found at www.sedro.xyz
+API documents
+- http://api.sedro.xyz/api-current#persona
+- http://api.sedro.xyz/api-current#chat
 
-building the Server
+RapidAPI Cloud based Sedro APIs
+- https://rapidapi.com/WORDAPIS/api/inteligent-chatbots
+
+Sedro Blog series on Chatbots
+- http://blog.sedro.xyz/2020/01/21/working-with-persona-forms
+
+
+### building the Server
 
 	1. go to base directory of branch, this will build the package with everything in it
 	2. prompt# brew install maven
 	3. prompt# mvn clean
 	4. prompt# mvn install
 	
-Run locally
+### Run locally
 
 	1. build the server
 	2. prompt# mvn jetty:run
@@ -25,14 +36,14 @@ Run locally
 	4. browser: http://localhost:8081
 	   
 
-Deploy in AWS Elastic Beanstalk
+### Deploy in AWS Elastic Beanstalk
 
 	1. build the server
 	2. create new EBS application with Java 8 on linux
 	3. Add DB to the configuration
 	3. upload target/sedrochatbot-1.0.9999-bundle.zip to elastic beanstalk       
 		
-Data Base
+### Data Base
 	
 	Environment variables
 	RDS_DB_URL 	 - full jdbc url - jdbc:postgresql://<hostname>:<port>/<dbname>
@@ -40,7 +51,7 @@ Data Base
 	RDS_PASSWORD - password
 	ENC_KEY      - data encryption key (16 bytes), default key exists
 	
-Login
+### Login
 	
 	default username: admin
 	default password: admin
