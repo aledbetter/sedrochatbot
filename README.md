@@ -20,6 +20,8 @@ RapidAPI Cloud based Sedro APIs
 Sedro Blog series on Chatbots
 - http://blog.sedro.xyz/2020/01/21/working-with-persona-forms
 
+### built package (click raw)
+- https://github.com/aledbetter/sedrochatbot/blob/master/package/sedrochatbot-1.0.9999-bundle.zip
 
 ### building the Server
 
