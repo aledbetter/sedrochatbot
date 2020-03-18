@@ -53,6 +53,7 @@ public class SCSedro {
 	private String calltime = null;
 	private int tzoffset = -1;
 	private String tzn = null;
+	private int call_count = 0;
 	
 	private int msg_num_last = 0;	
 	private int msg_num = 0;	
@@ -168,6 +169,12 @@ public class SCSedro {
 	public int getMax_qn() {
 		return max_qn;
 	}
+	public void setCall_count(int call_count) {
+		this.call_count = call_count;
+	}
+	public int getCall_count() {
+		return call_count;
+	}
 	
 	private static String getAPIHost() {
 		return SCServer.getChatServer().getSedro_host();
@@ -224,6 +231,7 @@ public class SCSedro {
 		reqData += ", \"persona\": \"" + persona  + "\""; 
 		if (text != null) reqData += ", \"text\": \"" + escape(text) + "\""; 
 		if (caller != null) reqData += ", \"user\": \"" + escape(caller) + "\""; 
+		if (call_count != 0) reqData += ", \"call_count\": \"" + call_count + "\""; 
 	    if (caller_token != null) reqData += ", \"caller_token\": \"" + caller_token + "\""; 
 	    if (context != null) reqData += ", \"context\": \"" + context  + "\""; 
 	    if (language != null) reqData += ", \"language\": \"" + language  + "\""; 

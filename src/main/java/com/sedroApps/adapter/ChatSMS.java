@@ -320,6 +320,8 @@ public class ChatSMS extends ChatAdapter {
 			mm.put("phonenumber", from);
 		//	mm.put("caller_token", status);
 	//		System.out.println(" MSG txt: " + mm.get("msg"));
+// CHECK if return caller... so we can respond as such
+			//mm.put("call_count", from);
 
 			if (msgList == null) msgList = new ArrayList<>();
 			msgList.add(0, mm);
