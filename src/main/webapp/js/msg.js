@@ -143,9 +143,10 @@ $(document).ready(function() {
 		var ctoken = $("#caller_token").val(); 
 		if (!ctoken || ctoken.length < 1) ctoken = null;
 		var max_qn = -1;
+		var call_count = 0;	// first call from person
 
 		// ready..
-		postChatWake(g_tenant, persona, null, author, ctoken, g_context, g_channel_type, g_language, "false", max_qn, chatHandler);
+		postChatWake(g_tenant, persona, null, author, ctoken, g_context, g_channel_type, g_language, "false", max_qn, call_count, chatHandler);
 		// clear it
 		$("#interact_text").val(""); 
 		waitChid();	
