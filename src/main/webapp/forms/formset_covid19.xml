@@ -1,0 +1,38 @@
+<doc>
+	<!-- http://localhost:8081/forms/formset_covid19.xml -->
+
+	<!-- The DATA we get -->	
+	<form name='show state' data-type='dataform' data-link='state=possesses'>
+		<input name="state" data-type="input"/>
+		<input name="last_update" data-type="input" data-alias='time updated'/>
+		<input name="last_check" data-type="input" data-alias='time checked'/>
+		<input name="positive" data-type="input" data-alias='covid test positive'/>		
+		<input name="negative" data-type="input" data-alias='covid test negative'/>		
+		<input name="pending" data-type="input" data-alias='covid test pending'/>		
+		<input name="total" data-type="input" data-alias='covid test total'/>		
+		<input name="death" data-type="input" data-alias='covid death'/>		
+	</form>
+	
+	<!-- FORM to show a shows -->
+	<form name='_show_state_' data-type='form' >
+		<input name="show sum" data-type="content" />
+		<label for="show sum" state='wake' data-method='append'>%iterator:state_data/state% positive: %iterator:state_data/positive% deaths: %iterator:state_data/positive% tested: %iterator:state_data/total%\n</label>	
+	</form>	
+	
+	<!-- Bot: (or sub element) that just gets the weather -->
+	<form name='_covid_us_bot_' role="main" data-type='form'>
+		<input name="intro" data-type="content" />
+		<label for="intro" state='wake'>Covid-19 US States</label>
+							
+ 		<input name="state_data" data-type="post" data-async="true" data-resp-formname='show state' data-posturl='http://localhost:8080/api/1.0/test/covid/us'/>
+		<label for="state_data" state='wake' data-msg-event='typing' data-pre-wait='2'>Getting Data...</label>
+		
+		<input name="show states" data-tag='state_data' data-iterate='all' data-type="form" data-formname="_show_state_" />	 
+		
+		<input name="outro" data-type="outro" />
+		<label for="outro" state='wake' data-pre-wait='20' data-post-wait='30'>Good bye</label>
+	
+		<input name="bye" data-type="event" data-event='bye'/>
+	</form>
+</doc>
+

@@ -305,7 +305,7 @@ function pollChatMsg() {
 function addRemoteMsg(msg) {
 	var cmsg = "<div class='s_msg' data-num='"+msg.num+"' data-qn='"+msg.qn+"' data-event='"+msg.event+"' data-time='"+msg.time+" 'data-from='"+msg.from+"' ";
 	cmsg += " title='qn: "+msg.qn+" e: "+msg.event+" rply_type: "+msg.rply_type+" rply_base: "+msg.rply_base+" req_base: "+msg.req_base+" w: "+msg.pre_wait+" / "+msg.post_wait+" ' ";
-	cmsg += ">"+msg.msg+"</div>";
+	cmsg += ">"+updateNewLine(msg.msg)+"</div>";
 	if (g_msg_num < msg.num) g_msg_num = msg.num;
 	return cmsg;
 }
@@ -350,6 +350,10 @@ function waitPostMessage(tag, msg) {
 		}
 		processMsgs(tag);
 	}, (msg.post_wait * 100));
+}
+//new line for web chat
+function updateNewLine(text) {
+	return text.replace(/\\n/g, "<br>");
 }
 
 

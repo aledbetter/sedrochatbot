@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.json.JSONObject;
 
@@ -91,7 +92,14 @@ public class ChatSMS extends ChatAdapter {
 		if (psms_callback_url != null) return false;
 		return true;	
 	}
-	
+	@Override
+	public String getNewLine() {
+		return "%0a";
+	}
+	@Override
+	public String replaceNewLine(String text) {
+		return StringUtils.replace(text, "\n", getNewLine());
+	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// EXTERNAL calls: init & processing
@@ -169,10 +177,11 @@ public class ChatSMS extends ChatAdapter {
 	@Override
 	public String sendDirectMessage(SCSedro proc, String touser, String msg) {
 		try {
+			msg = replaceNewLine(msg);
 			if (isProvider("twilio")) {
 				String caller_phone = makePhoneNumber(proc.getCaller_handle());
 				if (touser != null) caller_phone = touser;
-							    
+						    
 				//System.out.println("sendDirectMessage["+this.pphone_number+" -> " + caller_phone + "]  => " + msg);
 				if (!no_send) {
 					Message message = Message.creator(new PhoneNumber(caller_phone), new PhoneNumber(this.pphone_number), msg).create();

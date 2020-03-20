@@ -19,6 +19,8 @@ package main.java.com.sedroApps.adapter;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import main.java.com.sedroApps.SCOrator;
 import main.java.com.sedroApps.SCSedro;
 import main.java.com.sedroApps.SCUser;
@@ -88,7 +90,12 @@ public class ChatAdapter {
 		return user.getServiceInfo(getId(), element);
 	}
 	
-	
+	public String getNewLine() {
+		return "\n";
+	}
+	public String replaceNewLine(String text) {
+		return text;
+	}	
 	public int init(SCUser ua) {
 		// over-ride for each service to set info needed
 		return 0;
