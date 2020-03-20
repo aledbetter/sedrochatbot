@@ -18,6 +18,9 @@
 package main.java.com.sedroApps.adapter;
 
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -168,6 +171,41 @@ public class ChatEmail extends ChatAdapter {
 		return "ERROR";			
 	}
 
+	//////////////////////////////////////////////////
+	// Polling handlers	
+	// list of messages: from:from user / msg:message text
+	//https://api.twilio.com/2010-04-01/Accounts/{AccountSid}/Messages.json
+	@Override	
+	public List<HashMap<String, String>> getDirectCall(SCOrator orat) {	
+		List<HashMap<String, String>> cl = null;
+
+		/*
+		List<HashMap<String, String>> ml = getMessages(orat);
+		if (ml == null || ml.size() < 1) return null;
+		for (HashMap<String, String> msg:ml) {
+			// find session...					
+			String from = msg.get("from");
+			SCSedro proc = orat.findProcessor(from);					
+			if (proc != null) continue; // check for new calls only	
+			if (cl != null) {
+				// check if accounted for
+				boolean dup = false;
+				for (HashMap<String, String> m:cl) {
+					String tf = m.get("from");
+					if (tf.equals(from)) {
+						dup = true;
+						break;
+					}
+				}
+				if (dup) continue;
+			}
+			if (cl == null) cl = new ArrayList<>();
+			cl.add(msg);
+			//System.out.println("   NEW["+cl.size()+"]: " +from);			
+		}
+		*/
+		return cl;
+	}
 	
 	// list of messages: from:from user / msg:message text
 	@Override	
@@ -179,20 +217,40 @@ public class ChatEmail extends ChatAdapter {
 		Message [] msgs = getMessages();
 		if (msgs == null || msgs.length < 1) return null;
 		
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datefmt);
+
 		List<HashMap<String, String>> dl = new ArrayList<>();
 		for (int i = 0; i < msgs.length; i++) {
 			HashMap<String, String> m = new HashMap<>();
 			try {
 				if (msgs[i].getSubject() != null) m.put("subject", msgs[i].getSubject());
-				
-				
-				Address[] fromAddress = msgs[i].getFrom();
-				m.put("from", fromAddress[0].toString());
-				Date sent = msgs[i].getSentDate();
-				m.put("time", sent.toString());
+				Address[] recpients = msgs[i].getAllRecipients();
+				// FIXME limit to single eamil address?				
+				System.out.println("EMAIL_IN["+recpients.length+"]");
+		//		if (pphone_number != null) {
+		//		}
+//FIXME
+//				mm.put("to", record.getTo());
 
- //FIXME get all info and correct formats
+				Address[] fromAddress = msgs[i].getFrom();
+				String from = fromAddress[0].toString();
+				if (!from.equals(processor.getCaller_handle())) continue;	
+				m.put("caller_handle", from);
+				m.put("caller", from);
+				m.put("email", from);
 				
+				Date sent = msgs[i].getSentDate();
+				m.put("date_created", simpleDateFormat.format(sent));
+				
+				try {
+					String content = msgs[i].getContent().toString();
+					m.put("msg", content);			 
+				} catch (IOException e) {}
+
+				m.put("status", "recieved");
+				String hdrs[] = msgs[i].getHeader("message-id");
+				if (hdrs != null && hdrs.length > 0) m.put("id", hdrs[0]);
+
 			} catch (MessagingException e) {
 				e.printStackTrace();
 			}
@@ -200,6 +258,11 @@ public class ChatEmail extends ChatAdapter {
 		return dl;
 	}
 	
+	@Override	
+	public void clearCache() {
+		//msg_set = null;
+	}
+
 	
 	private boolean isLoggedIn() {
 		return mStore.isConnected();

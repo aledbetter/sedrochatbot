@@ -26,6 +26,8 @@ import main.java.com.sedroApps.util.Sutil;
 
 
 public class ChatAdapter {
+	public static final String datefmt = "EEE, dd MMM yyyy HH:mm:ss Z";
+
 	private SCUser user = null;
 	private String id = null;
 	private SCOrator orat = null;

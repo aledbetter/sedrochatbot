@@ -45,7 +45,6 @@ import main.java.com.sedroApps.util.Sutil;
 public class ChatSMS extends ChatAdapter { 
 	private static final boolean no_send = false;
 	
-	private static final String datefmt = "EEE, dd MMM yyyy HH:mm:ss Z";
 	private static final int DEF_PAST = 2; // 2 days
 
 	// this is per user?
