@@ -22,21 +22,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.github.messenger4j.Messenger;
+
 import main.java.com.sedroApps.SCOrator;
 import main.java.com.sedroApps.SCSedro;
 import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.util.Sutil;
 
 
+/*
+Facebook requires a public Domain SSL and a publicly signed cert in order to
+interact. 
+All interaction is via a registered webhook (url).
+ 
+ 
+This library may help with some work:
+https://github.com/messenger4j/messenger4j
 
+ */
 public class ChatFacebook extends ChatAdapter { 
 
 	// this is per user?
-	//private TwitterFactory factory = null;
-	private String pconsumer_key = null;  	// api_key
-	private String pconsumer_secret = null; // api_secret
+	private Messenger factory = null;
+	private String papp_secret = null;  	// secret
+	private String pverify_token = null; // api_secret
 	private String paccess_token = null;
-	private String paccess_token_secret = null;
+	private String pweb_hook_url = null;
 	private String pdopublic = null;
 	private String pdoprivate = null;
 	
@@ -71,41 +82,37 @@ public class ChatFacebook extends ChatAdapter {
 	@Override
 	public int init(SCUser ua) {
 		super.init(ua);
-		String consumer_key = getServiceInfo("consumer_key");
-		String consumer_secret = getServiceInfo("consumer_secret");
+		String app_secret = getServiceInfo("app_secret");
+		String verify_token = getServiceInfo("verify_token");
 		String access_token = getServiceInfo("access_token");
-		String access_token_secret = getServiceInfo("access_token_secret");
+		String web_hook_url = getServiceInfo("web_hook_url");
+		
 		String idopublic = getServiceInfo("dopublic");
 		String idoprivate = getServiceInfo("doprivate");
 
-		if (consumer_key == null || consumer_secret == null || access_token == null || access_token_secret == null) {
+		if (app_secret == null || verify_token == null || access_token == null) {
 			return -1; // not configured... remove
 		}
-		/*
+		
 		if (factory != null) {
 			// check for updates..
 			boolean change = false;
-			if (!pconsumer_key.equals(consumer_key)) change = true;
-			if (!pconsumer_secret.equals(consumer_secret)) change = true;
+			if (!papp_secret.equals(app_secret)) change = true;
+			if (!pverify_token.equals(verify_token)) change = true;
 			if (!paccess_token.equals(access_token)) change = true;
-			if (!paccess_token_secret.equals(access_token_secret)) change = true;
+			if (!pweb_hook_url.equals(web_hook_url)) change = true;
 			if (Sutil.compare(idopublic, pdopublic)) change = true;
 			if (Sutil.compare(idoprivate, pdoprivate)) change = true;
 			if (!change) return 0;
 		}
-    	ConfigurationBuilder cb = new ConfigurationBuilder();
-    	cb.setDebugEnabled(true);
-    	cb.setOAuthConsumerKey(consumer_key);
-    	cb.setOAuthConsumerSecret(consumer_secret);
-    	cb.setOAuthAccessToken(access_token);
-    	cb.setOAuthAccessTokenSecret(access_token_secret);
-    	factory = new TwitterFactory(cb.build());
-    	*/
+		// set it... 
+		factory = Messenger.create(access_token, app_secret, verify_token);
+
     	// retain config
-    	pconsumer_key = consumer_key;
-    	pconsumer_secret = consumer_secret;
+    	papp_secret = app_secret;
+    	pverify_token = verify_token;
     	paccess_token = access_token;
-    	paccess_token_secret = access_token_secret;
+    	pweb_hook_url = web_hook_url;
     	pdoprivate = idoprivate;
     	pdopublic = idopublic;
     	

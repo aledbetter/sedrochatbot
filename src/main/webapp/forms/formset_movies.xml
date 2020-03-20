@@ -22,7 +22,7 @@
 
 	<!-- request input -->
 	<form name='_get_request_' data-type='form'>
-		<input name="title" data-type="input" data-seq="[SENTENCE]"/>
+		<input name="title" data-type="input" data-seq="[NAME]"/>
 		<label for="title" state='wake'>What show would you like to find?</label>
 		<label for="title" state='incomplete'>I didn't get that</label>
 	</form>
@@ -53,7 +53,7 @@
 
 	<!-- Bot: Wake from background to find stuff -->
 	<form name='_show_invoke_' data-type='form' >
-		<input name="listen" data-type="invoke" data-seq="find:% X:show/shows/movie/movies:%"/>				
+		<input name="listen" data-type="invoke" data-seq="find/lookup/search:% (%any%:pos[determiner/adverb/adjective]) X:show/shows/movie/movies:%"/>				
 		<input name="show list" data-type="form" data-formname="_getmovies_"/>			
 		<input name="background" data-type="event" data-event='background_reset' />
 	</form>

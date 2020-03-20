@@ -18,27 +18,49 @@
 package main.java.com.sedroApps.adapter;
 
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import java.util.Properties;
+
+import javax.mail.Address;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.Transport;
+import javax.mail.URLName;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import main.java.com.sedroApps.SCOrator;
 import main.java.com.sedroApps.SCSedro;
 import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.util.Sutil;
 
+// FIXME imap only for now
 
 
 public class ChatEmail extends ChatAdapter { 
-/*
- * https://www.twilio.com
- */
+
+	private Session mSession;
+	private Store mStore;
+	private Folder mFolder;
+	
 	// this is per user?
-	//private TwitterFactory factory = null;
-	private String pconsumer_key = null;  	// api_key
-	private String pconsumer_secret = null; // api_secret
-	private String paccess_token = null;
-	private String paccess_token_secret = null;
+	private String pusername = null;  	// username
+	private String ppassword = null; 	// password
+	private String pprotocol = "imaps";
+	private String pfolder = "INBOX";
+	private String phost = "imap.gmail.com";
+	private int pport = 993;
+	private String pemail = null; 		// email address
+	private String pfrom_email = null; 	// email address
+	private String preplyto_email = null; 	// email address
+
 	
 	public ChatEmail(SCUser user, String id) {
 		super(user, id);
@@ -54,52 +76,95 @@ public class ChatEmail extends ChatAdapter {
 	@Override
 	public int init(SCUser ua) {
 		super.init(ua);
-		String consumer_key = getServiceInfo("consumer_key");
-		String consumer_secret = getServiceInfo("consumer_secret");
-		String access_token = getServiceInfo("access_token");
-		String access_token_secret = getServiceInfo("access_token_secret");
-		if (consumer_key == null || consumer_secret == null || access_token == null || access_token_secret == null) {
+		String protocol = getServiceInfo("protocol");
+		String host = getServiceInfo("host");
+		int port = Sutil.toInt(getServiceInfo("port"));
+		String folder = getServiceInfo("folder");
+		String username = getServiceInfo("username");
+		String password = getServiceInfo("password");
+		String email = getServiceInfo("email");
+		String from_email = getServiceInfo("from_email");
+		String replyto_email = getServiceInfo("replyto_email");
+		if (username == null || password == null || host == null || protocol == null || email == null) {
 			return -1; // not configured... remove
 		}
-		/*
-		if (factory != null) {
+		
+		if (isLoggedIn()) {
 			// check for updates..
 			boolean change = false;
-			if (!pconsumer_key.equals(consumer_key)) change = true;
-			if (!pconsumer_secret.equals(consumer_secret)) change = true;
-			if (!paccess_token.equals(access_token)) change = true;
-			if (!paccess_token_secret.equals(access_token_secret)) change = true;
+			if (!pusername.equals(username)) change = true;
+			if (!ppassword.equals(password)) change = true;
+			if (!Sutil.compare(pprotocol, protocol)) change = true;
+			if (!Sutil.compare(phost, host)) change = true;
+			if (port != pport) change = true;
+			if (!Sutil.compare(pfolder, folder)) change = true;
+			if (!Sutil.compare(pemail, email)) change = true;
+			if (!Sutil.compare(pfrom_email, from_email)) change = true;
+			if (!Sutil.compare(preplyto_email, replyto_email)) change = true;
 			if (!change) return 0;
+			// logout
+			this.logout();
 		}
-    	ConfigurationBuilder cb = new ConfigurationBuilder();
-    	cb.setDebugEnabled(true);
-    	cb.setOAuthConsumerKey(consumer_key);
-    	cb.setOAuthConsumerSecret(consumer_secret);
-    	cb.setOAuthAccessToken(access_token);
-    	cb.setOAuthAccessTokenSecret(access_token_secret);
-    	factory = new TwitterFactory(cb.build());
-    	*/
+
     	// retain config
-    	pconsumer_key = consumer_key;
-    	pconsumer_secret = consumer_secret;
-    	paccess_token = access_token;
-    	paccess_token_secret = access_token_secret;
+    	pusername = username;
+    	ppassword = password;
+    	pprotocol = protocol;
+    	phost = host;
+    	pport = port;
+    	pfolder = folder;
+    	pemail = email;
+    	pfrom_email = from_email;
+    	preplyto_email = replyto_email;
     	return 0;
 	}
 	
-	@Override
-	public String postMessage(SCSedro proc, String msg) {
-		try {
-		
-		} catch (Throwable t) { }
-		return "ERROR";	
-	}
-
+	
 	@Override
 	public String sendDirectMessage(SCSedro proc, String touser, String msg) {
-		try {
+      try{  
+          MimeMessage message = new MimeMessage(mSession);  
+          String from = this.pfrom_email;
+          if (from == null) from = this.pemail;
+          
+          message.setFrom(new InternetAddress(from));   
+       
+          if (this.preplyto_email != null) {
+        	  Address address = new InternetAddress(this.preplyto_email);
+        	  Address adr [] = {address};
+        	  message.setReplyTo(adr);
+          }
+          message.addRecipient(Message.RecipientType.TO, new InternetAddress(touser));  
+          message.setText(msg);  
 
-		} catch (Throwable t) { }
+         String subject = "FIXME";
+          message.setSubject(subject);  
+
+          // Send message  
+          Transport.send(message);  
+          System.out.println("message sent successfully....");  
+          
+
+          /*
+          // Send the message by authenticating the SMTP server
+          // Create a Transport instance and call the sendMessage
+          Transport t = session.getTransport("smtp");
+          try {
+     //connect to the smpt server using transport instance
+     //change the user and password accordingly	
+         t.connect("abc", "****");
+         t.sendMessage(replyMessage, replyMessage.getAllRecipients());
+          } finally {
+             t.close();
+          }
+          System.out.println("message replied successfully ....");
+   
+          */
+          
+          
+       } catch (MessagingException mex) {
+    	   mex.printStackTrace();
+       }
 		return "ERROR";			
 	}
 
@@ -107,8 +172,116 @@ public class ChatEmail extends ChatAdapter {
 	// list of messages: from:from user / msg:message text
 	@Override	
 	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedro processor) {
+		if (!this.login()) {
+			return null;
+		}
+		// get messages
+		Message [] msgs = getMessages();
+		if (msgs == null || msgs.length < 1) return null;
+		
+		List<HashMap<String, String>> dl = new ArrayList<>();
+		for (int i = 0; i < msgs.length; i++) {
+			HashMap<String, String> m = new HashMap<>();
+			try {
+				if (msgs[i].getSubject() != null) m.put("subject", msgs[i].getSubject());
+				
+				
+				Address[] fromAddress = msgs[i].getFrom();
+				m.put("from", fromAddress[0].toString());
+				Date sent = msgs[i].getSentDate();
+				m.put("time", sent.toString());
+
+ //FIXME get all info and correct formats
+				
+			} catch (MessagingException e) {
+				e.printStackTrace();
+			}
+		}		
+		return dl;
+	}
+	
+	
+	private boolean isLoggedIn() {
+		return mStore.isConnected();
+	}
+
+	// login to the mail host server
+	public boolean login() {
+		URLName url = new URLName(pprotocol, phost, pport, pfolder, pusername, ppassword);
+		if (mSession == null) {
+			Properties props = null;
+			try {
+				props = System.getProperties();
+			} catch (SecurityException sex) {
+				props = new Properties();
+			}
+			mSession = Session.getInstance(props, null);
+		}
+		try {
+			mStore = mSession.getStore(url);
+			mStore.connect();
+			mFolder = mStore.getFolder(url);
+			if (mFolder == null) return false;
+		
+			mFolder.open(Folder.READ_WRITE);
+			return true;
+		
+		} catch (Throwable t) {}
+		return false;
+	}
+
+	// logout from the mail host server
+	private void logout() {
+		try {
+			mFolder.close(false);
+			mStore.close();
+		} catch (Throwable t) {}
+		mStore = null;
+		mSession = null;
+	}
+
+	private Message[] getMessages() {
+		try {
+		return mFolder.getMessages();
+		} catch (Throwable t) {}
 		return null;
 	}
 
+	private void sendMessage(String from, String to, String subject, String text) {
+	      try{  
+	          MimeMessage message = new MimeMessage(mSession);  
+	          message.setFrom(new InternetAddress(from));  
+	          message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));  
+	          message.setSubject(subject);  
+	          message.setText(text);  
+	//          message.setReplyTo(original.getReplyTo());
+
+	          // Send message  
+	          Transport.send(message);  
+	          System.out.println("message sent successfully....");  
+	          
+
+	          /*
+              // Send the message by authenticating the SMTP server
+              // Create a Transport instance and call the sendMessage
+              Transport t = session.getTransport("smtp");
+              try {
+   	     //connect to the smpt server using transport instance
+	     //change the user and password accordingly	
+             t.connect("abc", "****");
+             t.sendMessage(replyMessage, replyMessage.getAllRecipients());
+              } finally {
+                 t.close();
+              }
+              System.out.println("message replied successfully ....");
+	   
+	          */
+	          
+	          
+	       } catch (MessagingException mex) {
+	    	   mex.printStackTrace();
+	       }  
+	}
+	
 
 }
