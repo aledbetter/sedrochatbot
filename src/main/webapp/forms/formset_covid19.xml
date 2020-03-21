@@ -16,7 +16,7 @@
 	<!-- FORM to show a shows -->
 	<form name='_show_state_' data-type='form' >
 		<input name="show sum" data-type="content" />
-		<label for="show sum" state='wake' data-method='append'>%iterator:state_data/state% positive: %iterator:state_data/positive% deaths: %iterator:state_data/positive% tested: %iterator:state_data/total%\n</label>	
+		<label for="show sum" state='wake' data-method='append'>%iterator:state_data/state% positive: %iterator:state_data/positive% deaths: %iterator:state_data/positive% tested: %iterator:state_data/total% time: %iterator:state_data/last_check%\n</label>	
 	</form>	
 	
 	<!-- Bot: (or sub element) that just gets the weather -->
@@ -24,8 +24,8 @@
 		<input name="intro" data-type="content" />
 		<label for="intro" state='wake'>Covid-19 US States</label>
 							
- 		<input name="state_data" data-type="post" data-async="true" data-resp-formname='show state' data-posturl='http://localhost:8080/api/1.0/test/covid/us'/>
-		<label for="state_data" state='wake' data-msg-event='typing' data-pre-wait='2'>Getting Data...</label>
+ 		<input name="state_data" data-type="post" data-async="true" data-resp-formname='show state' data-posturl='http://api.sedro.xyz/api/1.0/test/covid/us'/>
+		<label for="state_data" state='wake' data-msg-event='typing' data-pre-wait='3'>Getting Data...</label>
 		
 		<input name="show states" data-tag='state_data' data-iterate='all' data-type="form" data-formname="_show_state_" />	 
 		

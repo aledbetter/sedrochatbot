@@ -325,7 +325,7 @@ function waitPreWriteMessage(tag, msg) {
 	if (msg.pre_wait > 0) {
 		var mt = "...";
 		if (msg.event == 'typing' && msg.msg != null) mt = msg.msg;
-		$(tag).append("<div class='s_msg s_typeing' style='font-weight:bold'>"+msg+"</div>");
+		$(tag).append("<div class='s_msg s_typeing' style='font-weight:bold'>"+mt+"</div>");
 		$("#interact_msg").scrollTop($("#interact_msg")[0].scrollHeight);
 	} 
     setTimeout(function () {	
