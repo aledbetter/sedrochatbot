@@ -394,6 +394,7 @@ img.wash {
 	padding:3px;
 	padding-right:8px;
 	text-align:right;
+	line-height:1.5em;
 }
 .s_msg {
 	float:left;
@@ -404,6 +405,7 @@ img.wash {
 	padding:3px;
 	padding-left:8px;
 	text-align:left;
+	line-height:1.5em;
 }
 
 
