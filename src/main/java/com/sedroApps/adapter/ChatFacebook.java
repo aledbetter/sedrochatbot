@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import com.github.messenger4j.Messenger;
 
 import main.java.com.sedroApps.SCOrator;
-import main.java.com.sedroApps.SCSedro;
+import main.java.com.sedroApps.SCSedroCall;
 import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.util.Sutil;
 
@@ -120,7 +120,7 @@ public class ChatFacebook extends ChatAdapter {
 	}
 	
 	@Override
-	public String postMessage(SCSedro proc, String msg) {
+	public String postMessage(SCSedroCall proc, String msg) {
 		try {
 		
 		} catch (Throwable t) { }
@@ -128,7 +128,7 @@ public class ChatFacebook extends ChatAdapter {
 	}
 
 	@Override
-	public String sendDirectMessage(SCSedro proc, String touser, String msg) {
+	public String sendDirectMessage(SCSedroCall proc, String touser, String msg) {
 		try {
 
 		} catch (Throwable t) { }
@@ -145,7 +145,7 @@ public class ChatFacebook extends ChatAdapter {
 	
 	// list of messages: from:from user / msg:message text
 	@Override	
-	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedro processor) {
+	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedroCall processor) {
 		return null;
 	}
 

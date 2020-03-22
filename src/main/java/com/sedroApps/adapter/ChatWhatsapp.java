@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import main.java.com.sedroApps.SCOrator;
-import main.java.com.sedroApps.SCSedro;
+import main.java.com.sedroApps.SCSedroCall;
 import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.util.Sutil;
 
@@ -89,7 +89,7 @@ public class ChatWhatsapp extends ChatAdapter {
 	}
 	
 	@Override
-	public String postMessage(SCSedro proc, String msg) {
+	public String postMessage(SCSedroCall proc, String msg) {
 		try {
 		
 		} catch (Throwable t) { }
@@ -97,7 +97,7 @@ public class ChatWhatsapp extends ChatAdapter {
 	}
 
 	@Override
-	public String sendDirectMessage(SCSedro proc, String touser, String msg) {
+	public String sendDirectMessage(SCSedroCall proc, String touser, String msg) {
 		try {
 
 		} catch (Throwable t) { }
@@ -107,7 +107,7 @@ public class ChatWhatsapp extends ChatAdapter {
 	
 	// list of messages: from:from user / msg:message text
 	@Override	
-	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedro processor) {
+	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedroCall processor) {
 		return null;
 	}
 

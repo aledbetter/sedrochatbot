@@ -39,7 +39,7 @@ public class SCOrator {
 	private static final boolean wake_text = false;
 	
 	
-	private List<SCSedro> processors = null;
+	private List<SCSedroCall> calls = null;
 	
 	private ChatAdapter service = null;
 	private SCServer server = null;
@@ -49,7 +49,7 @@ public class SCOrator {
 	private List<HashMap<String, Object>> msg_set = null;
 	private Timer msg_timer = null;
 
-	private SCSedro processorPublic = null;
+	private SCSedroCall callPublic = null;
 	boolean procPoll = false;
 	
 	SCOrator(SCServer server, ChatAdapter service, SCUser user, boolean readPublic, boolean respPublic) {
@@ -63,11 +63,11 @@ public class SCOrator {
 		}
 		if (readPublic) {
 			// add porcessor for public
-			processorPublic = addProcessor(readPublic, respPublic, false);
-			processorPublic.setChannel_type(service.getChannel_type());
-			processorPublic.setLanguage(service.getLanguage());
-			processorPublic.setContext(service.getContext());
-			processorPublic.setPersona(user.getSedroPersona());
+			callPublic = addCall(readPublic, respPublic, false);
+			callPublic.setChannel_type(service.getChannel_type());
+			callPublic.setLanguage(service.getLanguage());
+			callPublic.setContext(service.getContext());
+			callPublic.setPersona(user.getSedroPersona());
 		}
 		service.setOrator(this);
 		
@@ -77,9 +77,9 @@ public class SCOrator {
 		}
 	}
 	
-	public int getProcessorCount() {
-		if (processors == null) return 0;
-		return processors.size();
+	public int getCallCount() {
+		if (calls == null) return 0;
+		return calls.size();
 	}
 	public ChatAdapter getChatService() {
 		return this.service;
@@ -117,10 +117,10 @@ public class SCOrator {
 	            	String txt = (String)m.get("msg");
 	            	String to = (String)m.get("to");
 	            	String from = (String)m.get("from");
-	            	SCSedro processor = (SCSedro)m.get("processor");
+	            	SCSedroCall call = (SCSedroCall)m.get("call");
 	               // System.out.println("TIMER Send("+sendList.size()+")["+service.getName()+"]["+from+"] => ["+to+"]: " + txt);
 
-					service.sendDirectMessage(processor, to, txt);
+					service.sendDirectMessage(call, to, txt);
     			}
             }
         }, 100, 100);		
@@ -128,30 +128,29 @@ public class SCOrator {
 	
 	// close 
 	public void close() {
-		if (getProcessorCount() > 0) {
-			for (SCSedro s:processors) {
-				// close all processors
+		if (getCallCount() > 0) {
+			for (SCSedroCall s:calls) {
+				// close all calls
 				List<HashMap<String, Object>> msg = s.chatBye();
 			}
 		}
 		if (msg_timer != null) msg_timer.cancel();
 	}
-	
-	public SCSedro addProcessor(boolean readPublic, boolean respPublic, boolean directMsg) {
-		SCSedro s = new SCSedro(readPublic, respPublic, directMsg);
-		if (processors == null) processors = new ArrayList<>();
-		processors.add(s);
+	public SCSedroCall addCall(boolean readPublic, boolean respPublic, boolean directMsg) {
+		SCSedroCall s = new SCSedroCall(readPublic, respPublic, directMsg);
+		if (calls == null) calls = new ArrayList<>();
+		calls.add(s);
 		return s;
 	}
-	public void removeProcessor(SCSedro s) {
-		if (processors == null) return;
-		processors.remove(s);
+	public void removeCall(SCSedroCall s) {
+		if (calls == null) return;
+		calls.remove(s);
 	}
 	
-	public SCSedro findProcessor(String caller_handle) {
-		if (getProcessorCount() > 0) {
-			for (SCSedro s:processors) {
-				// close all processors
+	public SCSedroCall findCall(String caller_handle) {
+		if (getCallCount() > 0) {
+			for (SCSedroCall s:calls) {
+				// close all calls
 				if (Sutil.compare(s.getCaller_handle(), caller_handle)) return s;
 			}
 		}
@@ -160,19 +159,19 @@ public class SCOrator {
 	
 	//////////////////////////////////////////////////////	
 	// check callbacks for message override
-	private String getFinalMessage(String caname, SCSedro processor, boolean msgPublic, 
+	private String getFinalMessage(String caname, SCSedroCall call, boolean msgPublic, 
 			HashMap<String, Object> msgInfo, String msg) {
 		if (msg == null || msg.equals("null") || msg.isEmpty()) return null;
 		CbMessage cb = this.user.getMessageCb();
-		if (cb != null) return cb.getFinalMessage(caname, processor, msgPublic, msgInfo, msg);
+		if (cb != null) return cb.getFinalMessage(caname, call, msgPublic, msgInfo, msg);
 		return msg;
 	}
 	
 	//////////////////////////////////////////////////////
 	// Add processor for new call
-	private SCSedro addNewCall(HashMap<String, String> call) {
-		// ADD NEW channels...Processors
-		SCSedro proc = addProcessor(false, false, true);
+	private SCSedroCall addNewCall(HashMap<String, String> call) {
+		// ADD NEW channels...calls
+		SCSedroCall proc = addCall(false, false, true);
 		// add information to it
 		proc.setChannel_type(service.getChannel_type());
 		proc.setLanguage(service.getLanguage());
@@ -261,9 +260,9 @@ public class SCOrator {
 			}
 		}
 		
-		if (getProcessorCount() > 0) {
+		if (getCallCount() > 0) {
 			// if there are any conversations ... deal
-			for (SCSedro s:processors) process(s);
+			for (SCSedroCall s:calls) process(s);
 		}	
 		
 		// clear the cache
@@ -273,50 +272,50 @@ public class SCOrator {
 	}
 	
 	
-	private void process(SCSedro processor) {
+	private void process(SCSedroCall call) {
 		int procCnt = 0;
-		if (debug) System.out.println("\nPROCESS_["+processor.getStatus()+"]["+processor.getPersona()+"] => ["+processor.getCaller_handle()+"]");
+		if (debug) System.out.println("\nPROCESS_["+call.getStatus()+"]["+call.getPersona()+"] => ["+call.getCaller_handle()+"]");
 							
-		if (processor.isReadPublic()) {
+		if (call.isReadPublic()) {
 			//////////////////////////////////////////////////////
 			// PUBLIC MESSAGES
 			
 			///////////////////////////////////////
 			// wake the persona
-			if (processor.getStatus().equals("wake")) {
-				List<HashMap<String, Object>> wake_msg = processor.chatWake(server.getSedro_access_key(), null);
+			if (call.getStatus().equals("wake")) {
+				List<HashMap<String, Object>> wake_msg = call.chatWake(server.getSedro_access_key(), null);
 				procCnt++;
-				//System.out.println(" WAKE_WOKE["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
+				//System.out.println(" WAKE_WOKE["+call.getStatus()+"]["+call.getPersona()+"] msg: " + call.getMsgNumber());
 			}
 			
 			List<String> tml = service.getPublicMessages();
 			if (tml != null) {
 				for (String msg:tml) {
 					System.out.println("PUB: " + msg);
-					if (!processor.isRespPublic()) continue;
-					List<HashMap<String, Object>> rmsg = processor.chatMsg(msg);
+					if (!call.isRespPublic()) continue;
+					List<HashMap<String, Object>> rmsg = call.chatMsg(msg);
 					if (rmsg != null) {
 						for (HashMap<String, Object> m:rmsg) {
 							// send direct message
-							String smsg = getFinalMessage(service.getName(), processor, true, m, (String)m.get("msg"));
+							String smsg = getFinalMessage(service.getName(), call, true, m, (String)m.get("msg"));
 							if (smsg == null) continue;
 							procCnt++;
-							service.postMessage(processor, smsg);
+							service.postMessage(call, smsg);
 							if (debug) System.out.println("PUB_RESP: " + smsg);
 						}
 					}
 				}
 			}
-		} else if (processor.isDirectMsg()) {
+		} else if (call.isDirectMsg()) {
 			//////////////////////////////////////////////////////
 			// PRIVATE MESSAGES
 
 			// get any incomming messages for this caller
-			List<HashMap<String, String>> dml = service.getDirectMessages(this, processor);
+			List<HashMap<String, String>> dml = service.getDirectMessages(this, call);
 	
 			///////////////////////////////////////
 			// wake the persona
-			if (processor.getStatus().equals("wake")) {
+			if (call.getStatus().equals("wake")) {
 				String wmsg = null, wfrom = null;
 				if (dml != null) {
 					// remove first message and send it with wake
@@ -327,20 +326,20 @@ public class SCOrator {
 					if (debug) System.out.println(" wakeMSG["+wfrom+"]: " + wmsg);
 				}
 
-				List<HashMap<String, Object>> wake_msg = processor.chatWake(server.getSedro_access_key(), wmsg);
+				List<HashMap<String, Object>> wake_msg = call.chatWake(server.getSedro_access_key(), wmsg);
 				procCnt++;
-				//System.out.println(" WAKE_WOKE["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
+				//System.out.println(" WAKE_WOKE["+call.getStatus()+"]["+call.getPersona()+"] msg: " + call.getMsgNumber());
 				if (wake_msg != null) {
 					// where to send these messages?
 					for (HashMap<String, Object> m:wake_msg) {
-						String smsg = getFinalMessage(service.getName(), processor, false, m, (String)m.get("msg"));
+						String smsg = getFinalMessage(service.getName(), call, false, m, (String)m.get("msg"));
 						if (smsg == null) continue;
-						if (debug) System.out.println("    outWMSG["+processor.getCaller_handle()+"]: " + smsg);
+						if (debug) System.out.println("    outWMSG["+call.getCaller_handle()+"]: " + smsg);
 						String to = null;
 						if (send_timed) {
-							addMsg(smsg, (String)m.get("event"), m.get("pre_wait"), m.get("post_wait"), processor.getCaller_handle(), to, processor);
+							addMsg(smsg, (String)m.get("event"), m.get("pre_wait"), m.get("post_wait"), call.getCaller_handle(), to, call);
 						} else {
-							service.sendDirectMessage(processor, processor.getCaller_handle(), smsg);
+							service.sendDirectMessage(call, call.getCaller_handle(), smsg);
 						}
 					}
 				}
@@ -354,19 +353,19 @@ public class SCOrator {
 					if (debug) System.out.println(" inMSG["+from+"]: " + msg);
 					// private direct messages => private direct response
 					procCnt++;
-					List<HashMap<String, Object>> rmsg = processor.chatMsg(msg);
+					List<HashMap<String, Object>> rmsg = call.chatMsg(msg);
 					if (rmsg != null) {
 						for (HashMap<String, Object> m:rmsg) {
-							String smsg = getFinalMessage(service.getName(), processor, false, m, (String)m.get("msg"));
+							String smsg = getFinalMessage(service.getName(), call, false, m, (String)m.get("msg"));
 							if (smsg == null) continue;
 							String to = null;
 							if (debug) System.out.println("    outMSG["+from+"]: " + smsg);
 							// NOTE: from/to reverse
 							if (send_timed) {
-								addMsg(smsg, (String)m.get("event"), m.get("pre_wait"), m.get("post_wait"), from, to, processor);
+								addMsg(smsg, (String)m.get("event"), m.get("pre_wait"), m.get("post_wait"), from, to, call);
 							} else {
 								// send direct message
-								service.sendDirectMessage(processor, from, smsg);
+								service.sendDirectMessage(call, from, smsg);
 							}
 						}
 					}
@@ -378,26 +377,26 @@ public class SCOrator {
 		//////////////////////////////////////////////////////	
 		// poll for new messages to post/send
 		if (procPoll && procCnt == 0) {
-			List<HashMap<String, Object>> dml = processor.chatPoll();
+			List<HashMap<String, Object>> dml = call.chatPoll();
 			for (HashMap<String, Object> mm:dml) {
 				String msg = (String)mm.get("msg");
 				String from = (String)mm.get("from");
 				if (debug) System.out.println(" inMSG["+from+"]: " + msg);
 				// private direct messages => private direct response
 				procCnt++;
-				List<HashMap<String, Object>> rmsg = processor.chatMsg(msg);
+				List<HashMap<String, Object>> rmsg = call.chatMsg(msg);
 				if (rmsg != null) {
 					for (HashMap<String, Object> m:rmsg) {
-						String smsg = getFinalMessage(service.getName(), processor, false, m, (String)m.get("msg"));
+						String smsg = getFinalMessage(service.getName(), call, false, m, (String)m.get("msg"));
 						if (smsg == null) continue;
 						String to = null;
 						if (debug) System.out.println("    outPMSG["+from+"]: " + smsg);
 						// NOTE: from/to reverse
 						if (send_timed) {
-							addMsg(smsg, (String)m.get("event"), m.get("pre_wait"), m.get("post_wait"), from, to, processor);
+							addMsg(smsg, (String)m.get("event"), m.get("pre_wait"), m.get("post_wait"), from, to, call);
 						} else {
 							// send direct message
-							service.sendDirectMessage(processor, from, smsg);
+							service.sendDirectMessage(call, from, smsg);
 						}
 					}
 				}
@@ -405,14 +404,14 @@ public class SCOrator {
 		}
 		
 		if (debug) {
-			System.out.println(" PROC["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
+			System.out.println(" PROC["+call.getStatus()+"]["+call.getPersona()+"] msg: " + call.getMsgNumber());
 			System.out.println("");
 		}
 	}
 	
 	
 	// Add message to the message QUEUE
-	private void addMsg(String txt, String event, Object pre_wait, Object post_wait, String to, String from, SCSedro processor) {
+	private void addMsg(String txt, String event, Object pre_wait, Object post_wait, String to, String from, SCSedroCall call) {
 		HashMap<String, Object> smsg = new HashMap<>();
 		
 		Integer wi = 0, pwi = 0;
@@ -427,7 +426,7 @@ public class SCOrator {
 		smsg.put("event", event);
 		smsg.put("to", to);
 		smsg.put("from", from);
-		smsg.put("processor", processor);
+		smsg.put("processor", call);
 
 		synchronized(msg_set) {
 			HashMap<String, Object> lmsg = null;
@@ -453,51 +452,51 @@ public class SCOrator {
 	
 	//////////////////////////////////////////////////////	
 	// Process incoming
-	public void processMessage(HashMap<String, String> call) {
-		String hd = (String)call.get("caller_handle");
-		String wmsg = (String)call.get("msg");
-		SCSedro processor = this.findProcessor(hd);
-		if (processor == null) {
-			System.out.println("ORAT: new session: " + hd);
-			processor = addNewCall(call);
+	public void processMessage(HashMap<String, String> call_info) {
+		String hd = (String)call_info.get("caller_handle");
+		String wmsg = (String)call_info.get("msg");
+		SCSedroCall call = this.findCall(hd);
+		if (call == null) {
+			System.out.println("ORAT: new call: " + hd);
+			call = addNewCall(call_info);
 		} 
 		List<HashMap<String, Object>> wake_msg = null;
 		if (!wake_text) wmsg = null;
 			
 		//////////////////////////////////////////////////////
 		// wake the persona
-		if (processor.getStatus().equals("wake")) {
-			wake_msg = processor.chatWake(server.getSedro_access_key(), wmsg);
-			//System.out.println(" WAKE_WOKE["+processor.getStatus()+"]["+processor.getPersona()+"] msg: " + processor.getMsgNumber());
+		if (call.getStatus().equals("wake")) {
+			wake_msg = call.chatWake(server.getSedro_access_key(), wmsg);
+			//System.out.println(" WAKE_WOKE["+call.getStatus()+"]["+call.getPersona()+"] msg: " + call.getMsgNumber());
 		}
 		
 		//////////////////////////////////////////////////////
 		// PRIVATE MESSAGES
-		if (processor.isDirectMsg()) {
+		if (call.isDirectMsg()) {
 			if (wake_msg != null) {
 				// where to send these messages?
 				for (HashMap<String, Object> msg:wake_msg) {
-					String smsg = getFinalMessage(service.getName(), processor, false, msg, (String)msg.get("msg"));
+					String smsg = getFinalMessage(service.getName(), call, false, msg, (String)msg.get("msg"));
 					if (smsg == null) continue;	
-					System.out.println("    outWMSG["+processor.getCaller_handle()+"]: " + smsg);
-					service.sendDirectMessage(processor, processor.getCaller_handle(), smsg);
+					System.out.println("    outWMSG["+call.getCaller_handle()+"]: " + smsg);
+					service.sendDirectMessage(call, call.getCaller_handle(), smsg);
 				}
 			}
 			
 			if (!wake_text) {
 				// Deal with direct messages
-				String msg = call.get("msg");
-				String from = call.get("from");
+				String msg = call_info.get("msg");
+				String from = call_info.get("from");
 				System.out.println(" inMSG["+from+"]: " + msg);
 				// private direct messages => private direct response
-				List<HashMap<String, Object>> rmsg = processor.chatMsg(msg);
+				List<HashMap<String, Object>> rmsg = call.chatMsg(msg);
 				if (rmsg != null) {
 					for (HashMap<String, Object> m:rmsg) {
-						String smsg = getFinalMessage(service.getName(), processor, false, m, (String)m.get("msg"));
+						String smsg = getFinalMessage(service.getName(), call, false, m, (String)m.get("msg"));
 						if (smsg == null) continue;					
 						// send direct message
 						System.out.println("    outMSG["+from+"]: " + smsg);
-						service.sendDirectMessage(processor, from, smsg);
+						service.sendDirectMessage(call, from, smsg);
 					}
 				}
 			}

@@ -22,7 +22,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import main.java.com.sedroApps.SCOrator;
-import main.java.com.sedroApps.SCSedro;
+import main.java.com.sedroApps.SCSedroCall;
 import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.util.Sutil;
 
@@ -106,11 +106,11 @@ public class ChatAdapter {
 		return 0;
 	}
 	
-	public String postMessage(SCSedro proc, String msg) {
+	public String postMessage(SCSedroCall proc, String msg) {
 		return "NOP";	
 	}
 
-	public String sendDirectMessage(SCSedro proc, String touser, String msg) {
+	public String sendDirectMessage(SCSedroCall proc, String touser, String msg) {
 		return "NOP";			
 	}
 	
@@ -130,7 +130,7 @@ public class ChatAdapter {
 
 	// list of messages: from:from user / msg:message text
 	// Call identifier: "CID" in each
-	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedro processor) {
+	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedroCall processor) {
 		return null;
 	}
 	

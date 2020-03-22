@@ -21,7 +21,7 @@ package main.java.com.sedroApps.adapter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import main.java.com.sedroApps.SCSedro;
+import main.java.com.sedroApps.SCSedroCall;
 import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.util.Sutil;
 import twitter4j.DirectMessage;
@@ -119,7 +119,7 @@ public class ChatTwitter extends ChatAdapter {
 	}
 	
 	@Override
-	public String postMessage(SCSedro proc, String msg) {
+	public String postMessage(SCSedroCall proc, String msg) {
 		try {
 			Twitter twitter = getTwitterinstance();
 			Status status = twitter.updateStatus(msg);
@@ -129,7 +129,7 @@ public class ChatTwitter extends ChatAdapter {
 	}
 
 	@Override
-	public String sendDirectMessage(SCSedro proc, String touser, String msg) {
+	public String sendDirectMessage(SCSedroCall proc, String touser, String msg) {
 		try {
 		    Twitter twitter = getTwitterinstance();
 		    DirectMessage message = twitter.sendDirectMessage(touser, msg);

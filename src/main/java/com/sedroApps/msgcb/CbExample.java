@@ -18,7 +18,7 @@ package main.java.com.sedroApps.msgcb;
 
 import java.util.HashMap;
 
-import main.java.com.sedroApps.SCSedro;
+import main.java.com.sedroApps.SCSedroCall;
 
 
 public class CbExample extends CbMessage {
@@ -28,7 +28,7 @@ public class CbExample extends CbMessage {
 	}
 	
 	@Override
-	public String getFinalMessage(String caname, SCSedro processor, boolean msgPublic, 
+	public String getFinalMessage(String caname, SCSedroCall processor, boolean msgPublic, 
 			HashMap<String, Object> msgInfo, String msg) {
 		// just a simple replace
 		msg.replaceAll("yes", "maybe");

@@ -28,152 +28,10 @@ import main.java.com.sedroApps.util.HttpUtil;
 import main.java.com.sedroApps.util.Sutil;
 
 
-public class SCSedro {
-	
-	private String persona;
-	private String persona_full_name;
-	private String persona_handle;	// email/phone/id
-	
-	private String caller = null;
-	private String caller_full_name = null;
-	private String caller_handle = null;	// email/phone/id
+public class SCSedroCall extends SCCall {
 
-	private HashMap<String, String> call_info = null;
-	
-	private String language = null;
-	private String context;
-	private String chid;
-	private String key;
-	private String channel_type = null;
-	private String caller_token = null;
-	private int max_qn = -1;
-	private double latitude = 0;
-	private double longitude = 0;
-	private String location = null;
-	private String calltime = null;
-	private int tzoffset = -1;
-	private String tzn = null;
-	private int call_count = 0;
-	
-	private int msg_num_last = 0;	
-	private int msg_num = 0;	
-	private boolean readPublic = false;
-	private boolean respPublic = false;
-	private boolean directMsg = false;
-	
-	//private List<HashMap<String, Object>> msg = null;
-	
-	private String status = "wake";
-	
-
-	SCSedro(boolean readPublic, boolean respPublic, boolean directMsg) {
-		this.status = "wake";
-		this.readPublic = readPublic;
-		this.respPublic = respPublic;
-		this.directMsg = directMsg;
-	}
-	
-	//////////////////////////////////////////////////
-	// Configuration
-	public boolean isReadPublic() {
-		return readPublic;
-	}
-	public boolean isRespPublic() {
-		return respPublic;
-	}
-	public boolean isDirectMsg() {
-		return directMsg;
-	}
-	
-	public String getPersona() {
-		return persona;
-	}	
-	public void setPersona(String persona) {
-		this.persona = persona;
-	}
-	public String getPersona_full_name() {
-		return persona_full_name;
-	}	
-	public String getPersona_handle() {
-		return persona_handle;
-	}	
-	public void setPersona_handle(String persona_handle) {
-		this.persona_handle = persona_handle;
-	}
-	public void setLocation(double latitude, double longitude, String location) {
-		this.location = location;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		if (this.latitude <= 0 || this.longitude <= 0) {
-			this.latitude = 0;
-			this.longitude = 0;
-		}
-	}
-	public void setCalltime(String calltime, String tzn, int tzoffset) {
-		this.calltime = calltime;
-		this.tzoffset = tzoffset;
-		this.tzn = tzn;
-	}
-	
-	public String getCaller() {
-		return caller;
-	}	
-	public void setCaller(String caller) {
-		this.caller = caller;
-	}
-	public String getCaller_full_name() {
-		return caller_full_name;
-	}	
-	public void setCaller_full_name(String caller_full_name) {
-		this.caller_full_name = caller_full_name;
-	}
-	public String getCaller_handle() {
-		return caller_handle;
-	}	
-	public void setCaller_handle(String caller_handle) {
-		this.caller_handle = caller_handle;
-	}
-	
-	public void setCall_info(HashMap<String, String> call_info) {
-		this.call_info = call_info;
-	}
-	
-	
-	public String getLanguage() {
-		return language;
-	}	
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-	public String getContext() {
-		return context;
-	}	
-	public void setContext(String context) {
-		this.context = context;
-	}
-	public String getChannel_type() {
-		return channel_type;
-	}
-	public void setChannel_type(String channel_type) {
-		this.channel_type = channel_type;
-	}
-	public void setCaller_token(String caller_token) {
-		this.caller_token = caller_token;
-	}
-	public String getCaller_token() {
-		return caller_token;
-	}	
-	public void setMax_qn(int max_qn) {
-		this.max_qn = max_qn;
-	}
-	public int getMax_qn() {
-		return max_qn;
-	}
-	public void setCall_count(int call_count) {
-		this.call_count = call_count;
-	}
-	public int getCall_count() {
-		return call_count;
+	public SCSedroCall(boolean readPublic, boolean respPublic, boolean directMsg) {
+		super(readPublic, respPublic, directMsg);
 	}
 	
 	private static String getAPIHost() {
@@ -183,15 +41,6 @@ public class SCSedro {
 		return "https://"+ getAPIHost()+ending;
 	}
 
-	//////////////////////////////////////////////////
-	// State and status
-	public String getStatus() {
-		return status;
-	}
-	public int getMsgNumber() {
-		return msg_num;
-	}
-	
 	
 	// get current personas
 	public static List<String> getPersonas(String key) {
@@ -219,7 +68,7 @@ public class SCSedro {
 		return null;
 	}
 
-	
+	@Override
 	public List<HashMap<String, Object>> chatWake(String key, String text) {
 		if (!getStatus().equals("wake") && !getStatus().equals("bye")) return null;
 		//System.out.println(" **CHAT_WAKE");
@@ -230,14 +79,14 @@ public class SCSedro {
 		String reqData = "{\"event\": \"wake\""; 		
 		reqData += ", \"persona\": \"" + persona  + "\""; 
 		if (text != null) reqData += ", \"text\": \"" + escape(text) + "\""; 
-		if (caller != null) reqData += ", \"user\": \"" + escape(caller) + "\""; 
-		if (call_count != 0) reqData += ", \"call_count\": \"" + call_count + "\""; 
-	    if (caller_token != null) reqData += ", \"caller_token\": \"" + caller_token + "\""; 
+		if (this.getCaller() != null) reqData += ", \"user\": \"" + escape(this.getCaller()) + "\""; 
+		if (this.getCall_count() != 0) reqData += ", \"call_count\": \"" + this.getCall_count() + "\""; 
+	    if (this.getCaller_token() != null) reqData += ", \"caller_token\": \"" + this.getCaller_token() + "\""; 
 	    if (context != null) reqData += ", \"context\": \"" + context  + "\""; 
-	    if (language != null) reqData += ", \"language\": \"" + language  + "\""; 
-	    if (channel_type != null) reqData += ", \"channel_type\": \"" + channel_type  + "\""; 
+	    if (this.getLanguage() != null) reqData += ", \"language\": \"" + this.getLanguage()  + "\""; 
+	    if (this.getChannel_type() != null) reqData += ", \"channel_type\": \"" + this.getChannel_type()  + "\""; 
 	 //   if (save) ind += ", \"save\": \"" + save + "\"";  
-	    if (max_qn >= 0) reqData += ", \"max_qn\": \"" + max_qn + "\"";
+	    if (this.getMax_qn() >= 0) reqData += ", \"max_qn\": \"" + this.getMax_qn() + "\"";
 	    if (latitude > 0) reqData += ", \"latitude\": \"" + latitude + "\"";
 	    if (longitude > 0) reqData += ", \"longitude\": \"" + longitude + "\"";
 	    if (location != null) reqData += ", \"location\": \"" + location + "\"";
@@ -259,6 +108,7 @@ public class SCSedro {
 		return rl;
 	}
 	
+	@Override
 	public List<HashMap<String, Object>> chatPoll() {
 		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
 		//System.out.println(" **CHAT_POLL: " + this.chid);
@@ -275,6 +125,7 @@ public class SCSedro {
 		return rl;
 	}
 	
+	@Override
 	public List<HashMap<String, Object>> chatMsg(String text) {
 		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
 		//System.out.println(" **CHAT_MSG: " + this.chid);
@@ -294,6 +145,7 @@ public class SCSedro {
 		return rl;
 	}
 	
+	@Override
 	public List<HashMap<String, Object>> chatBye() {
 		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
 		//System.out.println(" **CHAT_BYE");
@@ -306,7 +158,7 @@ public class SCSedro {
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
 		List<HashMap<String, Object>> rl = chatRespParse(line, true);
-		status = "bye";
+		this.setStatus("bye");
 		return rl;
 	}
 	
@@ -347,7 +199,7 @@ public class SCSedro {
 					for (int i=0;i<list.length();i++) {
 						// the messages .... 
 				//		if (resp.list[i].r == "false" || !resp.list[i].msg) continue; // only if remote add..
-						status = "msg";
+						this.setStatus("msg");
 						HashMap<String, Object> mm = new HashMap<>();
 						JSONObject msg = list.getJSONObject(i);
 						String nms [] = JSONObject.getNames(msg);
@@ -379,7 +231,7 @@ public class SCSedro {
 
 						String ev = (String)mm.get("event");
 						if (Sutil.compare(ev, "bye")) {
-							status = "msg";
+							this.setStatus("msg");
 						}
 						
 						//System.out.println(" MSG["+mnum+"]["+msg_num+"] txt: " + mm.get("msg"));
