@@ -60,7 +60,8 @@ function clearErrors() {
 	$("#knowledge_text").removeClass("error");
 	$("#form_content").removeClass("error");
 	$("#username").removeClass("error");
-
+	$("#qanda_question").removeClass("error");
+	$("#qanda_answer").removeClass("error");
 }
 
 /////////////////////////////////////////////////////////////////
@@ -171,19 +172,29 @@ $(document).ready(function() {
 			$("#add_persona_bt").click();
 		});
 
-	});		
+	});	
+	$("#raw_persona_cancel_bt").on('click', function (e) {
+		$("#raw_persona_data").val(""); 
+		$("#raw_persona").hide();
+	});
+	
+	// FORMs
 	$("#form_add_bt").on('click', function (e) {
-		addPersonaForm();
+		addPresonaForm();
 	});
 	$("#form_add_cancel_bt").on('click', function (e) {
 		$("#form_content, #form_url").val(""); 
 		$("#add_form").hide();
 	});	
-	$("#raw_persona_cancel_bt").on('click', function (e) {
-		$("#raw_persona_data").val(""); 
-		$("#raw_persona").hide();
-	});		
-	
+		
+	// QandA
+	$("#qanda_add_bt").on('click', function (e) {
+		addPresonaQandA();
+	});
+	$("#qanda_add_cancel_bt").on('click', function (e) {
+		$("#qanda_question, #qanda_answer, #qanda_answer_short").val(""); 
+		$("#add_qanda").hide();
+	});	
 	
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -366,6 +377,30 @@ function showPersona(persona) {
 			$("#pform_"+persona).html(dat);			
 		} else $("#xpool_action").html("ERROR: getting persona forms: " + rctx + " / " + rpersona);
 	});
+	// get QandA
+	sedroPersonaGetQandA(ctx, persona, function (rctx, rpersona, data) {
+		if (data) {
+			var dat = "";
+			if (data.list) {
+				for (var i=0;i<data.list.length;i++) {
+					dat += "<div class='fLn' style='width:90%;padding-top:5px;padding-bottom:5px;margin-left:40px;position:relative;border-top:1px solid #CCC'" +
+							" title='classifier:"+data.list[i].classifier+" type:"+data.list[i].object+" act:"+data.list[i].act+" answer: "+data.list[i].answer+"' " +
+							">";
+					//answer_short
+					dat += "<b>"+data.list[i].object+"</b>";
+					dat += ":&nbsp;&nbsp;" + data.list[i].question;
+					dat += "<div class='bslink' onClick='personaRemoveQandA(\""+persona+"\", \""+data.list[i].object+"\", \"" + data.list[i].classifier + "\", \"" + data.list[i].question + "\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:10px;background:#666;color:#FFF;'>Remove</div>";		
+					dat += "</div>";
+				}				
+			}	
+			if (dat != "") {
+				var hdr = "<div class='fLn' style='width:90%;padding-top:10px;padding-bottom:5px;margin-left:25px;font-weight:bold;position:relative'>Questions and Answers</div>";
+				dat = hdr + dat;
+			}
+			// put it
+			$("#pqanda_"+persona).html(dat);			
+		}
+	});
 }
 function addShowForm(tag, persona, name, del) {
 	var dat = "<div class='fLn' style='width:90%;padding-top:5px;padding-bottom:5px;margin-left:40px;position:relative;border-top:1px solid #CCC'>";
@@ -373,7 +408,7 @@ function addShowForm(tag, persona, name, del) {
 	else dat += "<b>"+tag+"</b>";
 	dat += ":&nbsp;&nbsp;" + name;
 	if (del) {
-		dat += "<div class='bslink' onClick='sedroPersonaRForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:10px;background:#666;color:#FFF;'>Remove</div>";		
+		dat += "<div class='bslink' onClick='sedroPersonaRemoveRForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:10px;background:#666;color:#FFF;'>Remove</div>";		
 		dat += "<div class='bslink' onClick='sedroPersonaRawForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:80px;background:#666;color:#FFF;'>Raw</div>";		
 		dat += getTypeSelect(persona, name, tag);		
 		dat += "<div class='bslink' onClick='sedroPersonaUpdateRForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:150px;background:#666;color:#FFF;'>Update</div>";		
@@ -448,7 +483,7 @@ function addPersonaForm() {
 	}
 }
 
-function sedroPersonaRForm(persona, name) {
+function sedroPersonaRemoveRForm(persona, name) {
 	var ctx = $("#ctx").val();
 	$(".poolCount").html("Removeing persona Form["+persona+"] form["+name+"]...");
 	sedroPersonaRemoveForm(ctx, persona, name, function (rctx, persona, data) {
@@ -493,6 +528,59 @@ function sedroPersonaRawForm(persona, name) {
 			$("#add_form").show();
 			$("#form_persona").val(data.info.persona);
 			$("#persona_form_show").html(data.info.persona + " form: " + data.info.form);			
+		}
+	});
+}
+
+//QandA
+function showPresonaQandA(persona) {
+	clearErrors();
+	$("#qanda_question, #qanda_answer, #qanda_answer_short").val(""); 
+	$("#add_qanda").show();
+	$("#qanda_persona").val(persona);
+	$("#persona_qanda_show").html(persona);
+}
+function addPresonaQandA() {
+	clearErrors();
+	var ctx = $("#ctx").val();
+	var persona = $("#qanda_persona").val();
+	var qq = $("#qanda_question").val(); // select
+	var qa = $("#qanda_answer").val();
+	var qas = $("#qanda_answer_short").val();
+	var err = false;
+	if (!qq) {
+		$("#qanda_question").addClass("error");
+		err = true;
+	}
+	if (!qa) {
+		$("#qanda_answer").addClass("error");
+		err = true;
+	}
+	if (err) return;
+	
+	var ctx = $("#ctx").val();
+	
+	$("#xpool_action").html("Adding QandA: " + ctx + " / " + persona + " ...");
+	var caller = null, caller_token = null, language = null;
+	sedroPersonaAddQandA(ctx, persona, qq, qa, qas, caller, caller_token, language, function (rctx, rpersona, data) {
+		if (data) {
+			$("#xpool_action").html("Added QandA: " + rctx + " / " + persona);
+			$("#add_qanda").hide();
+			getTenant();
+		} else {
+			$("#xpool_action").html("ERROR: Adding QandA: " + rctx + " / " + persona);
+		}
+	});
+}
+
+function personaRemoveQandA(persona, object, classifier, question) {
+	var ctx = $("#ctx").val();
+	sedroPersonaRemoveQandA(ctx, persona, object, classifier, question, function (rctx, rpersona, data) {
+		if (data) {
+			$("#xpool_action").html("Removed QandA: " + rctx + " / " + persona);
+			getTenant();
+		} else {
+			$("#xpool_action").html("ERROR: Removing QandA: " + rctx + " / " + persona);
 		}
 	});
 }
