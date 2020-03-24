@@ -1,0 +1,50 @@
+<doc>
+	<!-- http://localhost:8081/forms/formset_template.xml -->
+	
+	<!-- The DATA we get -->	
+	<form name='location weather' data-type='dataform' data-link='location=possesses'>
+		<input name="location" data-type="input" data-thought="no"/>
+		<input name="sunrise" data-type="input" data-alias='sunrise time'/>
+		<input name="sunset" data-type="input" data-alias='sunset time'/>
+		<input name="precipitation" data-type="input"/>
+		<input name="aqi" data-type="input" data-alias='Air Quality Index'/>
+		<input name="temperature" data-type="input"/>
+		<input name="visibility" data-type="input"/>
+		<input name="wind" data-type="input"/>
+		<input name="conditions" data-type="input"/>		
+	</form>
+	
+	<!-- input -->
+	<form name='location' data-type='dataform'>
+		<input name="latitude" data-type="input" value="%caller/latitude%"/>
+		<input name="longitude" data-type="input" value="%caller/longitude%"/>
+	</form>
+	
+	<!-- FORM to show the weather -->
+	<form name='_show_weather_' data-type='form' >
+		<input name="weather sum" data-type="content"/>
+		<label for="weather sum" state='wake' data-template='location, location weather'>
+			Currently ${forms.location_weather.conditions}  ${forms.location_weather.temperature} and in ${forms.location_weather.location}
+		</label>			
+	</form>
+	
+	<!-- Explicit get and show -->
+	<form name='_getweather_' data-type='form'>
+		<!-- for location weather a request form OR here with longitude/latitued could be added -->
+		<input name="get_weather" data-type="post" data-req-formname='location' data-resp-formname='location weather' data-posturl='http://localhost:8080/api/1.0/test/weather'/>		
+		<input name="show report" data-type="form" data-formname="_show_weather_" data-task='weather report'/>	
+	</form>
+
+	<!-- Bot (or sub element) that just gets the weather -->
+	<form name='_weather_bot_' role='main' data-type='form'>
+		<input name="intro" data-type="intro"/>
+		<label for="intro" state='wake'>Getting the current weather</label>	
+				
+		<input name="weather report" data-type="form" data-formname="_getweather_"/>
+		
+		<input name="outro" data-type="outro" />
+		<label for="outro" state='wake' data-pre-wait='10' data-post-wait='10'>Good bye</label>
+			
+		<input name="bye" data-type="event" data-event='bye'/>
+	</form>
+</doc>

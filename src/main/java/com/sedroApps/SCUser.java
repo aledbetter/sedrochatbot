@@ -248,6 +248,7 @@ public class SCUser {
 		SCServer.getChatServer().save();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void load(HashMap<String, Object> um) {
 		// user config
 		this.sedro_persona = (String)um.get("sedro_persona");
