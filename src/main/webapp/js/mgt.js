@@ -17,36 +17,24 @@
 
 var glob_max_persona = 0;
 var glob_cur_persona = 0;
-var glob_api_key = null;
+var chbot_glob_api_key = null;
 
 function resetPage() {
 	$(".sedro_version").html(getSedroVersion()); // add version
-	
-	$("#knowledge_text, #api_key").val(""); 
-	$("#ctx, #persona, #username").val(""); 
-	
-	$("#pub_list").hide(); 
-	$("#gen_persona, #gen_knowledge").hide(); 
+		
 	$("#thetenant").hide(); 
 	$("#tenantchoice").show(); 
 	
 	$(".poolCount, .ctx, .ctxName").html(""); 
-	
-	$("#add_persona").hide().attr("data-h", "hide");
-	$("#add_knowledge").hide().attr("data-h", "hide");
-	
-	$("#add_persona_bt, #add_knowledge_bt").html("Add");
+	$("#api_key, #ctx, #persona, #username").val(""); 
+	$("#add_persona, #add_form, #add_qanda, #add_dbknow, #raw_persona").hide();
 	
 	setStat("");
 	g_msg_num = 1;
 	clearErrors();
 	
-	$("#first_name").val(""); 
-	$("#last_name").val(""); 
-	$("#sex").val(""); 
-	$("#email").val(""); 
+	$("#first_name, #last_name, #sex, #email").val(""); 
 	$("#form_content, #form_url").val(""); 
-	$("#add_form").hide();
 }
 function setStat(stat) {
 	$(".action").html("");
@@ -57,11 +45,11 @@ function clearErrors() {
 	$("#first_name").removeClass("error");
 	$("#last_name").removeClass("error");
 	$("#email").removeClass("error");
-	$("#knowledge_text").removeClass("error");
-	$("#form_content").removeClass("error");
 	$("#username").removeClass("error");
+	$("#form_content").removeClass("error");
 	$("#qanda_question").removeClass("error");
 	$("#qanda_answer").removeClass("error");
+	$("#dbknow_content").removeClass("error");	
 }
 
 /////////////////////////////////////////////////////////////////
@@ -83,16 +71,16 @@ $(document).ready(function() {
 	// get the key
 	scsGetSettings(function(data) {
 		if (data && data.info && data.info.sedro_access_key) {
-			glob_api_key = data.info.sedro_access_key;
+			chbot_glob_api_key = data.info.sedro_access_key;
 			$("#api_key").val(data.info.sedro_access_key); 
 			setAPIKey(data.info.sedro_access_key);
 			setAPIHost(data.info.sedro_host);
 			sedroGetAccount(function (data) {
 				if (data) showTenant(data.results[0]);
-				else $("#xtenant_action").html("ERROR: Adding Account for: " + glob_api_key);
+				else $("#xtenant_action").html("ERROR: Adding Account for: " + chbot_glob_api_key);
 			});
 		} else {
-			glob_api_key = null;
+			chbot_glob_api_key = null;
 			$("#api_key").val(""); 
 			$("#xtenant_action").html("ERROR: RAPID API key not set ");
 		}
@@ -115,20 +103,44 @@ $(document).ready(function() {
 		});
 	});
 	
+	// raw persona
+	$("#raw_persona_cancel_bt").on('click', function (e) {
+		$("#raw_persona_data").val(""); 
+		$("#raw_persona").hide();
+	});	
 	
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	// persona generate
+	// FORMs
+	$("#form_add_bt").on('click', function (e) {
+		addPresonaForm();
+	});
+	$("#form_add_cancel_bt").on('click', function (e) {
+		$("#form_content, #form_url").val(""); 
+		$("#add_form").hide();
+	});	
+	
+	// QandA
+	$("#qanda_add_bt").on('click', function (e) {
+		addQandA();
+	});
+	$("#qanda_add_cancel_bt").on('click', function (e) {
+		$("#qanda_question, #qanda_answer, #qanda_answer_short").val(""); 
+		$("#add_qanda").hide();
+	});	
+
+	// DBKnow
+	$("#dbknow_add_bt").on('click', function (e) {
+		addDBKnow();
+	});
+	$("#dbknow_add_cancel_bt").on('click', function (e) {
+		$("#dbknow_content").val(""); 
+		$("#add_dbknow").hide();
+	});	
+	// Persona	
 	$("#add_persona_bt").on('click', function (e) {		
-		var h = $("#add_persona").attr("data-h");
-		if (!h || h == "hide") {
-			$("#add_persona").show().attr("data-h", "show");
-			$("#add_persona_bt").html("Close");
-
-		} else {
-			$("#add_persona").hide().attr("data-h", "hide");
-			$("#add_persona_bt").html("Add");
-
-		}
+		$("#add_persona").show();
+	});
+	$("#persona_generate_cancel_bt").on('click', function (e) {
+		$("#add_persona").hide();
 	});
 	$("#persona_generate_bt").on('click', function (e) {
 		clearErrors();
@@ -141,7 +153,6 @@ $(document).ready(function() {
 		var err = false;
 		if (!ctx) {
 			$("#ctx").addClass("error");
-			alert("CTX");
 			err = true;
 		}
 		if (!persona) {
@@ -163,91 +174,14 @@ $(document).ready(function() {
 		$(".ctx").html(ctx);	
 		$("#persona").val(persona);
 
-		$("#xpersona_action").html("Generating2 Persona: " + ctx + " / " + persona + " ...");
 		var nvlist = {first_name:""+first_name, last_name: ""+last_name, sex: ""+sex, email: ""+email};
 		sedroGeneratePersonaMap(ctx, nvlist, function (data) {
-			$("#xpersona_action").html("Persona Saved: " + persona);
-			$("#first_name, #last_name, #sex, #email").val("");
+			$("#first_name, #last_name, #sex, #email").val(""); 
 			getTenant();
-			$("#add_persona_bt").click();
+			$("#add_persona").hide();
 		});
-
-	});	
-	$("#raw_persona_cancel_bt").on('click', function (e) {
-		$("#raw_persona_data").val(""); 
-		$("#raw_persona").hide();
-	});
 	
-	// FORMs
-	$("#form_add_bt").on('click', function (e) {
-		addPresonaForm();
-	});
-	$("#form_add_cancel_bt").on('click', function (e) {
-		$("#form_content, #form_url").val(""); 
-		$("#add_form").hide();
 	});	
-		
-	// QandA
-	$("#qanda_add_bt").on('click', function (e) {
-		addPresonaQandA();
-	});
-	$("#qanda_add_cancel_bt").on('click', function (e) {
-		$("#qanda_question, #qanda_answer, #qanda_answer_short").val(""); 
-		$("#add_qanda").hide();
-	});	
-	
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	// DB generate
-	$("#add_knowledge_bt").on('click', function (e) {		
-		var h = $("#add_knowledge").attr("data-h");
-		
-		var persona = $("#persona").val(); 
-		if (persona && persona.length > 2) {
-			$(".personaName").html(persona);
-			$("#persona_select").val(persona);
-		} else $(".personaName").html("...");
-
-		if (!h || h == "hide") {
-			$("#add_knowledge").show().attr("data-h", "show");
-			$("#add_knowledge_bt").html("Close");
-
-		} else {
-			$("#add_knowledge").hide().attr("data-h", "hide");
-			$("#add_knowledge_bt").html("Add");
-
-		}
-	});
-	$("#db_generate_bt").on('click', function (e) {	
-		var persona = $("#persona_select").val();
-		if (!persona || persona.length < 2) {
-			alert("no persona");
-			return;
-		}
-		$("#persona").val(persona); 
-		$(".personaName").html(persona);
-
-		
-		var content = $("#knowledge_text").val(); 
-		if (!content || content.length < 10) {
-			$("#knowledge_text").addClass("error");
-			return;
-		}
-		var ctx = $("#ctx").val(); 
-		var name = persona +"_info";  //%dbname%_info => ctx+"_"+persona +"_info"
-		$("#xdb_action").html("Generating knowledge: " + ctx + " / " + name + " ...");
-		sedroPersonaGenerateDb(ctx, persona, content, function (rctx, rname, rcontent, data) {
-			if (data) {
-				$("#xdb_action").html("Knowledge generated: " + rctx + " / " + rname);
-				$("#knowledge_text").val(""); 
-				getTenant();
-				$("#add_knowledge_bt").click();
-			} else {
-				$("#xdb_action").html("ERRORO: Knowledge generation: " + rctx + " / " + rname);
-			}
-		});
-	});	
-	
 });
 
 function getTenant() {
@@ -265,92 +199,102 @@ function getTenant() {
 
 function showTenant(tenant) {
 	$("#ctx").val(tenant.ctx);
-	
-	var hh = "<div class='fLn' style='font-size:16px;line-height:1.6em;padding-left:15px'>";
+	$("#xtenant_action").html("");
+
+	// header info
+	var hh = "";
 	if (tenant.username) hh += "<div class='fLn'>Username: <b>" + tenant.username+"</b></div>";
 	if (tenant.name != tenant.username) hh += "<div class='fLn'>Name: <b>" + tenant.name+"</b></div>";
 	hh += "<div class='fLn'>Language: <b>" + tenant.language+"</b></div>";
 	if (tenant.email) hh += "<div class='fLn'>Email: <b>" + tenant.email+"</b></div>";
 	hh += "<div class='fLn'>Subscription: <b>" + tenant.subscription+"</b> ";
-	hh += "&nbsp;&nbsp;&gt;&gt;&nbsp;&nbsp;max persona: <b>" + tenant.max_persona+"</b> max db: <b>" + tenant.max_db+"</b> max session: <b>" + tenant.max_session+"</b></div>";
-	hh += "</div>"
+	hh += "&nbsp;&nbsp;&gt;&gt;&nbsp;&nbsp;max persona: <b>" + tenant.max_persona+"</b> max db: <b>" + tenant.max_db+"</b>  max session: <b>" + tenant.max_session+"</b></div>";
+	$("#tenant_header").html(hh);
 	
+	// persona info
+	hh = "";	
 	var pselect = "";
 	if (tenant.personas) {
-		hh += "<div class='fLn personas' style='margin-top:15px;padding-bottom:8px;padding-top:8px;border-top:solid 2px #555;border-bottom:solid 2px #555;font-size:18px'>&nbsp;Personas: " + tenant.personas.length+ "</div>";
+		$("#persona_count").html(""+tenant.personas.length);
 		var hp = "";
 		for (var i=0;i<tenant.personas.length;i++) {
-			hp += "<div class='fLn' style='padding-top:8px;padding-bottom:6px;font-size:16px;margin-top:4px;border-bottom:solid 1px #555'><span>&nbsp;&nbsp;&nbsp;&nbsp;";
-			hp += "<b>" + tenant.personas[i]+"</b></span>";
+			hp += "<div class='fLn'>";
+			hp += "<div class='fLn' style='padding-top:8px;font-size:16px;margin-bottom:4px;border-top:solid 1px #555'><span>&nbsp;&nbsp;&nbsp;&nbsp;";			
+			hp += "<b class='wordHover' onClick='showPersonaRaw(\""+tenant.personas[i]+"\");'>" + tenant.personas[i]+"</b></span>";					
 			hp += "<div class='bslink' onClick='showChat(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Chat</div>";		
 			hp += "<div class='bslink' onClick='removePersona(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Remove</div>";				
 			hp += "<div class='bslink' onClick='sedroPersonaClearRForms(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Clear Forms</div>";				
 			hp += "<div class='bslink' onClick='showPresonaForm(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Add Form</div>";		
-			hp += "<div class='bslink' onClick='showPersonaRaw(\""+tenant.personas[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Raw</div>";				
-			
-			hp += "<div id='pform_"+tenant.personas[i]+"' class='fLn' style='margin-top:5px'></div>";
+			hp += "</div>";			
+			hp += "<div class='fLn db_select_view'>";
+				hp += "<div class='bslink' onClick='personaAddDB(\""+tenant.personas[i]+"\");' style='width:80px;text-align:center;float:right;font-size:14px;margin-top:3px;background:#666;color:#FFF;margin-right:10px;'>Add DB</div>";				
+				hp += "<select id='"+tenant.personas[i]+"_db_select' class='db_select' style='width:200px;float:right;margin-top:0px;'></select>";
 			hp += "</div>";
+			hp += "<div class='fLn'>";
+				hp += "<div id='pform_"+tenant.personas[i]+"' class='fLn' style='margin-top:5px'></div>";
+				hp += "<div id='pdbs_"+tenant.personas[i]+"' class='fLn' style='margin-top:5px'></div>";
+			hp += "</div></div>";			
 			pselect += "<option value='"+tenant.personas[i]+"'>"+tenant.personas[i]+"</option>";						
 		}
 		hh += hp;		
-	}
-	$("#persona_select").html(pselect);
-
-	if (tenant.dbs) {
-		hh += "<div class='fLn dbs' style='margin-top:10px;margin-bottom:4px;border-bottom:solid 2px #CCC;font-size:18px'>&nbsp;Persona Knowledge: " + tenant.dbs.length+ "</div>";
-		var lh = "";
-		for (var i=0;i<tenant.dbs.length;i++) {
-			lh += "<div class='fLn' style='margin-top:4px;margin-bottom:4px;border-bottom:solid 1px #CCC'><span>&nbsp;&nbsp;&nbsp;&nbsp;";
-			lh += "<b>" + tenant.dbs[i]+"</b></span>";
-			lh += "<div class='bslink' onClick='removeTenantDb(\""+tenant.dbs[i]+"\");' style='width:70px;text-align:center;float:right;font-size:16px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Remove</div>";		
-			lh += "</div>";
-		}
-		hh += lh;
-	}
-	$("#xtenant_data").html(hh);
-	/*
-	if (tenant.pools) {
-		var lh = "";
-		for (var i=0;i<tenant.pools.length;i++) {
-			lh += showPool(tenant.pools[i]);
-		}
-		$(".poolCount").html(tenant.pools.length);
-		$("#xpool_data").html(lh);
 	} else {
-		$(".poolCount").html("No Depot Pools");
-		$("#xpool_data").html("");
-	}*/
+		$("#persona_count").html("0");
+	}
+	$("#tenant_personas").html(hh);
 	
-	$("#xpool_action").html("");
+	var lh = "", dbselect = "";
+	if (tenant.dbs) {
+		$("#db_count").html(""+tenant.dbs.length);
+		
+		for (var i=0;i<tenant.dbs.length;i++) {
+			lh += "<div class='fLn'>";
+			lh += "<div class='fLn' style='padding-top:8px;font-size:16px;margin-bottom:4px;border-top:solid 1px #555'><span>&nbsp;&nbsp;&nbsp;&nbsp;";
+			lh += "<b>" + tenant.dbs[i]+"</b></span>";
+			lh += "&nbsp;&nbsp;&nbsp;&nbsp;<span id='dbobjects_"+tenant.dbs[i]+"'>...</span>";
+			lh += "<div class='bslink' onClick='deleteTenantDb(\""+tenant.dbs[i]+"\");' style='width:70px;text-align:center;float:right;font-size:16px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Delete</div>";		
+			lh += "<div class='bslink' onClick='showAddQandA(\""+tenant.dbs[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Add Q&A</div>";		
+			lh += "<div class='bslink' onClick='showAddDBKnow(\""+tenant.dbs[i]+"\");' style='width:90px;text-align:center;float:right;font-size:14px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Add Know</div>";		
+			lh += "</div>";
+			lh += "<div class='fLn'>";
+				lh += "<div id='dbknowledge_"+tenant.dbs[i]+"' class='fLn' style='margin-top:5px'></div>";
+				lh += "<div id='dbqanda_"+tenant.dbs[i]+"' class='fLn' style='margin-top:5px'></div>";			
+			lh += "</div></div>";
+			
+			if (!tenant.dbs[i].endsWith("_info")) { // exclude default DBs
+				dbselect += "<option value='"+tenant.dbs[i]+"'>"+tenant.dbs[i]+"</option>";	
+			}
+		}
+	} else {
+		$("#db_count").html("0");
+	}
+	
+	$("#tenant_databases").html(lh);
+
 	$(".ctx").html(tenant.ctx);
 	$("#ctx").html(tenant.ctx);
-
 	$(".ctxName").html(tenant.name);
-	$("#thetenant, #gen_persona").show();
+	$("#thetenant, #mypool").show();
 	$("#tenantchoice").hide();
-	glob_max_persona = tenant.max_persona;
-	$(".ctxSubscription").html(tenant.subscription);
+	$("#persona_select").html(pselect);	
 
+	$(".db_select_view").hide();
+	$(".db_select").html(dbselect);
+	if (dbselect != "") $(".db_select_view").show();
 
 	// get persona forms
-	if (tenant.personas && tenant.personas.length > 0) {
-		$("#gen_knowledge").show();
-		glob_cur_persona = tenant.personas.length;
-		for (var i=0;i<tenant.personas.length;i++) {
-			showPersona(tenant.personas[i]);
-		}
-	} else {
-		$("#gen_knowledge").hide();
+	if (tenant.personas) {
+		for (var i=0;i<tenant.personas.length;i++) showPersona(tenant.personas[i]);
+	}
+	if (tenant.dbs) {
+		for (var i=0;i<tenant.dbs.length;i++) showDb(tenant.dbs[i]);
 	}
 }
 function showPersona(persona) {
-	var ctx = $("#ctx").val(); 
 	if (!persona) return;
+	var ctx = $("#ctx").val(); 
 	
-	$("#xpool_action").html("Show persona Forms: " + ctx + " / " + persona + " ...");
 	sedroPersonaGetForms(ctx, persona, function (rctx, rpersona, data) {
 		if (data) {
-			$("#xpool_action").html("Show persona forms: " + rctx + " / " + rpersona);
 			var dat = "";
 			if (data.info && data.info.main) {
 				dat += addShowForm("main", persona, data.info.main, false);
@@ -363,7 +307,7 @@ function showPersona(persona) {
 				}
 				if (data.results[0].background) {
 					for (var i=0;i<data.results[0].background.length;i++) {
-						dat += addShowForm("background", persona, data.results[0].active[i], false);
+						dat += addShowForm("background", persona, data.results[0].background[i], false);
 					}
 				}
 				if (data.results[0].action) {
@@ -372,46 +316,82 @@ function showPersona(persona) {
 					}				
 				}
 			}
-				
-			// put it
 			$("#pform_"+persona).html(dat);			
-		} else $("#xpool_action").html("ERROR: getting persona forms: " + rctx + " / " + rpersona);
+		} 
 	});
-	// get QandA
-	sedroPersonaGetQandA(ctx, persona, function (rctx, rpersona, data) {
+	sedroGetPersonaDbs(ctx, persona, function (rctx, rpersona, data) {
 		if (data) {
 			var dat = "";
 			if (data.list) {
 				for (var i=0;i<data.list.length;i++) {
-					dat += "<div class='fLn' style='width:90%;padding-top:5px;padding-bottom:5px;margin-left:40px;position:relative;border-top:1px solid #CCC'" +
-							" title='classifier:"+data.list[i].classifier+" type:"+data.list[i].object+" act:"+data.list[i].act+" answer: "+data.list[i].answer+"' " +
-							">";
-					//answer_short
-					dat += "<b>"+data.list[i].object+"</b>";
-					dat += ":&nbsp;&nbsp;" + data.list[i].question;
-					dat += "<div class='bslink' onClick='personaRemoveQandA(\""+persona+"\", \""+data.list[i].object+"\", \"" + data.list[i].classifier + "\", \"" + data.list[i].question + "\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:10px;background:#666;color:#FFF;'>Remove</div>";		
+					dat += "<div class='fLn' style='width:90%;padding-top:5px;padding-bottom:5px;margin-left:40px;position:relative;border-top:1px solid #CCC'>";
+					if (data.list[i].endsWith("_info")) { // default DB
+						dat += "<b>database</b> [<b>default</b>]:</b> " + data.list[i]
+						dat += "<div class='bslink' onClick='showAddQandA(\""+data.list[i]+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:80px;background:#666;color:#FFF;'>Add Q&A</div>";		
+						dat += "<div class='bslink' onClick='showAddDBKnow(\""+data.list[i]+"\");'  style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:10px;background:#666;color:#FFF;'>Add Know</div>";		
+					} else {
+						dat += "<b>database:</b> " + data.list[i];
+						dat += "<div class='bslink' onClick='personaRemoveDB(\""+persona+"\", \""+data.list[i]+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:10px;background:#666;color:#FFF;'>Remove</div>";		
+					}
 					dat += "</div>";
 				}				
 			}	
-			if (dat != "") {
-				var hdr = "<div class='fLn' style='width:90%;padding-top:10px;padding-bottom:5px;margin-left:25px;font-weight:bold;position:relative'>Questions and Answers</div>";
-				dat = hdr + dat;
-			}
+			$("#pdbs_"+persona).html(dat);			
+		}
+	});
+}
+function showDb(dbname) {
+	if (!dbname) return;
+	var ctx = $("#ctx").val(); 
+	sedroGetDb(ctx, dbname, function (rctx, rdbname, data) {
+		$("#dbobjects_"+dbname).html("empty");
+		if (!data.results[0]) return;
+
+		// objects
+		if (data.results[0].objects) {
+			$("#dbobjects_"+dbname).html("<b>"+data.results[0].objects+"</b> objects");
+		}
+		
+		// knowledge
+		if (data.results[0].knowledge) {
+			var dat = "";
+			for (var i=0;i<data.results[0].knowledge.length;i++) {
+				dat += "<div class='fLn' style='width:90%;white-space: nowrap;overflow:hidden;padding-top:5px;padding-bottom:5px;margin-left:40px;position:relative;border-top:1px solid #CCC' title='"+data.results[0].knowledge[i]+"'>";
+				dat += "<b>Knowledge:</b>&nbsp;&nbsp;" + data.results[0].knowledge[i];
+				dat += "</div>";	
+			}	
+			$("#dbknowledge_"+dbname).html(dat);
+		}
+		// qanda
+		if (data.results[0].qanda) {
+			var dat = "";
+			for (var i=0;i<data.results[0].qanda.length;i++) {
+				var qa = data.results[0].qanda[i];
+				dat += "<div class='fLn' style='width:90%;padding-top:5px;padding-bottom:5px;margin-left:40px;position:relative;border-top:1px solid #CCC'" +
+						" title='classifier:"+qa.classifier+" act:"+qa.act+" short: "+qa.answer_short+"' answer: "+qa.answer+"' " +
+						">";
+				dat += "<b>Q&A ("+qa.object+")</b>&nbsp;&nbsp;" + qa.question;
+				dat += "<div class='bslink' onClick='removeQandA(\""+dbname+"\", \""+qa.object+"\", \"" + qa.classifier + "\", \"" + qa.question + "\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:10px;background:#666;color:#FFF;'>Remove</div>";		
+				dat += "</div>";
+			}				
 			// put it
-			$("#pqanda_"+persona).html(dat);			
+			$("#dbqanda_"+dbname).html(dat);
 		}
 	});
 }
 function addShowForm(tag, persona, name, del) {
 	var dat = "<div class='fLn' style='width:90%;padding-top:5px;padding-bottom:5px;margin-left:40px;position:relative;border-top:1px solid #CCC'>";
-	if (tag == "load") dat += tag;
-	else dat += "<b>"+tag+"</b>";
-	dat += ":&nbsp;&nbsp;" + name;
+	dat += "<b>form </b>";
+	if (tag == "load") dat += "["+tag+"]";
+	else dat += "[<b>"+tag+"</b>]";
+
 	if (del) {
+		dat += "&nbsp;&nbsp;<span class='wordHover' onClick='sedroPersonaRawForm(\""+persona+"\", \""+name+"\");'>" + name+"</span>";
 		dat += "<div class='bslink' onClick='sedroPersonaRemoveRForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:10px;background:#666;color:#FFF;'>Remove</div>";		
-		dat += "<div class='bslink' onClick='sedroPersonaRawForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:80px;background:#666;color:#FFF;'>Raw</div>";		
 		dat += getTypeSelect(persona, name, tag);		
-		dat += "<div class='bslink' onClick='sedroPersonaUpdateRForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:150px;background:#666;color:#FFF;'>Update</div>";		
+		dat += "<div class='bslink' onClick='sedroPersonaUpdateRForm(\""+persona+"\", \""+name+"\");' style='z-index:0;width:60px;text-align:center;font-size:12px;height:16px;min-height:16px;position:absolute;top:3px;right:80px;background:#666;color:#FFF;'>Update</div>";		
+	} else {
+		dat += "&nbsp;&nbsp;" + name;
 	}
 	dat += "</div>";
 	return dat;
@@ -434,36 +414,25 @@ function getTypeSelect(persona, form, type) {
 	return dat;
 }
 
-function showChat(persona) {
-	clearErrors();
-	var ctx = $("#ctx").val();
-//	alert("start Chat: " + persona);
-	window.open("/msg.html?persona="+persona+"&tenant="+ctx, "_blank");
-	
-}
 function showPresonaForm(persona) {
 	clearErrors();
 	$("#form_content, #form_url").val(""); 
 	$("#add_form").show();
 	$("#form_persona").val(persona);
 	$("#persona_form_show").html(persona);
+	scrollToId("#thetenant");
 }	
-function addPersonaForm() {
+function addPresonaForm() {
 	var ctx = $("#ctx").val();
-
 	var ftype = $("#form_type").val(); // select
 	var persona = $("#form_persona").val();
 	var fcontent = $("#form_content").val();
-
 	var furl = $("#form_url").val();
 	if (furl) {
-		// do it
 		sedroPersonaAddFormRemote(ctx, persona, furl, ftype, function (rctx, persona, url, data) {
 			if (data) {
-				//$("#xpool_action").html("removed persona form: " + rctx + " / " + persona);
 				getTenant();
 				$("#add_form").hide();
-			} else {	
 			}
 		});
 	} else {
@@ -471,38 +440,26 @@ function addPersonaForm() {
 			$("#form_content").addClass("error");
 			return;
 		}
-		// do it
 		sedroPersonaAddForm(ctx, persona, fcontent, ftype, function (rctx, persona, data) {
 			if (data) {
-				//$("#xpool_action").html("removed persona form: " + rctx + " / " + persona);
 				getTenant();
 				$("#add_form").hide();
-			} else {	
 			}
 		});
 	}
 }
-
 function sedroPersonaRemoveRForm(persona, name) {
 	var ctx = $("#ctx").val();
 	$(".poolCount").html("Removeing persona Form["+persona+"] form["+name+"]...");
 	sedroPersonaRemoveForm(ctx, persona, name, function (rctx, persona, data) {
-		if (data) {
-			$("#xpool_action").html("removed persona form: " + name + " / " + persona);
-			getTenant();		
-		} else {	
-		}
+		if (data) getTenant();
 	});
 }
 function sedroPersonaClearRForms(persona) {
 	var ctx = $("#ctx").val();
 	$(".poolCount").html("Removeing all persona Form["+persona+"]...");
 	sedroPersonaClearForms(ctx, persona, function (rctx, persona, data) {
-		if (data) {
-			$("#xpool_action").html("removed all persona form: " + persona);
-			getTenant();		
-		} else {	
-		}
+		if (data) getTenant();
 	});
 }
 function sedroPersonaUpdateRForm(persona, name) {
@@ -510,14 +467,9 @@ function sedroPersonaUpdateRForm(persona, name) {
 	var type = $("#pform_"+persona +" #"+persona+"_"+name+"_type").val();
 	$(".poolCount").html("Updateing persona Form["+persona+"] form["+name+"] to " + type);
 	sedroPersonaUpdateForm(ctx, persona, name, type, function (rctx, persona, data) {
-		if (data) {
-			$("#xpool_action").html("updated persona form: " + name + " / " + persona);
-			getTenant();		
-		} else {	
-		}
+		if (data) getTenant();		
 	});
 }
-
 function sedroPersonaRawForm(persona, name) {
 	var ctx = $("#ctx").val();
 	sedroPersonaGetFormRaw(ctx, persona, name, function (rctx, persona, form, data) {
@@ -527,32 +479,35 @@ function sedroPersonaRawForm(persona, name) {
 			$("#form_content").val(data.info.raw); 
 			$("#add_form").show();
 			$("#form_persona").val(data.info.persona);
-			$("#persona_form_show").html(data.info.persona + " form: " + data.info.form);			
+			$("#persona_form_show").html(data.info.persona + " form: " + data.info.form);	
+			scrollToId("#thetenant");
 		}
 	});
 }
 
+
 //QandA
-function showPresonaQandA(persona) {
+function showAddQandA(name) {
 	clearErrors();
 	$("#qanda_question, #qanda_answer, #qanda_answer_short").val(""); 
 	$("#add_qanda").show();
-	$("#qanda_persona").val(persona);
-	$("#persona_qanda_show").html(persona);
+	$("#qanda_dbname").val(name);
+	$("#dbname_qanda_show").html(name);
+	scrollToId("#thetenant");
 }
-function addPresonaQandA() {
+function addQandA() {
 	clearErrors();
 	var ctx = $("#ctx").val();
-	var persona = $("#qanda_persona").val();
+	var dbname = $("#qanda_dbname").val();
 	var qq = $("#qanda_question").val(); // select
 	var qa = $("#qanda_answer").val();
 	var qas = $("#qanda_answer_short").val();
 	var err = false;
-	if (!qq) {
+	if (!qq || qq == "") {
 		$("#qanda_question").addClass("error");
 		err = true;
 	}
-	if (!qa) {
+	if (!qa || qa == "") {
 		$("#qanda_answer").addClass("error");
 		err = true;
 	}
@@ -562,31 +517,52 @@ function addPresonaQandA() {
 	
 	$("#xpool_action").html("Adding QandA: " + ctx + " / " + persona + " ...");
 	var caller = null, caller_token = null, language = null;
-	sedroPersonaAddQandA(ctx, persona, qq, qa, qas, caller, caller_token, language, function (rctx, rpersona, data) {
+	sedroAddQandA(ctx, dbname, qq, qa, qas, caller, caller_token, language, function (rctx, data) {
 		if (data) {
-			$("#xpool_action").html("Added QandA: " + rctx + " / " + persona);
 			$("#add_qanda").hide();
 			getTenant();
-		} else {
-			$("#xpool_action").html("ERROR: Adding QandA: " + rctx + " / " + persona);
-		}
+		} 
 	});
 }
-
-function personaRemoveQandA(persona, object, classifier, question) {
+function removeQandA(dbname, object, classifier, question) {
 	var ctx = $("#ctx").val();
-	sedroPersonaRemoveQandA(ctx, persona, object, classifier, question, function (rctx, rpersona, data) {
+	sedroRemoveQandA(ctx, dbname, object, classifier, question, function (rctx, data) {
 		if (data) {
-			$("#xpool_action").html("Removed QandA: " + rctx + " / " + persona);
 			getTenant();
-		} else {
-			$("#xpool_action").html("ERROR: Removing QandA: " + rctx + " / " + persona);
-		}
+		} 
 	});
 }
 
 
-// get raw persona
+//knowledge
+function showAddDBKnow(name) {
+	clearErrors();
+	$("#dbknow_content").val(""); 
+	$("#add_dbknow").show();
+	$("#dbknow_dbname").val(name);
+	$("#dbname_dbknow_show").html(name);
+	scrollToId("#thetenant");
+}
+function addDBKnow() {
+	clearErrors();
+	var ctx = $("#ctx").val();
+	var dbname = $("#dbknow_dbname").val();
+	var know = $("#dbknow_content").val(); // select
+	if (!know || know.length < 10) {
+		$("#dbknow_content").addClass("error");
+		return
+	}
+	var ctx = $("#ctx").val();
+	sedroAddDbKnow(ctx, dbname, know, function (rctx, rname, rcontent, data) {
+		if (data) {
+			$("#add_dbknow").hide();
+			getTenant();
+		}
+	});	
+}
+
+
+//get raw persona
 function showPersonaRaw(persona) {
 	var ctx = $("#ctx").val();
 	sedroGetPersonaRaw(ctx, persona, function (rctx, persona, data) {
@@ -594,6 +570,7 @@ function showPersonaRaw(persona) {
 			$("#raw_persona_name").html(data.info.persona)
 			$("#raw_persona_data").html(data.info.raw);
 			$("#raw_persona").show();
+			scrollToId("#thetenant");
 		}
 	});
 }
@@ -603,79 +580,45 @@ function removePersona(persona) {
 		getTenant();
 	});
 }
-function findPersonaPool(pools, persona) {
-	if (!pools) return null;
-	for (var i=0;i<pools.length;i++) {
-		if (pools[i].persona == persona) return pools[i];
-	}	
-	return null;
-}
-
-function showPool(pool) {
-	var hh = "<div class='fLn dpool' style='margin-top:4px;margin-bottom:4px;'><span>&nbsp;"
-	hh += "<b>" + pool.name+"</b>";
-	if (pool.persona) hh += " Persona: <b>" + pool.persona+"</b>";
-	hh += " language: " + pool.language;
-	hh += " [" + pool.min +" - " + pool.max +"]";
-	hh += " Total: " + pool.total;
-	hh += "</span>";
-	hh += "<div class='bslink' onClick='removeDepotPool(\""+pool.persona+"\", \""+pool.name+"\");' style='width:70px;text-align:center;float:right;font-size:16px;margin-top:-5px;background:#666;color:#FFF;margin-right:10px;'>Remove</div>";		
-	hh += "</div>";
-	return hh;
-}
-
-function getDepotPools() {
+function personaAddDB(persona) {
 	var ctx = $("#ctx").val();
-	$(".poolCount").html("Getting Depot Pools...");
-	sedroGetPool(ctx, function (rctx, data) {
-		if (!data) $(".poolCount").html("ERROR: No Depot Pools");
-		else if (data.results) {
-			var lh = "";
-			for (var i=0;i<data.results.length;i++) {
-				lh += showPool(data.results[i]);
-			}
-			$(".poolCount").html(data.results.length);
-			$("#xpool_data").html(lh);
-		} else {
-			$(".poolCount").html("No Depot Pools");
-			$("#xpool_data").html("");
-		}
+	var dbname = $("#"+persona+"_db_select").val();
+	sedroAddPersonaDb(ctx, persona, dbname, function (rctx, persona, data) {
+		getTenant();
 	});
 }
-function removeDepotPool(persona, name) {
-	var ctx = $("#ctx").val(); 
-	if (persona) name = null;
-	else persona = null;
-	$("#xpool_action").html("Removing Depot Pool: " + ctx + " / " + persona + "/"+name+" ...");
-	sedroRemovePool(ctx, persona, name, function (rctx, rpersona, data) {
-		if (data) {
-			$("#xpool_action").html("Removed Depot Pool: " + rctx + " / " + rpersona);
-			getTenant();
-		} else $("#xpool_action").html("ERROR: Removing Depot Pool: " + rctx + " / " + rpersona);
+function personaRemoveDB(persona, dbname) {
+	var ctx = $("#ctx").val();
+	sedroRemovePersonaDb(ctx, persona, dbname, function (rctx, persona, data) {
+		getTenant();
 	});
 }
-function addDepotPool(persona) {
+function deleteTenantDb(name) {
 	var ctx = $("#ctx").val();
-	$("#xpool_action").html("Adding Depot Pool: " + ctx + " / " + persona + " ...");
-	sedroAddPool(ctx, persona, 1, 3, function (rctx, rpersona, data) {
-		if (data) {
-			$("#xpool_action").html("Added Depot Pool: " + rctx + " / " + rpersona);
-			getTenant();
-		}
-		else $("#xpool_action").html("ERROR: Adding Depot Pool: " + rctx + " / " + rpersona);
-	});
-}
-function removeTenantDb(name) {
-	var ctx = $("#ctx").val();
-	$("#xpool_action").html("Removing DB: " + ctx + " / " + name + " ...");
 	sedroRemoveDb(ctx, name, function (rctx, rname, data) {
-		if (data) {
-			$("#xpool_action").html("Removed DB: " + rctx + " / " + rname);
-			getTenant();
-		}
-		else $("#xpool_action").html("ERROR: Removing DB: " + rctx + " / " + rname);
+		if (data) getTenant();
 	});
 }
+
+
+//////////////////////////////////////////////////////////////////
+// UTILS
+//////////////////////////////////////////////////////////////////
+
+// Chat handoff
+function showChat(persona) {
+	clearErrors();
+	var ctx = $("#ctx").val(); 
+	url = "/msg?tenant="+ctx+"&persona="+persona;
+	window.open(url, "_blank");
+}
+
+function scrollToId(id) {
+	$([document.documentElement, document.body]).animate({
+	    scrollTop: $(id).offset().top-20
+	}, 200);
+}
+
 function scsGetSettings(cb) {
 	$.ajax({url: "/api/1.0/settings", type: 'GET', dataType: "json", contentType: 'application/json', 
 	  success: function(data){
