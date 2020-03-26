@@ -408,5 +408,11 @@ img.wash {
 	line-height:1.5em;
 }
 
+.wordHover {
+	cursor:pointer;
+}
+.wordHover:hover {
+	color:orange;
+}
 
 
