@@ -13,12 +13,13 @@
 	<link rel="stylesheet" href="/css/style.css" />
 	 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-	<script type="text/javascript" src="http://api.sedro.xyz/w/00_DEV_00/js/api/api_sedro.js?version=1"></script> 
-	<script type="text/javascript" src="/js/mgt.js?version=1"></script> 
+	<script type="text/javascript" src="http://api.sedro.xyz/w/00_DEV_00/js/api/api_sedro.js"></script> 
+	<script type="text/javascript" src="http://api.sedro.xyz/w/00_DEV_00/js/api/api_mgt.js"></script> 
+	<script type="text/javascript" src="/js/mgt.js"></script> 
 
 </head>
 
-<body>
+<body style='text-align:left;font-size:16px'>
 	<div id="lheader">
 		<div>
 			<h1>The Sedro Project</h1>
@@ -31,26 +32,12 @@
 
 	<div class="fLn" style='margin-top:110px;background:#FFF'>
 		<input type='hidden' id='treename' value='english'/>
-		<input type='hidden' id='ctx'/>
-		<input id='persona' type='hidden'>
+		<input type='hidden' class='inerr' id='ctx'/>
+		<input type='hidden' class='inerr' id='persona'/>
 		
 		<div class="cent">			
 			<div class="fLn" style='min-height:1000px'>										
-				<div class="fLn" id='tenantchoice'>				
-					<div class="fLn" style='display:none;margin-top:30px;margin-bottom:50px'>
-						<div class="fLn" style='background:#666;color:#FFF;height:35px;position:relative;font-size:20px;padding-top:17px'>		
-							<span style='float:left'>
-								&nbsp;&nbsp;RapidAPI Key: <input type='text' id='api_key' style='width:400px;position:absolute;top:11px;left:150px'>
-							</span>	
-							<div class='bslink' id='tenant_get_bt' style='width:140px;text-align:center;float:right;font-size:16px;margin-top:-2px;background:#EEE;margin-right:15px;'>Get Personas</div>			
-						</div>						
-					</div>
-					<div class="fLn" style='padding-top:10px;padding-bottom:5px'>					
-						<div class='fLn action' style='font-weight:bold' id='xtenant_action'></div>
-					</div>	
-				</div>
-	
-				
+
 				<div class="fLn" id='thetenant' style='display:none;margin-top:10px;margin-bottom:10px;background:#EEE;position:relative'>
 					<div class="fLn" style='margin-bottom:10px;background:#666;color:#FFF;height:40px;font-size:18px;padding-top:12px'>		
 						<span style='float:left;padding-left:10px'>Name: <b><span class='ctxName'></span></b></span>
@@ -58,17 +45,18 @@
 						<span style='float:right;padding-right:10px'>Tenant ID: <span class='ctx'></span></span>	
 					</div>	
 						
-					<div class='fLn' style='padding-top:10px;padding-bottom:10px'>					
+					<div class='fLn' style='padding-top:10px'>					
 						<div class='fLn' style='font-weight:normal'>
-							<div class='fLn' id='tenant_header' style='font-size:16px;line-height:1.6em;padding-left:15px;padding-bottom:10px'>							
+							<div class='fLn' style='font-size:16px;line-height:1.6em'>
+								<div class='fLn' id='tenant_header' style='padding:10px'></div>
 							</div>
 							<div class='fLn' style='position:relative'>
-								<div class='fLn personas' style='background:#FFF;padding-bottom:8px;padding-top:15px;font-size:18px;font-weight:bold'>&nbsp;Personas: <span id='persona_count'>...</span></div>
+								<div class='fLn personas' style='background:#FFF;padding-bottom:8px;padding-top:15px;font-size:18px;font-weight:bold;border-bottom:2px solid #DDD'>&nbsp;Personas: <span id='persona_count'>...</span></div>
 								<div class='bslink' id='add_persona_bt' style='z-index:999;width:120px;text-align:center;font-size:16px;position:absolute;top:8px;right:5px;background:#666;color:#FFF'>Add Persona</div>								
 								<div class='fLn' id='tenant_personas'></div>				
 							</div>
 							<div class='fLn'>
-								<div class='fLn dbs' style='background:#FFF;padding-top:15px;padding-bottom:8px;font-size:18px;font-weight:bold'>&nbsp;DataBases: <span id='db_count'>...</span></div>
+								<div class='fLn dbs' style='background:#FFF;padding-top:15px;padding-bottom:8px;font-size:18px;font-weight:bold;border-bottom:2px solid #DDD'>&nbsp;Databases: <span id='db_count'>...</span></div>
 								<!-- FIXME put add DB here -->								
 								<div class='fLn' id='tenant_databases'></div>		
 							</div>
@@ -86,7 +74,7 @@
 								&nbsp;&nbsp;Sex <select id='persona' style='width:100px'><option value='female'>female</option><option value='male'>male</option></select>
 							</div>
 
-							<div class='bslink' id='persona_generate_bt'style='width:70px;margin-bottom:10px;text-align:center;float:right;font-size:16px;margin-top:10px;background:#EEE;margin-right:10px;'>Generate</div>			
+							<div class='bslink' id='persona_generate_bt'style='width:70px;margin-bottom:10px;text-align:center;float:right;font-size:16px;margin-top:10px;background:#EEE;margin-right:10px;'>Create</div>			
 							<div class='bslink' id='persona_generate_cancel_bt' style='width:70px;margin-bottom:10px;text-align:center;float:right;font-size:16px;margin-top:10px;background:#EEE;margin-right:10px;'>Cancel</div>			
 						</div>
 					</div>			

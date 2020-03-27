@@ -61,8 +61,6 @@ $(document).ready(function() {
 		}		
 	}
 
-	var g_tenant = getUrlParam('tenant');
-
 	// get the key
 	scsGetSettings(function(data) {
 		if (data && data.info && data.info.sedro_access_key) {
@@ -88,6 +86,19 @@ $(document).ready(function() {
 		}
 	});
 
+	var g_tenant = getUrlParam('tenant');
+
+	g_caller_token = getUrlParam('caller_token');
+	if (g_caller_token) $("#caller_token").val(g_caller_token);
+	
+	// get the select list
+	var pers = getUrlParam('persona');
+	if (pers) {
+		$("#persona").val(pers);
+		$("#wake_now_bt").click();
+	}
+
+	
 	function waitChid() {
 	    if (anz_in_progress == true) {
 	        setTimeout(waitChid, 50);//wait 50 millisecnds then recheck
@@ -108,19 +119,18 @@ $(document).ready(function() {
 	    }
         setTimeout(pollChid, 1000*30); // poll every 30 seconds
 	}
-	
-
-	g_caller_token = getUrlParam('caller_token');
-	if (g_caller_token) $("#caller_token").val(g_caller_token);
-	
-	// get the select list
-
-	var pers = getUrlParam('persona');
-	if (pers) {
-		$("#persona").val(pers);
-		$("#wake_now_bt").click();
-	}
-	
+	// get persona list select
+	function getPersonasSelect(ctx) {
+		sedroGetPersonas(ctx, function (data) {
+			var pselect = "";
+			if (data && data.list) {
+				for (var i=0;i<data.list.length;i++) {
+					pselect += "<option value='"+data.list[i]+"'>"+data.list[i]+"</option>";						
+				}
+			}
+			$("#persona").html(pselect);
+		});			
+	}	
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// Add interactive message
@@ -384,6 +394,15 @@ var askTellHandler = function (words, resp) {
 	anz_in_progress = false;
 }
 
+function scsGetSettings(cb) {
+	$.ajax({url: "/api/1.0/settings", type: 'GET', dataType: "json", contentType: 'application/json', 
+	  success: function(data){
+		  cb(data);
+	  }, error: function(xhr) {
+		  cb(null);
+	  }
+	});
+}
 
 var getUrlParam = function getUrlParameter(sParam) {
     var sPageURL = window.location.search.substring(1),
@@ -400,18 +419,26 @@ var getUrlParam = function getUrlParameter(sParam) {
     }
 };
 
-function scsGetSettings(cb) {
-	$.ajax({url: "/api/1.0/settings", type: 'GET', dataType: "json", contentType: 'application/json', 
-	  success: function(data){
-		  cb(data);
-	  }, error: function(xhr) {
-		  cb(null);
-	  }
-	});
+//get a cookie
+function setCookie(name,value,days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
 }
-// get a cookie
 function getCookie(name) {
-  var value = "; " + document.cookie;
-  var parts = value.split("; " + name + "=");
-  if (parts.length == 2) return parts.pop().split(";").shift();
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+function eraseCookie(name) {   
+    document.cookie = name+'=; Max-Age=-99999999;';  
 }
