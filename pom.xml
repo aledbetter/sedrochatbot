@@ -17,7 +17,7 @@
 		<java-version>1.8</java-version>
 		<jetty.version>9.4.12.RC2</jetty.version>
 			
-		<jersey.version>2.26</jersey.version>
+		<jersey.version>2.29</jersey.version>
 		<!-- **VERSION**  -->
 		<buildNumber>A.626567696e</buildNumber>
 	</properties>
@@ -38,13 +38,13 @@
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
-			<version>2.1</version>
+			<version>2.1.1</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
+			<version>4.0.1</version>
 			<scope>provided</scope>
 		</dependency>
 		  
@@ -81,12 +81,12 @@
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-core</artifactId>
-		    <version>2.9.5</version>
+		    <version>2.9.10</version>
 		</dependency>
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-annotations</artifactId>
-		    <version>2.9.5</version>
+		    <version>2.9.10</version>
 		</dependency>	  
 
 
@@ -94,12 +94,12 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.5.9</version>
+			<version>4.5.10</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
-			<version>4.5.9</version>
+			<version>4.5.10</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -111,26 +111,26 @@
 		<dependency>
 		    <groupId>org.apache.logging.log4j</groupId>
 		    <artifactId>log4j-core</artifactId>
-		    <version>2.11.1</version>
+		    <version>2.12.1</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-lang3</artifactId>
-		    <version>3.5</version>
+		    <version>3.9</version>
 		</dependency>
 
 		<!--  some logging -->
 		<dependency>
 	       <groupId>org.slf4j</groupId>
 	       <artifactId>slf4j-api</artifactId>
-	       <version>1.7.5</version>
+	       <version>1.7.30</version>
 	   </dependency>
 	   <dependency>
 	       <groupId>org.slf4j</groupId>
 	       <artifactId>slf4j-log4j12</artifactId>
-	       <version>1.7.5</version>
+	       <version>1.7.30</version>
 	   </dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.mindrot/jbcrypt -->
