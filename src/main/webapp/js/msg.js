@@ -44,12 +44,12 @@ function resetPage() {
 /////////////////////////////////////////////////////////////////
 $(document).ready(function() {
 	resetPage();
+	//setAPIChatHost("/api/1.0");
 	
 	// hangup handler
 	byeHandler = function() {
 		resetPage();
 	}
-	
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check auth cookie
@@ -194,73 +194,6 @@ $(document).ready(function() {
 		$("#interact_text").val(""); 
 	});
 	
-	
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	// Ask API for command OR question
-	$("#ask_now_bt").on('click', function (e) {
-		var persona = $("#persona").val(); 
-		if (persona == "") {
-			alert("select a persona");
-			return;
-		}
-		if (anz_in_progress) return;
-		anz_in_progress = true;
-		var txt = $("#asktell_text").val(); 
-		if (!txt || txt.length < 1) {
-			anz_in_progress = false;
-			$("#asktell_text").addClass("warn");
-			return;
-		}
-
-		// switch to woke
-		$(".notwoke").hide();
-		$(".askTell, .woke").show();
-		$(".personaName").html(persona);
-		$("#xaction").html("&nbsp;Ask");
-
-		var ctoken = $("#caller_token").val(); 
-		if (!ctoken || ctoken.length < 1) ctoken = null;
-		$("#asktell_text").removeClass("warn"); 
-		addLocalMsg(txt, "#asktell_response");
-		
-		// ready..
-		postChatAsk(g_tenant, persona, txt, null, ctoken, g_context, g_channel_type, g_language, askTellHandler);
-		waitChid();	
-	});
-	
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	// Tell API for command OR question
-	$("#tell_now_bt").on('click', function (e) {
-		var persona = $("#persona").val(); 
-		if (persona == "") {
-			alert("select a persona");
-			return;
-		}
-		if (anz_in_progress) return;
-		anz_in_progress = true;
-		var txt = $("#asktell_text").val(); 
-		if (!txt || txt.length < 1) {
-			anz_in_progress = false;
-			$("#asktell_text").addClass("warn");
-			return;
-		}
-
-		// switch to woke
-		$(".notwoke").hide();
-		$(".askTell, .woke").show();
-		$(".personaName").html(persona);
-		$("#xaction").html("&nbsp;Tell");
-		
-		var ctoken = $("#caller_token").val(); 
-		if (!ctoken || ctoken.length < 1) ctoken = null;
-		$("#asktell_text").removeClass("warn");
-		addLocalMsg(txt, "#asktell_response");
-		
-		// ready..
-		postChatTell(g_tenant, persona, txt, null, ctoken, g_context, g_channel_type, g_language, askTellHandler);
-		waitChid();	
-	});
-	
 	// reset to base
 	$("#reset_bt").on('click', function (e) {
 		resetPage();
@@ -367,32 +300,7 @@ function updateNewLine(text) {
 }
 
 
-// handle ask AND tell resp[onses
-var askTellHandler = function (words, resp) {
-	if (!doc) {
-		$("#asktell_response").html("<div class='fLn' style='margin-top:50px;color:red'>Error Retriving content</div>");
-		glob_chid = null;
-		return;
-	}
-	if (!resp.info) {
-		$("#resolve_list").show().html("<div class='fLn' style='margin-top:50px;color:red'>Error Retriving content: "+resp.code+"</div>");
-		glob_chid = null;
-		return;
-	}
-	if (resp.list && resp.list.length > 0) {
-		// first one will be the question in
-		//addRemoteMsg(resp.list[1], "#asktell_response");
-		for (var i=0;i<resp.list.length;i++) {
-			if (resp.list[i].r == "false" || !resp.list[i].msg) continue; // only if remote add..
-			addRemoteMsg(resp.list[i], "#asktell_response");
-		}
-		$("#asktell_response").scrollTop($("#asktell_response")[0].scrollHeight);
-		
-	} else {
-		addRemoteMsg("No Response", "#asktell_response");
-	}
-	anz_in_progress = false;
-}
+
 
 function scsGetSettings(cb) {
 	$.ajax({url: "/api/1.0/settings", type: 'GET', dataType: "json", contentType: 'application/json', 

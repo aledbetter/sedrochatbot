@@ -21,9 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import main.java.com.sedroApps.adapter.ChatAdapter;
+import main.java.com.sedroApps.adapter.ChatEmail;
 import main.java.com.sedroApps.adapter.ChatFacebook;
 import main.java.com.sedroApps.adapter.ChatSMS;
 import main.java.com.sedroApps.adapter.ChatTwitter;
+import main.java.com.sedroApps.adapter.ChatVoice;
+import main.java.com.sedroApps.adapter.ChatWebRest;
 import main.java.com.sedroApps.adapter.ChatWhatsapp;
 import main.java.com.sedroApps.msgcb.CbMessage;
 import main.java.com.sedroApps.util.Sutil;
@@ -219,9 +222,18 @@ public class SCUser {
 				case "sms":
 					if (cs == null) cs = new ChatSMS(this, id);
 					break;
+				case "email":
+					if (cs == null) cs = new ChatEmail(this, id);
+					break;
+				case "voice":
+					if (cs == null) cs = new ChatVoice(this, id);
+					break;
+				case "webchat":
+					if (cs == null) cs = new ChatWebRest(this, id);
+					break;
 				}
 				// up up date
-				if (cs.init(this) == 0) {
+				if (cs != null && cs.init(this) == 0) {
 					addChatService(cs);
 					if (!cs.isPublicMsg()) {
 						readPublic = respPublic = false;

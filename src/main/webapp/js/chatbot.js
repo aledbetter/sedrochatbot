@@ -37,7 +37,7 @@ function serviceSave(id, username, service) {
 		var v_twitter_public = $("#"+id+"_dopublic").val();		
 		
 		var twitter_serviceparams = {
-				service: "twitter", 
+				service: service, 
 				id: v_t_id, 
 				doprivate: v_twitter_private, 
 				dopublic: v_twitter_public, 
@@ -61,7 +61,7 @@ function serviceSave(id, username, service) {
 		var v_sms_callback_url = $("#"+id+"_sms_callback_url").val();
 			
 		var sms_serviceparams = {
-				service: "sms", 
+				service: service, 
 				id: v_sms_id, 
 				sms_callback_url: v_sms_callback_url, 			
 				provider: v_provider, 
@@ -73,7 +73,16 @@ function serviceSave(id, username, service) {
 			if (v_provider.length > 3 && v_account_sid.length > 5 && v_auth_token.length > 5 && v_phone_number.length >= 10) {
 				services.push(sms_serviceparams);
 			}
-		}	
+		}
+	} else 	if (service == "webchat") {
+		// Save WebChat
+		var v_wc_id = $("#"+id+"_id").val();
+	
+		var webchat_serviceparams = {
+				service: service, 
+				id: v_wc_id};
+		
+		services.push(webchat_serviceparams);
 	}
 	
 	scsUpdateUser(username, services, function(data) {
@@ -256,7 +265,7 @@ function getSettings() {
 			glob_api_key = data.info.sedro_access_key;
 			setAPIKey(data.info.sedro_access_key);
 			setAPIHost(data.info.sedro_host);
-			sedroGetPersonas(function (data) {
+			sedroGetPersonas(null, function (data) {
 				var pselect = "";
 				var pUser = "";
 				// persona select list
@@ -305,15 +314,18 @@ function getUsers() {
 		if (data.info && data.info.users) {
 			glob_users = data.info.users;
 			for (var i=0;i<data.info.users.length;i++) {
-				usr += "<div class='fLn' id='ua_"+data.info.users[i].username+"' style='padding-top:10px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #555;position:relative;background:#F7F7F7'>";				
-					usr += "<div class='bslink' onClick='delUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:10px;background:#EEE;'>Del</div>";	
+				usr += "<div class='fLn' id='ua_"+data.info.users[i].username+"' style='padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #555;position:relative;background:#F7F7F7'>";				
+					usr += "<div class='bslink' onClick='delUser(\""+data.info.users[i].username+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;right:10px;top:10px;background:#DDD;'>Delete</div>";	
 					usr += "<div style='width:180px;text-align:center;font-size:16px;position:absolute;top:8px;right:190px'>" +
 							"<select id='"+data.info.users[i].username+"_service' style='width:160px;'>" +
 								"<option value='twitter'>Twitter</option>" +
-								"<option value='sms'>SMS</option></select></div>";	
+								"<option value='sms'>SMS</option>" +
+								"<option value='webchat'>WebChat</option>" +
+								"</select></div>";	
 
-					usr += "<div class='bslink' onClick='addService(\""+data.info.users[i].username+"\");' style='width:100px;text-align:center;font-size:16px;position:absolute;right:90px;background:#EEE;'>Add Service</div>";	
-					usr += "<div class='fLn' style='padding-bottom:10px;'>";
+					usr += "<div class='bslink' onClick='addService(\""+data.info.users[i].username+"\");' style='width:100px;text-align:center;font-size:16px;position:absolute;right:90px;top:10px;background:#DDD;'>Add Service</div>";	
+					usr += "<div style='padding: 10px'>";
+					usr += "<div class='fLn'>";
 						usr += "<div style='text-align:left'><b>Username: " + data.info.users[i].username +"</b></div>";
 						usr += "<div style='text-align:left'><b>Sedro Persona: " + data.info.users[i].sedro_persona +"</b></div>";
 						if (data.info.users[i].callback) usr += "<div style='text-align:left'><b>Message Cb: " + data.info.users[i].callback +"</b></div>";
@@ -340,8 +352,8 @@ function getUsers() {
 									usr += "<div style='text-align:left'><b>" + property + "</b>: "+data.info.users[i].services[k][property]+"</div>";
 								usr += "</div>";				
 							}
-							usr += "<div class='bslink' onClick='delService(\""+sid+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;top:14px;right:10px;background:#EEE;'>Del</div>";	
-							usr += "<div class='bslink' onClick='editService(\""+data.info.users[i].username+"\", \""+sid+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;top:14px;right:90px;background:#EEE;'>Edit</div>";	
+							usr += "<div class='bslink' onClick='delService(\""+sid+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;top:14px;right:10px;background:#DDD'>Del</div>";	
+							usr += "<div class='bslink' onClick='editService(\""+data.info.users[i].username+"\", \""+sid+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;top:14px;right:90px;background:#DDD'>Edit</div>";	
 							
 							usr += "<div class='fLn' id='"+sid+"_edit' style='display:none'>";
 							// make form for service ID
@@ -355,7 +367,8 @@ function getUsers() {
 							usr += "</div>";
 						}
 					}
-					
+					usr += "</div>";
+				
 					usr += "</div>";				
 				usr += "</div>";				
 			}

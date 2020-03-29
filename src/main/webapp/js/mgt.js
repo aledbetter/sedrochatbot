@@ -33,6 +33,8 @@ $(document).ready(function() {
 			return;
 		}		
 	}
+	$("#message_here").html("loading...");
+	$("#message_here").show();
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// get info from the server
@@ -44,10 +46,13 @@ $(document).ready(function() {
 				$("#api_key").val(data.info.sedro_access_key); 
 				setAPIKey(data.info.sedro_access_key);
 				setAPIHost(data.info.sedro_host);
-				
+				$("#message_here").html("keyset loading tenant...");
+
 				sedroGetAccount(null, function (ctx, data) {
-					if (data) showTenant(data.results[0]);
-					else $("#xtenant_action").html("ERROR: Adding Account for: " + chbot_glob_api_key);
+					if (data) {
+						showTenant(data.results[0]);
+						$("#message_here").html("").hide();
+					} else $("#message_here").html("ERROR: Getting Account for: " + chbot_glob_api_key);
 				});
 			} else {
 				chbot_glob_api_key = null;

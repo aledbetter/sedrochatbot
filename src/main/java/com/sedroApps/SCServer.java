@@ -16,7 +16,6 @@
  */
 package main.java.com.sedroApps;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +42,7 @@ public class SCServer {
 
 	List<SCUser> uaList;	// list of users
 	
-	private String sedro_host = "inteligent-chatbots.p.rapidapi.com";
+	private String sedro_host = "https://inteligent-chatbots.p.rapidapi.com";
 //	private String sedro_host = "localhost:8080/api/1.0";
 
 	private HashMap<String, CbMessage> msgcbMap = null;

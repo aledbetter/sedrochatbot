@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.json.JSONObject;
+
 import main.java.com.sedroApps.SCOrator;
 import main.java.com.sedroApps.SCSedroCall;
 import main.java.com.sedroApps.SCUser;
@@ -29,40 +31,43 @@ import main.java.com.sedroApps.util.Sutil;
 
 
 
-public class ChatVoice extends ChatAdapter { 
-/*
- * https://www.twilio.com
- */
+public class ChatWebRest extends ChatAdapter { 
 	// this is per user?
-	//private TwitterFactory factory = null;
-	private String pconsumer_key = null;  	// api_key
-	private String pconsumer_secret = null; // api_secret
-	private String paccess_token = null;
-	private String paccess_token_secret = null;
+	private String papi_key = null;  	// api_key
 	
-	public ChatVoice(SCUser user, String id) {
+	public ChatWebRest(SCUser user, String id) {
 		super(user, id);
 	}
 	
 	@Override
 	public String getName() {
-		return "voice";	
+		return "webchat";	
 	}
 	@Override
 	public String getChannel_type() {
-		return "voice";	
+		return "chat";	
 	}	
+	@Override
+	public boolean isPublicMsg() {
+		return false;
+	}
+	@Override
+	public boolean isPrivateMsg() {
+		return true;
+	}
+	@Override
+	public boolean isPolled() {
+		return false;
+	}
+	
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// EXTERNAL calls: init & processing
 	@Override
 	public int init(SCUser ua) {
 		super.init(ua);
-		String consumer_key = getServiceInfo("consumer_key");
-		String consumer_secret = getServiceInfo("consumer_secret");
-		String access_token = getServiceInfo("access_token");
-		String access_token_secret = getServiceInfo("access_token_secret");
-		if (consumer_key == null || consumer_secret == null || access_token == null || access_token_secret == null) {
+		String api_key = getServiceInfo("api_key");
+		if (api_key == null) {
 			return -1; // not configured... remove
 		}
 		/*
@@ -84,10 +89,7 @@ public class ChatVoice extends ChatAdapter {
     	factory = new TwitterFactory(cb.build());
     	*/
     	// retain config
-    	pconsumer_key = consumer_key;
-    	pconsumer_secret = consumer_secret;
-    	paccess_token = access_token;
-    	paccess_token_secret = access_token_secret;
+		papi_key = api_key;
     	return 0;
 	}
 	
@@ -114,5 +116,27 @@ public class ChatVoice extends ChatAdapter {
 		return null;
 	}
 
-
+	
+	//////////////////////////////////////////////////
+	// Callback for direct recieve and handle from REST APIs
+	
+	// callback for receive (when deployed with public IP only)
+	@Override	
+	public List<String> getReceiveMessages(String data) {
+	/*
+		try {
+			JSONObject obj = new JSONObject(data);
+			HashMap<String, String> msg = parseTwillioMessage(obj);
+			this.getOrator().processMessage(msg);
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	*/
+		return null;
+	}
+	
+	// call back for new incomming calls 
+	@Override	
+	public HashMap<String, String> getReceiveCall() {
+		return null;
+	}
 }

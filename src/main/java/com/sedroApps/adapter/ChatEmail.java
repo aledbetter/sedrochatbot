@@ -73,6 +73,10 @@ public class ChatEmail extends ChatAdapter {
 	public String getName() {
 		return "email";	
 	}
+	@Override
+	public String getChannel_type() {
+		return "email";	
+	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// EXTERNAL calls: init & processing

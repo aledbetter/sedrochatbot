@@ -35,26 +35,27 @@
 					<h1 style='padding-bottom:10px;border-bottom:1px solid #333'>Server Configuration</h1>
 					<div class="bslink" id='update_settings_bt' style='width:100px;text-align:center;font-size:16px;margin-top:-50px;margin-right:10px;background:#EEE;float:right'>Update</div>			
 		
-					<div class="fLn" style='font-size:16px;padding-top:15px;text-align:left;line-height:2em' id='show_settings'> 
-						<div class="fLn"><b>Username:</b> <span id='setting_username'></span></div>
-						<div class="fLn"><b>Sedro Access Key:</b> <span id='setting_sedro_access_key'></span></div>
-						<div class="fLn"><b>Sedro Host:</b> <span id='setting_sedro_host'></span></div>
-						<div class="fLn"><b>Poll Interval:</b> <span id='setting_poll_interval'></span></div>				
-						<div class="fLn"><b>DataBase:</b> <span id='setting_database_path'></span></div>				
-						<div class="fLn"><b>Personas:</b>&nbsp;&nbsp;&nbsp;<a href='/mgt.html'>(Add or Edit Persona)</a></div>			
-						<div class="fLn" style='margin-left:40px'>
-							<div class='user_persona_list'>...</div>			
+					<div class="fLn" style='font-size:16px;background:#F5F5F5;padding-bottom:10px;margin-bottom:10px;text-align:left;line-height:2em' id='show_settings'> 
+						<div style='padding: 10px'>
+							<div class="fLn"><b>Username:</b> <span id='setting_username'></span></div>
+							<div class="fLn"><b>Sedro Access Key:</b> <span id='setting_sedro_access_key'></span></div>
+							<div class="fLn"><b>Sedro Host:</b> <span id='setting_sedro_host'></span></div>
+							<div class="fLn"><b>Poll Interval:</b> <span id='setting_poll_interval'></span></div>				
+							<div class="fLn"><b>DataBase:</b> <span id='setting_database_path'></span></div>				
+							<div class="fLn"><b>Personas:</b>&nbsp;&nbsp;&nbsp;<a href='/mgt.html'>(Add or Edit Persona)</a></div>			
+							<div class="fLn" style='margin-left:40px'>
+								<div class='user_persona_list'>...</div>			
+							</div>	
 						</div>	
-								
 					</div>
-					<div class="fLn" style='display:none;font-size:16px;padding-top:15px;text-align:left' id='update_settings'> 
+					<div class="fLn" style='display:none;font-size:16px;padding-top:5px;padding-bottom:15px;text-align:left' id='update_settings'> 
 						<div class="fLn" style='margin-top:5px'><b>Username:</b> <input type='text' id='set_username'/></div>
 						<div class="fLn" style='margin-top:5px'><b>Password:</b> <input type='password' id='set_password'/></div>
 						<div class="fLn" style='margin-top:5px'><b>Re-enter Password:</b> <input type='password' id='set_password2'/></div>
 						
 						<div class="fLn" style='margin-top:5px'><b>poll interval:</b> <input type='text' id='set_poll_interval'/></div>
 						<div class="fLn" style='margin-top:5px'><b>Sedro Access Key:</b> <input type='text' style='width:400px' id='set_sedro_access_key'/></div>				 		
-						<div class="fLn" style='margin-top:5px'><b>Sedro Host:</b> <input type='text' style='width:400px' id='set_sedro_host'/>&nbsp;&nbsp;inteligent-chatbots.p.rapidapi.com / localhost:8080/api/1.0</div>
+						<div class="fLn" style='margin-top:5px'><b>Sedro Host:</b> <input type='text' style='width:400px' id='set_sedro_host'/>&nbsp;&nbsp;https://inteligent-chatbots.p.rapidapi.com / localhost:8080/api/1.0</div>
 						 
 						<div class="fLn" style='margin-top:10px'>
 							<div class="bslink" id='save_settings_bt' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:440px;background:#EEE;'>Save</div>			
@@ -72,29 +73,27 @@
 				<div class="bslink" id='add_user_bt' style='width:100px;text-align:center;font-size:16px;margin-top:-50px;margin-right:10px;background:#EEE;float:right'>Add User</div>						
 				<h1 id='usererror' style='color:red;display:none'></h1>
 				
-				<div class="fLn" style='display:none;font-size:16px;padding-top:15px;' id='user_add'>
+				<div class="fLn" style='display:none;font-size:16px;padding-top:5px' id='user_add'>
 					<div class="fLn" style='text-align:left'> 					
 						<div class="fLn" style='margin-top:5px'><b>Username:</b> <input type='text' id='add_username'/></div>						
-						<div class="fLn" style='margin-top:5px'><b>Sedro Persona:</b> <select class='inform persona_list' id='user_sedro_persona' style='width:160px'><option value=''>No Personas</option></select>&nbsp;&nbsp;&nbsp;<a href='/mgt.html'>(Add or Edit Persona)</a></div>
+						<div class="fLn" style='margin-top:5px'><b>Persona:</b> <select class='inform persona_list' id='user_sedro_persona' style='width:160px'><option value=''>No Personas</option></select>&nbsp;&nbsp;&nbsp;<a href='/mgt.html'>(Add or Edit Persona)</a></div>
 						<div class="fLn" style='margin-top:5px'><b>Message Callback:</b> <select class='inform callback_list' id='user_callback' style='width:160px'><option value=''>No Callbacks</option></select></div>
 					</div>
-					
 					<div class="fLn" style='margin-top:15px'>
 						<div class="bslink" id='save_add_user_bt' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:440px;background:#EEE;'>Add</div>			
 					</div>
 				</div>
 					
-				<div class="fLn" style='font-size:16px;padding-top:15px;line-height:2em;padding-bottom:50px'>
+				<div class="fLn" style='font-size:16px;line-height:2em;padding-bottom:50px'>
 					<div class="fLn" id='userlist'></div>
 				</div>		
 			</div>			
 		</div>
 		
-		<div style='display:none'>
+		<div class="fLn" style='display:none'>
 			<div class="fLn" id='twitter_config' style='margin-top:25px'> 
-				<h2>Twitter Configuration:</h2>
-				
-				<div class="fLn" style='text-align:left'> 
+				<h2>Twitter Configuration:</h2>				
+				<div class="fLn" style='text-align:left;border-top:1px solid #AAA;padding-top:10px'> 
 					<div class="fLn" id='the_id' style='margin-top:5px'><b>id:</b> <input class='inform inform_id' style='width:300px;color:#777' type='text' id='twitter_id' readonly> </div>
 					<div class="fLn" style='margin-top:5px' title='api_key'><b>consumer_key:</b> <input class='inform' style='width:250px' type='text' id='twitter_consumer_key'/> </div>
 					<div class="fLn" style='margin-top:5px' title='api_secret'><b>consumer_secret:</b> <input class='inform' style='width:400px' type='text' id='twitter_consumer_secret'/> </div>
@@ -114,14 +113,14 @@
 					</div>					
 				</div>	
 				<div class="fLn" style='margin-top:15px;margin-bottom:15px'> 	
-					<div class="bslink" onClick='serviceCancel("xtwitter")' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:375px;float:left;background:#EEE;'>Cancel</div>			
-					<div class="bslink" onClick='serviceSave("xtwitter", "xusername", "twitter")' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:10px;float:left;background:#EEE;'>Save</div>			
+					<div class="bslink" onClick='serviceCancel("xtwitter")' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:375px;float:left;background:#DDD'>Cancel</div>			
+					<div class="bslink" onClick='serviceSave("xtwitter", "xusername", "twitter")' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:10px;float:left;background:#DDD'>Save</div>			
 				</div>
 			</div>
 			
 			<div class="fLn" id='sms_config' style='margin-top:25px'> 
 				<h2>SMS Configuration:</h2>
-				<div class="fLn" style='text-align:left'> 
+				<div class="fLn" style='text-align:left;border-top:1px solid #AAA;padding-top:10px'> 
 					<div class="fLn" id='the_id' style='margin-top:5px'><b>id:</b> <input class='inform inform_id' style='width:300px;color:#777' type='text' id='sms_id' readonly> </div>
 					<div class="fLn" style='margin-top:5px'><b>provider:</b> 							
 						<select class='inform' id='sms_provider' style='width:160px'>
@@ -135,10 +134,20 @@
 					<div class="fLn" style='margin-top:5px'><b>sms_callback_url:</b> <input class='inform' style='width:800px' type='text' id='sms_sms_callback_url'/></div>						
 				</div>	
 				<div class="fLn" style='margin-top:15px;margin-bottom:15px'> 	
-					<div class="bslink" onClick='serviceCancel("xsms")' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:375px;float:left;background:#EEE;'>Cancel</div>			
-					<div class="bslink" onClick='serviceSave("xsms", "xusername", "sms")' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:10px;float:left;background:#EEE;'>Save</div>			
+					<div class="bslink" onClick='serviceCancel("xsms")' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:375px;float:left;background:#DDD'>Cancel</div>			
+					<div class="bslink" onClick='serviceSave("xsms", "xusername", "sms")' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:10px;float:left;background:#DDD'>Save</div>			
 				</div>						
 			</div>	
+			<div class="fLn" id='webchat_config' style='margin-top:25px'> 
+				<h2>WebChat Configuration:</h2>
+				<div class="fLn" style='text-align:left;border-top:1px solid #AAA;padding-top:10px'> 
+					<div class="fLn" id='the_id' style='margin-top:5px'><b>id:</b> <input class='inform inform_id' style='width:300px;color:#777' type='text' id='webchat_id' readonly> </div>						
+				</div>	
+				<div class="fLn" style='margin-top:15px;margin-bottom:15px'> 	
+					<div class="bslink" onClick='serviceCancel("xwebchat")' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:375px;float:left;background:#DDD'>Cancel</div>			
+					<div class="bslink" onClick='serviceSave("xwebchat", "xusername", "webchat")' style='width:100px;text-align:center;font-size:16px;margin-top:0px;margin-left:10px;float:left;background:#DDD'>Save</div>			
+				</div>						
+			</div>			
 		</div> 
 		<div class="footer">	
 			<div class="cent">
