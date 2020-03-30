@@ -155,7 +155,7 @@ var chatHandler = function (resp) {
 		glob_from_full_name = resp.info.from_full_name;
 		$(".fromFullName").html(glob_from_full_name);
 	}
-	glob_chid = resp.info.chid;
+	glob_chid = resp.info.call_id;
 	//$("#interact_wd").show();
 
 	if (resp.list && resp.list.length > 0) {
@@ -221,7 +221,6 @@ function waitPostMessage(tag, msg) {
     setTimeout(function () {
 		if (msg.event == 'bye') {
 			glob_chid = null;
-			alert("byte");
 			$("#interact_wd").hide();
 			setTimeout(glob_bye_handler, glob_bye_delay);		
 		}
