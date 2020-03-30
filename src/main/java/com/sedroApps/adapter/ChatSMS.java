@@ -36,6 +36,7 @@ import com.twilio.rest.api.v2010.account.IncomingPhoneNumber;
 import com.twilio.rest.api.v2010.account.IncomingPhoneNumberUpdater;
 import com.twilio.type.PhoneNumber;
 
+import main.java.com.sedroApps.SCCall;
 import main.java.com.sedroApps.SCOrator;
 import main.java.com.sedroApps.SCSedroCall;
 import main.java.com.sedroApps.SCUser;
@@ -175,7 +176,7 @@ public class ChatSMS extends ChatAdapter {
 	}
 	
 	@Override
-	public String sendDirectMessage(SCSedroCall proc, String touser, String msg) {
+	public String sendDirectMessage(SCCall proc, String touser, String msg) {
 		try {
 			msg = replaceNewLine(msg);
 			if (isProvider("twilio")) {
@@ -215,7 +216,7 @@ public class ChatSMS extends ChatAdapter {
 		for (HashMap<String, String> msg:ml) {
 			// find session...					
 			String from = msg.get("from");
-			SCSedroCall proc = orat.findCall(from);					
+			SCCall proc = orat.findCall(from);					
 			if (proc != null) continue; // check for new calls only	
 			if (cl != null) {
 				// check if accounted for
@@ -240,7 +241,7 @@ public class ChatSMS extends ChatAdapter {
 
 	// get new calls
 	@Override	
-	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedroCall processor) {	
+	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCCall processor) {	
 		List<HashMap<String, String>> ml = getMessages(orat);
 		if (ml == null || ml.size() < 1) return null;	
 		

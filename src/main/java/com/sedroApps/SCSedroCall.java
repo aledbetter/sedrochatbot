@@ -24,21 +24,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import main.java.com.sedroApps.adapter.ChatAdapter;
 import main.java.com.sedroApps.util.HttpUtil;
 import main.java.com.sedroApps.util.Sutil;
 
 
 public class SCSedroCall extends SCCall {
 
-	public SCSedroCall(boolean readPublic, boolean respPublic, boolean directMsg) {
-		super(readPublic, respPublic, directMsg);
+	public SCSedroCall(ChatAdapter adapter, boolean readPublic, boolean respPublic, boolean directMsg) {
+		super(adapter, readPublic, respPublic, directMsg);
 	}
 	
 	private static String getAPIHost() {
-		return SCServer.getChatServer().getSedro_host();
+		return SCServer.getChatServer().getSedro_hostname();
 	}
 	private static String getUrl(String ending) {
-		return "https://"+ getAPIHost()+ending;
+		return SCServer.getChatServer().getSedro_host()+ending;
 	}
 
 	
@@ -69,7 +70,14 @@ public class SCSedroCall extends SCCall {
 	}
 
 	@Override
-	public List<HashMap<String, Object>> chatWake(String key, String text) {
+	public List<HashMap<String, Object>> chatWakeMessages(String key, String text) {
+		HashMap<String, Object> res =  chatWake(key, text);
+		if (res == null) return null;
+		List<HashMap<String, Object>> msgl = (List<HashMap<String, Object>>)res.get("messages");
+		return msgl;
+	}
+	@Override
+	public HashMap<String, Object> chatWake(String key, String text) {
 		if (!getStatus().equals("wake") && !getStatus().equals("bye")) return null;
 		//System.out.println(" **CHAT_WAKE");
 
@@ -92,8 +100,7 @@ public class SCSedroCall extends SCCall {
 	    if (location != null) reqData += ", \"location\": \"" + location + "\"";
 	    if (calltime != null) reqData += ", \"calltime\": \"" + calltime + "\"";
 	    if (tzoffset >= 0) reqData += ", \"tz\": \"" + tzoffset + "\"";
-	    if (tzn != null) reqData += ", \"tzn\": \"" + tzn + "\"";
-	    
+	    if (tzn != null) reqData += ", \"tzn\": \"" + tzn + "\"";	    
 		reqData += "}";
 		
 		HashMap<String, String> headers = new HashMap<String, String>();
@@ -102,14 +109,19 @@ public class SCSedroCall extends SCCall {
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
-		List<HashMap<String, Object>> rl = chatRespParse(line, true);
-//FIXME save info for instance
-		
-		return rl;
+		HashMap<String, Object> res = chatRespParse(line, true);
+		return res;
 	}
 	
 	@Override
-	public List<HashMap<String, Object>> chatPoll() {
+	public List<HashMap<String, Object>> chatPollMessages() {
+		HashMap<String, Object> res =  chatPoll();
+		if (res == null) return null;
+		List<HashMap<String, Object>> msgl = (List<HashMap<String, Object>>)res.get("messages");
+		return msgl;
+	}
+	@Override
+	public HashMap<String, Object> chatPoll() {
 		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
 		//System.out.println(" **CHAT_POLL: " + this.chid);
 
@@ -121,12 +133,19 @@ public class SCSedroCall extends SCCall {
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
-		List<HashMap<String, Object>> rl = chatRespParse(line, true);
-		return rl;
+		HashMap<String, Object> res = chatRespParse(line, true);
+		return res;
 	}
 	
 	@Override
-	public List<HashMap<String, Object>> chatMsg(String text) {
+	public List<HashMap<String, Object>> chatMsgMessages(String text) {
+		HashMap<String, Object> res =  chatMsg(text);
+		if (res == null) return null;
+		List<HashMap<String, Object>> msgl = (List<HashMap<String, Object>>)res.get("messages");
+		return msgl;
+	}
+	@Override
+	public HashMap<String, Object> chatMsg(String text) {
 		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
 		//System.out.println(" **CHAT_MSG: " + this.chid);
 
@@ -141,12 +160,19 @@ public class SCSedroCall extends SCCall {
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
-		List<HashMap<String, Object>> rl = chatRespParse(line, true);
-		return rl;
+		HashMap<String, Object> res = chatRespParse(line, true);
+		return res;
 	}
 	
 	@Override
-	public List<HashMap<String, Object>> chatBye() {
+	public List<HashMap<String, Object>> chatByeMessages() {
+		HashMap<String, Object> res =  chatBye();
+		if (res == null) return null;
+		List<HashMap<String, Object>> msgl = (List<HashMap<String, Object>>)res.get("messages");
+		return msgl;
+	}
+	@Override
+	public HashMap<String, Object> chatBye() {
 		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
 		//System.out.println(" **CHAT_BYE");
 		String url = getUrl("/persona/chat/bye");
@@ -157,12 +183,11 @@ public class SCSedroCall extends SCCall {
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
-		List<HashMap<String, Object>> rl = chatRespParse(line, true);
 		this.setStatus("bye");
-		return rl;
-	}
-	
-	private List<HashMap<String, Object>> chatRespParse(String resp, boolean noremote) {
+		HashMap<String, Object> res = chatRespParse(line, true);
+		return res;
+	}	
+	private HashMap<String, Object> chatRespParse(String resp, boolean noremote) {
 		if (resp == null) return null;
 
 		msg_num_last = msg_num;
@@ -172,26 +197,33 @@ public class SCSedroCall extends SCCall {
 		try {
 			JSONObject obj = new JSONObject(resp);
 			JSONObject info = obj.getJSONObject("info");
+			HashMap<String, Object> rm = new HashMap<>();
 			try {
 				String chid = info.getString("chid");
 				this.chid = chid;
+				rm.put("chid", chid);
 			} catch (Throwable t) {}
 			try {
 				String persona_full_name = info.getString("persona_full_name");
 				this.persona_full_name = persona_full_name;
+				rm.put("from_full_name", persona_full_name);
 			} catch (Throwable t) {}
 			try {
 				String persona = info.getString("persona");
 				this.persona = persona;
+				rm.put("from", persona);
 			} catch (Throwable t) {}
 			try {
 				String persona_email = info.getString("persona_email");
 				this.persona_handle = persona_email;
+				rm.put("from_email", persona_email);
 			} catch (Throwable t) {}
 			
 			String num_sent = info.getString("num_sent");
 			String num_total = info.getString("num_total");
 			//System.out.println("chatRespNUM["+num_sent+"]["+num_total+"] => " + this.chid );
+			rm.put("msg_total", num_total);
+			rm.put("msg_sent", num_sent);
 			
 			try {
 				JSONArray list = obj.getJSONArray("list");
@@ -241,12 +273,13 @@ public class SCSedroCall extends SCCall {
 					}
 				}
 			} catch (Throwable t) {}
+			if (rl != null && rl.size() > 0) rm.put("messages", rl);
+			return rm;
 		} catch (JSONException e) {
-			e.printStackTrace();
-			System.out.println("RESP: " + resp);
+			System.out.println("ERROR SCSedro RESP: " + resp);
 		}
-
-		return rl;
+		
+		return null;
 	}
 	
 	private static String escape(String raw) {

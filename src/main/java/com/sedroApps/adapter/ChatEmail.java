@@ -39,6 +39,7 @@ import javax.mail.URLName;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import main.java.com.sedroApps.SCCall;
 import main.java.com.sedroApps.SCOrator;
 import main.java.com.sedroApps.SCSedroCall;
 import main.java.com.sedroApps.SCUser;
@@ -128,7 +129,7 @@ public class ChatEmail extends ChatAdapter {
 	
 	
 	@Override
-	public String sendDirectMessage(SCSedroCall proc, String touser, String msg) {
+	public String sendDirectMessage(SCCall proc, String touser, String msg) {
       try{  
           MimeMessage message = new MimeMessage(mSession);  
           String from = this.pfrom_email;
@@ -213,7 +214,7 @@ public class ChatEmail extends ChatAdapter {
 	
 	// list of messages: from:from user / msg:message text
 	@Override	
-	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedroCall processor) {
+	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCCall processor) {
 		if (!this.login()) {
 			return null;
 		}

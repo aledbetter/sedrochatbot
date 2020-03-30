@@ -19,10 +19,8 @@ package main.java.com.sedroApps.adapter;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
+import main.java.com.sedroApps.SCCall;
 import main.java.com.sedroApps.SCOrator;
-import main.java.com.sedroApps.SCSedroCall;
 import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.util.Sutil;
 
@@ -65,7 +63,9 @@ public class ChatAdapter {
 	public SCOrator getOrator() {
 		return orat;
 	}
-	
+	public String getSedroPersona() {
+		return user.getSedroPersona();
+	}	
 	
 	public boolean isPublicMsg() {
 		return false;
@@ -106,11 +106,11 @@ public class ChatAdapter {
 		return 0;
 	}
 	
-	public String postMessage(SCSedroCall proc, String msg) {
+	public String postMessage(SCCall proc, String msg) {
 		return "NOP";	
 	}
 
-	public String sendDirectMessage(SCSedroCall proc, String touser, String msg) {
+	public String sendDirectMessage(SCCall proc, String touser, String msg) {
 		return "NOP";			
 	}
 	
@@ -130,7 +130,7 @@ public class ChatAdapter {
 
 	// list of messages: from:from user / msg:message text
 	// Call identifier: "CID" in each
-	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCSedroCall processor) {
+	public List<HashMap<String, String>> getDirectMessages(SCOrator orat, SCCall processor) {
 		return null;
 	}
 	
@@ -152,5 +152,7 @@ public class ChatAdapter {
 	public HashMap<String, String> getReceiveCall() {
 		return null;
 	}
-	
+	public HashMap<String, String> getReceiveCall(SCCall call, HashMap<String, String> call_info) {
+		return call_info;
+	}	
 }

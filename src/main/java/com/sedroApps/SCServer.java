@@ -29,6 +29,7 @@ import main.java.com.sedroApps.adapter.ChatAdapter;
 import main.java.com.sedroApps.msgcb.CbExample;
 import main.java.com.sedroApps.msgcb.CbMessage;
 import main.java.com.sedroApps.util.DButil;
+import main.java.com.sedroApps.util.Sutil;
 
 public class SCServer {
 	private static final int DEFAULT_INTERVAL = (1000*60)*1;
@@ -43,6 +44,7 @@ public class SCServer {
 	List<SCUser> uaList;	// list of users
 	
 	private String sedro_host = "https://inteligent-chatbots.p.rapidapi.com";
+	private String sedro_hostname = "inteligent-chatbots.p.rapidapi.com";
 //	private String sedro_host = "localhost:8080/api/1.0";
 
 	private HashMap<String, CbMessage> msgcbMap = null;
@@ -80,8 +82,21 @@ public class SCServer {
 	public String getSedro_host() {
 		return sedro_host;
 	}
+
 	public void setSedro_host(String sedro_host) {
 		this.sedro_host = sedro_host;
+		if (sedro_host != null) {
+			if (sedro_host.startsWith("https://")) {
+				sedro_hostname = sedro_host.substring(8);
+			} else if (sedro_host.startsWith("http://")) {
+				sedro_hostname = sedro_host.substring(7);
+			} else {
+				sedro_hostname = sedro_host;
+			}
+		}
+	}
+	public String getSedro_hostname() {
+		return sedro_hostname;
 	}
 	
 	public String getUsername() {
@@ -224,6 +239,17 @@ public class SCServer {
 		return null;
 	}
 	
+	public SCCall findCallByID(String id) {
+		if (uaList == null) return null;
+		synchronized (uaList) {
+			if (uaList.size() < 1) return null;
+			for (SCUser ua: uaList) {
+				SCCall call = ua.findCallByID(id);
+				if (call != null) return call;
+			}
+		}
+		return null;
+	}
 	
 	
 	public void save() {
@@ -256,7 +282,7 @@ public class SCServer {
 			this.username = (String)sm.get("username");
 			this.sedro_access_key = (String)sm.get("sedro_access_key");
 			String host = (String)sm.get("sedro_host");
-			if (host != null) this.sedro_host = host;
+			if (host != null) this.setSedro_host(host);
 			setPoll_interval((Integer)sm.get("poll_interval"));
 		}
 		List<HashMap<String, Object>> uml = (List<HashMap<String, Object>>)sm.get("users");

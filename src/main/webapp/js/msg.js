@@ -15,20 +15,28 @@
  * from Aaron Ledbetter.
  */
 
-var anz_in_progress = false;
+
+//FIXME these must go
 var glob_chid = null;
-var g_context = "itx";
-var g_channel_type = "chat";
+var anz_in_progress = false;
+var g_chat_id = null;
 var g_language = "english";
-
-var g_tenant = "";
-var g_caller_token = null;
 var g_msg_num = 1;
+var glob_from_full_name = null;
+var glob_from_name = null;
 
+//get location for chatbot APIs
+var glatitude = null;
+var glongitude = null;	
+if (navigator.geolocation) {
+	navigator.geolocation.getCurrentPosition(function(position) {
+		glatitude = position.coords.latitude;
+		glongitude = position.coords.longitude;
+	});
+}
 
 function resetPage() {
-	$(".sedro_version").html(getSedroVersion()); // add version
-	
+	$(".sedro_version").html(getSedroVersion()); // add version	
 	$("#interact_msg").html("");
 	if ($("#interact_msg").length) $("#interact_msg").scrollTop($("#interact_msg")[0].scrollHeight);
 	// switch to woke
@@ -36,9 +44,12 @@ function resetPage() {
 	$(".woke").hide();
 	$("#interact_text").val(""); 
 	$("#interact_wd").show();
-	$("#asktell_text").removeClass("warn").val(""); 
 	glob_chid = null;
 	g_msg_num = 1;
+}
+var glob_bye_delay = (1000 * 10);
+var glob_bye_handler = function() {
+	resetPage();
 }
 
 /////////////////////////////////////////////////////////////////
@@ -50,113 +61,29 @@ $(document).ready(function() {
 	byeHandler = function() {
 		resetPage();
 	}
-
+		
 	///////////////////////////////////////////////////////////////////////////////////////////////////
-	// Check auth cookie
-	var cookie = getCookie("atok");
-	if (!cookie || cookie == "") {
-		if (window.location.href.indexOf(".html") > -1 && window.location.href.indexOf("index.html") == -1) {
-			window.location.href = "/index.html";	
-			return;
-		}		
+	// get the chat ID
+	g_chat_id = getUrlParam('id');
+	if (!g_chat_id) {
+		alert("No Chat ID");
+		return;
 	}
-
-	// get the key
-	scsGetSettings(function(data) {
-		if (data && data.info && data.info.sedro_access_key) {
-			glob_api_key = data.info.sedro_access_key;
-			$("#api_key").val(data.info.sedro_access_key); 
-			setAPIKey(data.info.sedro_access_key);
-			setAPIHost(data.info.sedro_host);
-
-			sedroGetAccount(function (data) {
-				var pselect = "";
-				if (data.results[0].personas) {
-					for (var i=0;i<data.results[0].personas.length;i++) {
-						pselect += "<option value='"+data.results[0].personas[i]+"'>"+data.results[0].personas[i]+"</option>";						
-					}
-				}		
-				$("#persona").html(pselect);	
-				g_tenant = data.results[0].ctx;			
-			});
-		} else {
-			glob_api_key = null;
-			$("#api_key").val(""); 
-			$("#xtenant_action").html("ERROR: RAPID API key not set ");
-		}
-	});
-
-	var g_tenant = getUrlParam('tenant');
-
-	g_caller_token = getUrlParam('caller_token');
-	if (g_caller_token) $("#caller_token").val(g_caller_token);
-	
-	// get the select list
-	var pers = getUrlParam('persona');
-	if (pers) {
-		$("#persona").val(pers);
-		$("#wake_now_bt").click();
-	}
-
-	
-	function waitChid() {
-	    if (anz_in_progress == true) {
-	        setTimeout(waitChid, 50);//wait 50 millisecnds then recheck
-	        return;
-	    }
-	    pollChidBase(true);
-	}
-	
-	// poll for async messages
-	function pollChid() {
-		pollChidBase(false);
-	}
-	// polling every 30 seconds when no waiting for call...
-	function pollChidBase(init) {
-		if (glob_chid == null) return; // end
-	    if (!(anz_in_progress || init)) {
-	    	pollChatMsg();
-	    }
-        setTimeout(pollChid, 1000*30); // poll every 30 seconds
-	}
-	// get persona list select
-	function getPersonasSelect(ctx) {
-		sedroGetPersonas(ctx, function (data) {
-			var pselect = "";
-			if (data && data.list) {
-				for (var i=0;i<data.list.length;i++) {
-					pselect += "<option value='"+data.list[i]+"'>"+data.list[i]+"</option>";						
-				}
-			}
-			$("#persona").html(pselect);
-		});			
-	}	
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// Add interactive message
 	$("#wake_now_bt").on('click', function (e) {
-		var persona = $("#persona").val(); 
-		if (persona == "") {
-			alert("select a persona");
-			return;
-		}
 		$("#interact_msg").html("");
 		$("#interact_msg").scrollTop($("#interact_msg")[0].scrollHeight);
 
 		// switch to woke
-		$(".notwoke, .askTell").hide();
+		$(".notwoke").hide();
 		$(".woke").show();
-		$(".personaName").html(persona);
 		$("#xaction").html("&nbsp;Conversation");
-
-		var author = null; // todo 		
-		var ctoken = $("#caller_token").val(); 
-		if (!ctoken || ctoken.length < 1) ctoken = null;
-		var max_qn = -1;
-		var call_count = 0;	// first call from person
+		$("#interact_wd").show();
 
 		// ready..
-		postChatWake(g_tenant, persona, null, author, ctoken, g_context, g_channel_type, g_language, "false", max_qn, call_count, chatHandler);
+		scsChatWake(g_chat_id, g_language, chatHandler);
 		// clear it
 		$("#interact_text").val(""); 
 		waitChid();	
@@ -168,10 +95,9 @@ $(document).ready(function() {
 			addLocalMsg(txt, "#interact_msg");
 			$("#interact_msg").scrollTop($("#interact_msg")[0].scrollHeight);
 		}
-	
 		// ready..
 		$("#interact_wd").hide();
-		postChatBye(g_tenant, glob_chid, chatHandler);
+		postChatBye(glob_chid, chatHandler);
 	});
 	
 	
@@ -189,17 +115,15 @@ $(document).ready(function() {
 		$("#interact_msg").scrollTop($("#interact_msg")[0].scrollHeight);
 
 		// ready..
-		postChatMsg(g_tenant, glob_chid, txt, chatHandler);
+		scsChatMsg(glob_chid, txt, chatHandler);
 		waitChid();
 		$("#interact_text").val(""); 
 	});
-	
-	// reset to base
-	$("#reset_bt").on('click', function (e) {
-		resetPage();
-	});
 });
 
+
+/////////////////////////////////////////////////////////////
+// RENDER MESSAGES
 // add local message
 function addLocalMsg(msg, tag) {
 	var cmsg = "<div class='c_msg' data-num='"+g_msg_num+"'>"+msg+"</div>";
@@ -208,22 +132,31 @@ function addLocalMsg(msg, tag) {
 }
 
 // handle chat responses
-var chatHandler = function (words, resp) {
+var chatHandler = function (resp) {
 	if (!resp) {
-		$("#resolve_list").show().html("<div class='fLn' style='margin-top:50px;color:red'>Error Retriving content</div>");
 		glob_chid = null;
+		$("#interact_msg").html("Error Connecting...");
+		$("#interact_wd").hide();
 		return;
 	}
-	if (!resp.info) {
-		$("#resolve_list").show().html("<div class='fLn' style='margin-top:50px;color:red'>Error Retriving content: "+resp.code+"</div>");
+	if (resp.code == 429 || !resp.info) {
 		glob_chid = null;
+		$("#interact_msg").html("too many sessions");
+		$("#interact_wd").hide();
 		return;
 	}
-	// interact_msg
-	glob_persona_full_name = resp.info.persona_full_name;
-	$(".personaFullName").html(glob_persona_full_name);
 	
+	// interact_msg
+	if (resp.info.from) {
+		glob_from_name = resp.info.from;
+		$(".fromName").html(glob_from_name);
+	}
+	if (resp.info.from_full_name) {
+		glob_from_full_name = resp.info.from_full_name;
+		$(".fromFullName").html(glob_from_full_name);
+	}
 	glob_chid = resp.info.chid;
+	//$("#interact_wd").show();
 
 	if (resp.list && resp.list.length > 0) {
 		for (var i=0;i<resp.list.length;i++) {
@@ -242,7 +175,7 @@ var chatHandler = function (words, resp) {
 function pollChatMsg() {
 	if (anz_in_progress) return;
     anz_in_progress = false;
-	postChatPoll(g_tenant, glob_chid, chatHandler);
+	scsChatPoll(glob_chid, chatHandler);
 }
 
 function addRemoteMsg(msg) {
@@ -288,8 +221,9 @@ function waitPostMessage(tag, msg) {
     setTimeout(function () {
 		if (msg.event == 'bye') {
 			glob_chid = null;
+			alert("byte");
 			$("#interact_wd").hide();
-			setTimeout(glob_resolve_bye_handler, glob_resolve_bye_time);		
+			setTimeout(glob_bye_handler, glob_bye_delay);		
 		}
 		processMsgs(tag);
 	}, (msg.post_wait * 100));
@@ -300,18 +234,63 @@ function updateNewLine(text) {
 }
 
 
+/////////////////////////////////////////////////////////////
+// local Chat API
+function scsChatWake(chat_id, language, cb) {
+	var d = new Date();
+	var calltime = d.toISOString(); // "yyyy-MM-dd'T'HH:mm:ss.SSSZ"; 
 
-
-function scsGetSettings(cb) {
-	$.ajax({url: "/api/1.0/settings", type: 'GET', dataType: "json", contentType: 'application/json', 
-	  success: function(data){
-		  cb(data);
-	  }, error: function(xhr) {
-		  cb(null);
-	  }
+	var ind = "{ \"chat_id\": \"" + chat_id + "\""; 	
+    ind += ", \"time\": \"" + calltime + "\"";
+    if (glatitude) ind += ", \"latitude\": \"" + glatitude + "\"";
+    if (glongitude) ind += ", \"longitude\": \"" + glongitude + "\"";    
+	var tzn = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    ind += ", \"timezone\": \"" + tzn + "\"";	
+    ind += ", \"language\": \"" + language + "\"}";
+    
+	$.ajax({url: "/api/1.0/chat/wake", type: 'POST', dataType: "json", crossDomain: true, contentType: 'application/json', data: ind, 
+		success: function(data){
+			cb(data);
+		}, error: function(xhr) {
+			cb(null);
+		}
+	});
+}
+function scsChatMsg(call_id, text, cb) {
+	var ind = "{ \"call_id\": \"" + call_id + "\", \"text\": \"" + text.escapeSpecialChars() + "\"}";
+	$.ajax({url: "/api/1.0/chat/msg", type: 'POST', dataType: "json", crossDomain: true, contentType: 'application/json', data: ind, 
+		success: function(data){
+			cb(data);
+		}, error: function(xhr) {
+			cb(null);
+		}
+	});
+}
+function scsChatPoll(call_id, cb) {
+	var ind = "{ \"call_id\": \"" + call_id + "\"}";
+	$.ajax({url: "/api/1.0/chat/poll", type: 'POST', dataType: "json", crossDomain: true, contentType: 'application/json', data: ind, 
+		success: function(data){
+			cb(data);
+		}, error: function(xhr) {
+			cb(null);
+		}
+	});
+}
+function scsChatBye(call_id, cb) {
+	var ind = "{ \"call_id\": \"" + call_id + "\"}";
+	$.ajax({url: "/api/1.0/chat/bye", type: 'POST', dataType: "json", crossDomain: true, contentType: 'application/json', data: ind, 
+		success: function(data){
+			if (data.code == 200) cb(data);
+			else cb(null);
+		}, error: function(xhr) {
+			cb(null);
+		}
 	});
 }
 
+
+/////////////////////////////////////////////////////////////
+// UTILS
 var getUrlParam = function getUrlParameter(sParam) {
     var sPageURL = window.location.search.substring(1),
         sURLVariables = sPageURL.split('&'),
@@ -327,26 +306,32 @@ var getUrlParam = function getUrlParameter(sParam) {
     }
 };
 
-//get a cookie
-function setCookie(name,value,days) {
-    var expires = "";
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime() + (days*24*60*60*1000));
-        expires = "; expires=" + date.toUTCString();
+function waitChid() {
+    if (anz_in_progress == true) {
+        setTimeout(waitChid, 50);//wait 50 millisecnds then recheck
+        return;
     }
-    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    pollChidBase(true);
 }
-function getCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0;i < ca.length;i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+// poll for async messages
+function pollChid() {
+	pollChidBase(false);
+}
+// polling every 30 seconds when no waiting for call...
+function pollChidBase(init) {
+	if (glob_chid == null) return; // end
+    if (!(anz_in_progress || init)) {
+    	pollChatMsg();
     }
-    return null;
+    setTimeout(pollChid, 1000*30); // poll every 30 seconds
 }
-function eraseCookie(name) {   
-    document.cookie = name+'=; Max-Age=-99999999;';  
-}
+String.prototype.escapeSpecialChars = function() {
+	return this
+	.replace(/[\\]/g, '\\\\')
+	.replace(/[\/]/g, '\\/')
+	.replace(/[\f]/g, '\\f')
+	.replace(/[\n]/g, '\\n')
+	.replace(/[\r]/g, '\\r')
+	.replace(/[\t]/g, '\\t')
+	.replace(/[\"]/g, '\\"');
+	};

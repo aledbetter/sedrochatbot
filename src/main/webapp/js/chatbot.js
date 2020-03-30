@@ -120,7 +120,6 @@ $(document).ready(function() {
 	var cookie = getCookie("atok");
 	if (!cookie || cookie == "") {
 		if (window.location.href.indexOf(".html") > -1 && window.location.href.indexOf("index.html") == -1) {
-// FIXME only see login
 			window.location.href = "/index.html";	
 			return;
 		}		
@@ -348,10 +347,24 @@ function getUsers() {
 									continue;
 								}
 								if (property == "id") sid = data.info.users[i].services[k][property];
+								
+								// if url make link					
+								var val = data.info.users[i].services[k][property];
+								if (val.startsWith("http")) {
+									val = "<a target='_blank' href='"+val+"'>"+val+"</a>";
+								}
 								usr += "<div class='fLn'>";
-									usr += "<div style='text-align:left'><b>" + property + "</b>: "+data.info.users[i].services[k][property]+"</div>";
+									usr += "<div style='text-align:left'><b>" + property + "</b>: "+val+"</div>";
 								usr += "</div>";				
 							}
+							// HACK
+							//http://localhost:8081/msg.html?id=xxxx
+							if (service == "webchat") {
+								usr += "<div class='fLn'>";
+								usr += "<div style='text-align:left'><b>Chat URL</b>: <a target='_blank' href='/msg.html?id="+sid+"'>/msg.html?id="+sid+"</a></div>";
+								usr += "</div>";
+							}
+							
 							usr += "<div class='bslink' onClick='delService(\""+sid+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;top:14px;right:10px;background:#DDD'>Del</div>";	
 							usr += "<div class='bslink' onClick='editService(\""+data.info.users[i].username+"\", \""+sid+"\");' style='width:70px;text-align:center;font-size:16px;position:absolute;top:14px;right:90px;background:#DDD'>Edit</div>";	
 							

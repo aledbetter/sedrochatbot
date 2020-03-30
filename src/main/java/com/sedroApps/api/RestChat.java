@@ -19,7 +19,7 @@
 package main.java.com.sedroApps.api;
 
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,29 +33,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
+import main.java.com.sedroApps.SCCall;
 import main.java.com.sedroApps.SCServer;
-import main.java.com.sedroApps.util.HttpUtil;
+import main.java.com.sedroApps.adapter.ChatAdapter;
 import main.java.com.sedroApps.util.RestResp;
 import main.java.com.sedroApps.util.RestUtil;
 import main.java.com.sedroApps.util.Sutil;
 
 
 
-@Path("/1.0/persona/chat/")
+@Path("/1.0/chat/")
 @Produces(MediaType.APPLICATION_JSON)
 public class RestChat {
 
-	
-	/*
-	 * get instance OR create new one (SedroCall)
-	 * then forward info / get response
-	 * 
-	 */
-	
-	
 	@POST
 	@Path("/wake")
 	public Response interactWakePOST(@Context UriInfo info, 
@@ -63,41 +55,15 @@ public class RestChat {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-	//	if (!checkAuth(rr, "user")) return rr.retNoAuth();
-
-		String text = null, context = "itx", language = null, channel_type = "chat", channel_id = null,
-				caller_token = null, style = null, caller = null, persona = null;
-		boolean save_usage = false, ctx_save = false;
-		int max_qn = -1, call_count = 0;
+		String language = null, chat_id = null;
 		double latitude = 0, longitude = 0;
-		String timezone = null, time = null, location = null, tzn = null;
+		String timezone = null, time = null, location = null;
 		
 		try {
 			JSONObject obj = new JSONObject(body);
-			String scontext = RestUtil.getJStr(obj, "context"); // the name of the context... needed to save
-			if (RestUtil.paramHave(scontext)) context = scontext;
+			chat_id = RestUtil.getJStr(obj, "chat_id");
 			String slanguage = RestUtil.getJStr(obj, "language");
 			if (RestUtil.paramHave(slanguage)) language = slanguage;
-			
-			persona = RestUtil.getJStr(obj, "persona");
-			text = RestUtil.getJStr(obj, "text");
-
-			String scaller = RestUtil.getJStr(obj, "caller");
-			if (RestUtil.paramHave(scaller)) caller = scaller;
-			String scaller_token = RestUtil.getJStr(obj, "caller_token");
-			if (RestUtil.paramHave(scaller_token)) caller_token = scaller_token;
-			
-			String schannel_type = RestUtil.getJStr(obj, "channel_type");
-			if (RestUtil.paramHave(schannel_type)) channel_type = schannel_type;
-			String sstyle = RestUtil.getJStr(obj, "style");
-			if (RestUtil.paramHave(sstyle)) style = sstyle;			
-			if (RestUtil.paramTrue(RestUtil.getJStr(obj, "save"))) ctx_save = true;
-			
-			String smax_qn = RestUtil.getJStr(obj, "max_qn");
-			if (RestUtil.paramHave(smax_qn)) max_qn = Sutil.toInt(smax_qn);
-			String scall_count = RestUtil.getJStr(obj, "call_count");
-			if (RestUtil.paramHave(scall_count)) call_count = Sutil.toInt(scall_count);
-			
 			// location
 			String slatitude = RestUtil.getJStr(obj, "latitude");
 			if (RestUtil.paramHave(slatitude)) latitude = Sutil.toDouble(slatitude);
@@ -106,48 +72,45 @@ public class RestChat {
 			String slocation = RestUtil.getJStr(obj, "location");
 			if (RestUtil.paramHave(slocation)) location = slocation;
 			// time
-			String stimezone = RestUtil.getJStr(obj, "tz");
+			String stimezone = RestUtil.getJStr(obj, "timezone");
 			if (RestUtil.paramHave(stimezone)) timezone = stimezone;
-			String stzn = RestUtil.getJStr(obj, "tzn");
-			if (RestUtil.paramHave(stzn)) tzn = stzn;
 			String stime = RestUtil.getJStr(obj, "time");
 			if (RestUtil.paramHave(stime)) time = stime;
-
-		
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
-		if (text != null) text = text.trim();
-		if (!RestUtil.paramHave(persona)) {
-			// must have persona
-			return rr.ret(402);
+		if (!RestUtil.paramHave(chat_id)) return rr.ret(402); // must have chid
+
+		// Find chat service
+		ChatAdapter cs = SCServer.getChatServer().findChatService(chat_id);
+		if (cs == null) {
+			System.out.println("ERROR WAKE["+chat_id+"] Service NOT FOUND");
+			return rr.ret(404);
 		}
+		System.out.println("WAKE["+chat_id+"] " + cs.getName());
+
+		HashMap<String, String> call_info = new HashMap<>();
+		call_info.put("event", "wake");
+		call_info.put("remote_addr", hsr.getRemoteAddr());
+		if (language != null) call_info.put("language", language);
+		if (latitude != 0) call_info.put("latitude", ""+latitude);
+		if (longitude != 0) call_info.put("longitude", ""+longitude);
+		if (location != null) call_info.put("location", location);
+		if (timezone != null) call_info.put("timezone", timezone);
+		if (time != null) call_info.put("time", time);
 		
-		// FIND 
-		
-	//	ChatAdapter wc = null;
-	/*
-		/////////////////////////
-		// get tenant
-		PTenant tenant = RestUtils.getTenant(hsr);
-		if (tenant == null) return rr.ret(402);
-		
-		// session
-		PSession sess = new PSession(tenant, tenant.getTid(), null, context, language, text, caller, caller_token, persona, channel_type, "wake", channel_id, style, null, max_qn, true, ctx_save, save_usage);	
-		sess.setLocation(latitude, longitude, location);
-		sess.setTime(timezone, tzn, time);
-		sess.setCall_count(call_count);
-		
-		SDoc res = Lex.processInteraction(sess);
-		if (res == null) return rr.ret(502);
-		
-		// add all the doc content
-		makeMap(rr, res.getCtx(), res);
-		*/
+		// complete the call info
+		HashMap<String, String> ci = cs.getReceiveCall(null, call_info);
+		// process message
+		HashMap<String, Object> resp = cs.getOrator().processMessageFull(ci);
+		if (resp == null || resp.keySet().size() < 1) {
+			// too many sessions or something bad
+			return rr.ret(429);
+		}
+		setResp(rr, resp);
 		return rr.ret();
 	}
-	
-	
+		
 	@POST
 	@Path("/msg")
 	public Response interactMsgPOST(@Context UriInfo info, 
@@ -155,48 +118,35 @@ public class RestChat {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-//		if (!checkAuth(rr, "user")) return rr.retNoAuth();
-
-		String text = null, context = "itx", channel_type = null, channel_id = null, event = null, style = null, chid = null;	
-		int max_qn = -1;
+		String text = null, chid = null;
 		try {
 			JSONObject obj = new JSONObject(body);
 			text = RestUtil.getJStr(obj, "text");
-			String scontext = RestUtil.getJStr(obj, "context"); // the name of the context... needed to save
-			if (RestUtil.paramHave(scontext)) context = scontext;
-			
-			String schannel_type = RestUtil.getJStr(obj, "channel_type");
-			if (RestUtil.paramHave(schannel_type)) channel_type = schannel_type;
-			String sevent = RestUtil.getJStr(obj, "event");
-			if (RestUtil.paramHave(sevent)) event = sevent;
-			String sstyle = RestUtil.getJStr(obj, "style");
-			if (RestUtil.paramHave(sstyle)) style = sstyle;
-			String smax_qn = RestUtil.getJStr(obj, "max_qn");
-			if (RestUtil.paramHave(smax_qn)) max_qn = Sutil.toInt(smax_qn);
-			
-			chid = RestUtil.getJStr(obj, "chid");
-			
-					
+			chid = RestUtil.getJStr(obj, "call_id");							
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
 		if (!RestUtil.paramHave(chid)) return rr.ret(402); // must have chid
+		if (!RestUtil.paramHave(text)) return rr.ret();
 		if (text != null) text = text.trim();
+		System.out.println("MSG["+chid+"] " + text);
 		
+		// find the call
+		SCCall call = SCServer.getChatServer().findCallByID(chid);
+		if (call == null) return rr.ret(404); 
+				
+		HashMap<String, String> call_info = new HashMap<>();
+		call_info.put("event", "msg");
+		call_info.put("msg", text);
+		call_info.put("call_id", chid);
+		call_info.put("remote_addr", hsr.getRemoteAddr());
 		
-	/*		
-  		// get tenant
-		PTenant tenant = RestUtils.getTenant(hsr);
-		if (tenant == null) return rr.ret(402);
-		
-		// session
-		PSession sess = new PSession(tenant, tenant.getTid(), chid, context, null, text, null, null, null, channel_type, event, channel_id, style, null, max_qn, true, false, false);	
-		SDoc res = Lex.processInteraction(sess);		
-		if (res == null) return makeDefaultByeMap(rr);
-		
-		// add all the doc content
-		makeMap(rr, res.getCtx(), res);
-	*/
+		// complete the call info
+		ChatAdapter cs = call.getChatService();
+		HashMap<String, String> ci = cs.getReceiveCall(call, call_info);
+		// process message
+		HashMap<String, Object> resp = cs.getOrator().processMessageFull(ci);
+		setResp(rr, resp);
 		return rr.ret();
 	}
 	
@@ -207,45 +157,34 @@ public class RestChat {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-	//	if (!checkAuth(rr, "user")) return rr.retNoAuth();
-
-		String context = "itx", channel_type = null, channel_id = null, event = null, style = null, chid = null;	
-		int max_qn = -1;
+		String chid = null;
 		try {
 			JSONObject obj = new JSONObject(body);
-			String scontext = RestUtil.getJStr(obj, "context"); // the name of the context... needed to save
-			if (RestUtil.paramHave(scontext)) context = scontext;
-			
-			String schannel_type = RestUtil.getJStr(obj, "channel_type");
-			if (RestUtil.paramHave(schannel_type)) channel_type = schannel_type;
-			String sevent = RestUtil.getJStr(obj, "event");
-			if (RestUtil.paramHave(sevent)) event = sevent;
-			String sstyle = RestUtil.getJStr(obj, "style");
-			if (RestUtil.paramHave(sstyle)) style = sstyle;
-			String smax_qn = RestUtil.getJStr(obj, "max_qn");
-			if (RestUtil.paramHave(smax_qn)) max_qn = Sutil.toInt(smax_qn);
-			
-			chid = RestUtil.getJStr(obj, "chid");
+			chid = RestUtil.getJStr(obj, "call_id");
 					
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
 		if (!RestUtil.paramHave(chid)) return rr.ret(402); // must have chid
-	/*
-		// get tenant
-		PTenant tenant = RestUtils.getTenant(hsr);
-		if (tenant == null) return rr.ret(402);
 		
-		// session
-		PSession sess = new PSession(tenant, tenant.getTid(), chid, context, null, null, null, null, null, channel_type, event, channel_id, style, null, max_qn, true, false, false);	
-		SDoc res = Lex.processInteraction(sess);		
-		if (res == null) return makeDefaultByeMap(rr);
+		// find the call
+		SCCall call = SCServer.getChatServer().findCallByID(chid);
+		if (call == null) return rr.ret(404); 
 		
-		// add all the doc content
-		makeMap(rr, res.getCtx(), res);
-		*/
+		HashMap<String, String> call_info = new HashMap<>();
+		call_info.put("event", "poll");
+		call_info.put("call_id", chid);
+		call_info.put("remote_addr", hsr.getRemoteAddr());
+	
+		// complete the call info
+		ChatAdapter cs = call.getChatService();
+		HashMap<String, String> ci = cs.getReceiveCall(call, call_info);
+		// process message
+		HashMap<String, Object> resp = cs.getOrator().processMessageFull(ci);
+		setResp(rr, resp);
 		return rr.ret();
 	}
+	
 	@POST
 	@Path("/bye")
 	public Response interactByePOST(@Context UriInfo info, 
@@ -253,41 +192,44 @@ public class RestChat {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-	//	if (!checkAuth(rr, "user")) return rr.retNoAuth();
-
-		String context = "itx", channel_type = null, channel_id = null, style = null, chid = null;
-		int max_qn = -1;
+		String chid = null;
 		try {
 			JSONObject obj = new JSONObject(body);
-			String scontext = RestUtil.getJStr(obj, "context"); // the name of the context... needed to save
-			if (RestUtil.paramHave(scontext)) context = scontext;		
-			String schannel_type = RestUtil.getJStr(obj, "channel_type");
-			if (RestUtil.paramHave(schannel_type)) channel_type = schannel_type;
-			String sstyle = RestUtil.getJStr(obj, "style");
-			if (RestUtil.paramHave(sstyle)) style = sstyle;	
-			String smax_qn = RestUtil.getJStr(obj, "max_qn");
-			if (RestUtil.paramHave(smax_qn)) max_qn = Sutil.toInt(smax_qn);
-			
-			chid = RestUtil.getJStr(obj, "chid");
-					
+			chid = RestUtil.getJStr(obj, "call_id");				
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
 		if (!RestUtil.paramHave(chid)) return rr.ret(402); // must have chid
-	/*	
-		// get tenant
-		PTenant tenant = RestUtils.getTenant(hsr);
-		if (tenant == null) return rr.ret(402);
+		System.out.println("BYE["+chid+"] ");
 		
-		// session
-		PSession sess = new PSession(tenant, tenant.getTid(), chid, context, null, null, null, null, null, channel_type, "bye", channel_id, style, null, max_qn, true, false, false);	
-		SDoc res = Lex.processInteraction(sess);		
-		if (res == null) return makeDefaultByeMap(rr);
-		
-		// add all the doc content
-		makeMap(rr, res.getCtx(), res);
-	*/
+		// find the call
+		SCCall call = SCServer.getChatServer().findCallByID(chid);
+		if (call == null) return rr.ret(404); 
+
+		HashMap<String, String> call_info = new HashMap<>();
+		call_info.put("event", "bye");
+		call_info.put("call_id", chid);
+		call_info.put("remote_addr", hsr.getRemoteAddr());
+
+		// complete the call info
+		ChatAdapter cs = call.getChatService();
+		HashMap<String, String> ci = cs.getReceiveCall(call, call_info);
+		// process message
+		HashMap<String, Object> resp = cs.getOrator().processMessageFull(ci);
+		setResp(rr, resp);
 		return rr.ret();
+	}
+	private void setResp(RestResp rr, HashMap<String, Object> resp) {
+		if (resp != null) {
+			List<Object> ml = (List<Object>)resp.get("messages");
+// TODO cleanup messages ?			
+			rr.setList(ml);
+			resp.remove("messages");
+			resp.remove("chid");
+			rr.setInfo(resp);
+		} else {
+			rr.ret(402);
+		}
 	}
 	
 }

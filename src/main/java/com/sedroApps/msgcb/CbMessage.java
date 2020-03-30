@@ -18,7 +18,7 @@ package main.java.com.sedroApps.msgcb;
 
 import java.util.HashMap;
 
-import main.java.com.sedroApps.SCSedroCall;
+import main.java.com.sedroApps.SCCall;
 
 abstract public class CbMessage {
 	private String name;
@@ -35,6 +35,6 @@ abstract public class CbMessage {
 	
 	/////////////////////////////////////////////////////////
 	// implement and register this to make an override
-	public abstract String getFinalMessage(String caname, SCSedroCall processor, boolean msgPublic, 
+	public abstract String getFinalMessage(String caname, SCCall processor, boolean msgPublic, 
 											HashMap<String, Object> msgInfo, String msg);
 }

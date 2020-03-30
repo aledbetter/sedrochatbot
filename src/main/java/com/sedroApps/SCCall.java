@@ -19,10 +19,13 @@ package main.java.com.sedroApps;
 import java.util.HashMap;
 import java.util.List;
 
+import main.java.com.sedroApps.adapter.ChatAdapter;
 import main.java.com.sedroApps.util.Sutil;
 
 
 public class SCCall {
+	protected String id;
+	private ChatAdapter adapter = null;
 	
 	protected String persona;
 	protected String persona_full_name;
@@ -56,13 +59,14 @@ public class SCCall {
 	private boolean readPublic = false;
 	private boolean respPublic = false;
 	private boolean directMsg = false;
-	
-	
+		
 	private String status = "wake";
 	
 
-	public SCCall(boolean readPublic, boolean respPublic, boolean directMsg) {
+	public SCCall(ChatAdapter adapter, boolean readPublic, boolean respPublic, boolean directMsg) {
 		this.status = "wake";
+		this.id = Sutil.getGUIDNoString();
+		this.adapter = adapter; 
 		this.readPublic = readPublic;
 		this.respPublic = respPublic;
 		this.directMsg = directMsg;
@@ -79,7 +83,12 @@ public class SCCall {
 	public boolean isDirectMsg() {
 		return directMsg;
 	}
-	
+	public String getId() {
+		return id;
+	}
+	public ChatAdapter getChatService() {
+		return adapter;
+	}
 
 	//////////////////////////////////////////////////
 	// provider info
@@ -193,22 +202,39 @@ public class SCCall {
 
 	//////////////////////////////////////////////////
 	// Implementation to override
-	public List<HashMap<String, Object>> chatWake(String key, String text) {
+	public HashMap<String, Object> chatWake(String key, String text) {
+		if (!getStatus().equals("wake") && !getStatus().equals("bye")) return null;
+		return null;
+	}
+	public List<HashMap<String, Object>> chatWakeMessages(String key, String text) {
 		if (!getStatus().equals("wake") && !getStatus().equals("bye")) return null;
 		return null;
 	}
 	
-	public List<HashMap<String, Object>> chatPoll() {
+	public HashMap<String, Object> chatPoll() {
+		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		return null;
+	}
+	public List<HashMap<String, Object>> chatPollMessages() {
+		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		return null;
+	}	
+	
+	public HashMap<String, Object> chatMsg(String text) {
+		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		return null;
+	}
+	public List<HashMap<String, Object>> chatMsgMessages(String text) {
 		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
 		return null;
 	}
 	
-	public List<HashMap<String, Object>> chatMsg(String text) {
+	public HashMap<String, Object> chatBye() {
 		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		status = "bye";
 		return null;
 	}
-	
-	public List<HashMap<String, Object>> chatBye() {
+	public List<HashMap<String, Object>> chatByeMessages() {
 		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
 		status = "bye";
 		return null;

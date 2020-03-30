@@ -40,6 +40,10 @@ function resetPage() {
 	glob_chid = null;
 	g_msg_num = 1;
 }
+var glob_bye_delay = (1000 * 10);
+var glob_bye_handler = function() {
+	resetPage();
+}
 
 /////////////////////////////////////////////////////////////////
 $(document).ready(function() {
@@ -299,7 +303,7 @@ function waitPostMessage(tag, msg) {
 		if (msg.event == 'bye') {
 			glob_chid = null;
 			$("#interact_wd").hide();
-			setTimeout(glob_resolve_bye_handler, glob_resolve_bye_time);		
+			setTimeout(glob_bye_handler, glob_bye_delay);		
 		}
 		processMsgs(tag);
 	}, (msg.post_wait * 100));
@@ -308,8 +312,6 @@ function waitPostMessage(tag, msg) {
 function updateNewLine(text) {
 	return text.replace(/\\n/g, "<br>");
 }
-
-
 
 
 function scsGetSettings(cb) {

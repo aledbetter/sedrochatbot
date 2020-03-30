@@ -61,6 +61,15 @@ public class SCUser {
 		this.sedro_persona = sedro_persona;
 	}
 	
+	public SCCall findCallByID(String id) {
+		if (orators != null && orators.size() > 0) {
+			for (SCOrator orat:orators) {
+				SCCall call = orat.findCallByID(id);
+				if (call != null) return call;
+			}
+		}
+		return null;
+	}
 	
 	////////////////////////////////////////
 	// singleton message calback override for the user.... might register for details ?
