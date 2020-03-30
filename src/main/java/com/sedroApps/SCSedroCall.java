@@ -78,9 +78,7 @@ public class SCSedroCall extends SCCall {
 	}
 	@Override
 	public HashMap<String, Object> chatWake(String key, String text) {
-		if (!getStatus().equals("wake") && !getStatus().equals("bye")) return null;
-		//System.out.println(" **CHAT_WAKE");
-
+		if (!isStatus("wake") && !isStatus("bye")) return null;
 		String url = getUrl("/persona/chat/wake");
 		this.key = key;
 		
@@ -109,6 +107,7 @@ public class SCSedroCall extends SCCall {
 		headers.put("Accept", "application/json");
 
 		String line = HttpUtil.postDataHttpsJson(url, reqData, null, null, null, headers);
+		//System.out.println(line);
 		HashMap<String, Object> res = chatRespParse(line, true);
 		return res;
 	}
@@ -122,7 +121,7 @@ public class SCSedroCall extends SCCall {
 	}
 	@Override
 	public HashMap<String, Object> chatPoll() {
-		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		if (isStatus("wake") || isStatus("bye")) return null;
 		//System.out.println(" **CHAT_POLL: " + this.chid);
 
 		String url = getUrl("/persona/chat/poll");
@@ -146,7 +145,7 @@ public class SCSedroCall extends SCCall {
 	}
 	@Override
 	public HashMap<String, Object> chatMsg(String text) {
-		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		if (isStatus("wake") || isStatus("bye")) return null;
 		//System.out.println(" **CHAT_MSG: " + this.chid);
 
 		String url = getUrl("/persona/chat/msg");
@@ -173,7 +172,7 @@ public class SCSedroCall extends SCCall {
 	}
 	@Override
 	public HashMap<String, Object> chatBye() {
-		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		if (isStatus("wake") || isStatus("bye")) return null;
 		//System.out.println(" **CHAT_BYE");
 		String url = getUrl("/persona/chat/bye");
 		String reqData = "{ \"chid\": \"" + this.chid  + "\", \"event\": \"bye\"}";
@@ -253,12 +252,13 @@ public class SCSedroCall extends SCCall {
 							if (noremote) continue;
 						}
 						int mnum = Sutil.toInt((String)mm.get("num"));
-						
+		/*				
 						if (mnum <= this.msg_num_last) {
 							System.out.println(" ERROR_RESENT["+mnum+"]["+msg_num+"] [sns:"+num_sent+" / "+num_total+"] txt: " + mm.get("msg"));
 							continue; // alredy sent
 						}
-						
+///ERROR_RESENT[2][2] [sns:2 / 1] txt: Bye, have a good night
+			*/			
 						if (mnum > msg_num) msg_num = mnum;
 
 						String ev = (String)mm.get("event");

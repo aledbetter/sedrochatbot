@@ -38,20 +38,20 @@
 		<div class="cent">			
 			<div class="fLn" style='min-height:1000px'>										
 				<h2 id='message_here' style="margin-top:50px"></h2>
-				<div class="fLn" id='thetenant' style='display:none;margin-top:10px;margin-bottom:10px;background:#EEE;position:relative'>
-					<div class="fLn" style='margin-bottom:10px;background:#666;color:#FFF;height:40px;font-size:18px;padding-top:12px'>		
+				<div class="fLn" id='thetenant' style='display:none;margin-top:10px;margin-bottom:10px;position:relative'>
+					<div class="fLn" style='background:#666;color:#FFF;height:40px;font-size:18px;padding-top:12px'>		
 						<span style='float:left;padding-left:10px'>Name: <b><span class='tenantname'></span></b></span>
 						<span style='float:left;padding-left:140px'>Subscription: <b><span class='subscription'></span></b></span>							
 						<span style='float:right;padding-right:10px'>Tenant ID: <span class='tenantid'></span></span>	
 					</div>	
 						
-					<div class='fLn' style='padding-top:10px'>					
+					<div class='fLn' style='background:#EEE'>					
 						<div class='fLn' style='font-weight:normal'>
 							<div class='fLn' style='font-size:16px;line-height:1.6em'>
 								<div class='fLn' id='tenant_header' style='padding:10px'></div>
 							</div>
 							<div class='fLn' style='position:relative'>
-								<div class='fLn personas' style='background:#FFF;padding-bottom:8px;padding-top:15px;font-size:18px;font-weight:bold;border-bottom:2px solid #DDD'>&nbsp;Personas: <span id='persona_count'>...</span></div>
+								<div class='fLn personas' style='background:#FFF;padding-bottom:8px;padding-top:15px;font-size:18px;font-weight:bold'>&nbsp;Personas: <span id='persona_count'>...</span></div>
 								<div class='bslink' id='add_persona_bt' style='z-index:999;width:120px;text-align:center;font-size:16px;position:absolute;top:8px;right:5px;background:#666;color:#FFF'>Add Persona</div>								
 								<div class='fLn' id='tenant_personas'></div>				
 							</div>
@@ -62,7 +62,18 @@
 							</div>
 						</div>
 					</div>			
+					<!-- Sessions -->			
+					<div class='fLn' id='mysessions' style='display:none;margin-top:30px;margin-bottom:40px;background:#EEE;padding-bottom:10px;position:relative'>
+						<div class='bslink' id='sessions_list_bt' style='width:70px;text-align:center;font-size:16px;background:#EEE;position:absolute;top:15px;right:90px'>Refresh</div>			
+						<div class='bslink' id='sessions_clear_bt' style='width:70px;text-align:center;font-size:16px;background:#EEE;position:absolute;top:15px;right:10px'>Clear All</div>			
 						
+						<div class='fLn' style='margin-bottom:10px;background:#666;color:#FFF;height:40px;font-size:18px;padding-top:12px'>		
+							<span style='float:left'>&nbsp;&nbsp;Sessions: <b><span class='sessionCount'></span></b></span>	
+						</div>	
+						<div class='fLn'>					
+							<div style='padding:10px' id='xsessions_data'></div>
+						</div>						
+					</div>							
 					<div class='fLn' id='add_persona' style='display:none;z-index:1000;position:absolute;top:100px;margin-left:15px;width:97%;background:#FFF;border:solid 2px #555'>	
 						<div style='padding:15px'>
 							<h3>Add a new Persona</h3>							

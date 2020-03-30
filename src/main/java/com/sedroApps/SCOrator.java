@@ -459,16 +459,19 @@ public class SCOrator {
 	// Process incoming direct inline
 	public HashMap<String, Object> processMessageFull(HashMap<String, String> call_info) {
 		// find existing call
-		String hd = (String)call_info.get("caller_handle");
-		String callid = (String)call_info.get("call_id");
+		String callid = (String)call_info.get("call_id");		
 		SCCall call = null;	
 		if (callid != null) {
 			call = this.findCallByID(callid);
-		}
-		if (call == null && hd != null) {
-			call = this.findCall(hd);
-		}
-		if (call == null) call = addNewCall(call_info);
+			if (call == null) {
+				System.out.println("CALL NOT FOUND[" + callid  + "]  => " + call_info.toString());
+				return null;
+			}
+		} 
+		if (call == null) {
+			call = addNewCall(call_info);
+			//System.out.println(" NEW CALL: " + call.getStatus() + "  => " + callid);
+		} 
 		
 		String wmsg = (String)call_info.get("msg");
 		String event = call_info.get("event");

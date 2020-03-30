@@ -188,6 +188,10 @@ $(document).ready(function() {
 		postChatBye(g_tenant, glob_chid, chatHandler);
 	});
 	
+	// bye if they leave and are in conversation
+	$(window).unload(function() {
+		if (glob_chid) postChatBye(g_tenant, glob_chid, chatHandler);
+	});
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// Add interactive message

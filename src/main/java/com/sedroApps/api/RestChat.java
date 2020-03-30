@@ -87,7 +87,7 @@ public class RestChat {
 			System.out.println("ERROR WAKE["+chat_id+"] Service NOT FOUND");
 			return rr.ret(404);
 		}
-		System.out.println("WAKE["+chat_id+"] " + cs.getName());
+		//System.out.println("WAKE["+chat_id+"] " + cs.getName());
 
 		HashMap<String, String> call_info = new HashMap<>();
 		call_info.put("event", "wake");
@@ -129,7 +129,7 @@ public class RestChat {
 		if (!RestUtil.paramHave(chid)) return rr.ret(402); // must have chid
 		if (!RestUtil.paramHave(text)) return rr.ret();
 		if (text != null) text = text.trim();
-		System.out.println("MSG["+chid+"] " + text);
+		//System.out.println("MSG["+chid+"] " + text);
 		
 		// find the call
 		SCCall call = SCServer.getChatServer().findCallByID(chid);
@@ -200,7 +200,7 @@ public class RestChat {
 			t.printStackTrace();
 		}	
 		if (!RestUtil.paramHave(chid)) return rr.ret(402); // must have chid
-		System.out.println("BYE["+chid+"] ");
+		//System.out.println("BYE["+chid+"] ");
 		
 		// find the call
 		SCCall call = SCServer.getChatServer().findCallByID(chid);

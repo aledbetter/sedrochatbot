@@ -52,6 +52,7 @@ var glob_bye_handler = function() {
 	resetPage();
 }
 
+
 /////////////////////////////////////////////////////////////////
 $(document).ready(function() {
 	resetPage();
@@ -97,7 +98,12 @@ $(document).ready(function() {
 		}
 		// ready..
 		$("#interact_wd").hide();
-		postChatBye(glob_chid, chatHandler);
+		scsChatBye(glob_chid, chatHandler);
+	});
+	
+	// bye if they leave and are in conversation
+	$(window).unload(function() {
+		if (glob_chid) scsChatBye(glob_chid, chatHandler);
 	});
 	
 	

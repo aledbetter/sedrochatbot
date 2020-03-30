@@ -203,39 +203,39 @@ public class SCCall {
 	//////////////////////////////////////////////////
 	// Implementation to override
 	public HashMap<String, Object> chatWake(String key, String text) {
-		if (!getStatus().equals("wake") && !getStatus().equals("bye")) return null;
+		if (!isStatus("wake") && !isStatus("bye")) return null;
 		return null;
 	}
 	public List<HashMap<String, Object>> chatWakeMessages(String key, String text) {
-		if (!getStatus().equals("wake") && !getStatus().equals("bye")) return null;
+		if (!isStatus("wake") && !isStatus("bye")) return null;
 		return null;
 	}
 	
 	public HashMap<String, Object> chatPoll() {
-		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		if (isStatus("wake") || isStatus("bye")) return null;
 		return null;
 	}
 	public List<HashMap<String, Object>> chatPollMessages() {
-		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		if (isStatus("wake") || isStatus("bye")) return null;
 		return null;
 	}	
 	
 	public HashMap<String, Object> chatMsg(String text) {
-		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		if (isStatus("wake") || isStatus("bye")) return null;
 		return null;
 	}
 	public List<HashMap<String, Object>> chatMsgMessages(String text) {
-		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		if (isStatus("wake") || isStatus("bye")) return null;
 		return null;
 	}
 	
 	public HashMap<String, Object> chatBye() {
-		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		if (isStatus("wake") || isStatus("bye")) return null;
 		status = "bye";
 		return null;
 	}
 	public List<HashMap<String, Object>> chatByeMessages() {
-		if (getStatus().equals("wake") || getStatus().equals("bye")) return null;
+		if (isStatus("wake") || isStatus("bye")) return null;
 		status = "bye";
 		return null;
 	}
