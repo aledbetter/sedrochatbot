@@ -112,7 +112,7 @@
 					</div>
 					<div class='fLn' id='add_qanda' style='display:none;z-index:1000;position:absolute;top:100px;margin-left:15px;width:97%;background:#FFF;border:solid 2px #555'>	
 						<div style='padding:15px;line-height:1.8em'>
-							<h3>Add Question and Answer DB: <span id='dbname_qanda_show'></span></h3>
+							<h3>Add Question and Answer DB: <span id='qanda_xml_bt'><span id='dbname_qanda_show'></span></span></h3>
 							Question:<br>
 							<input id='qanda_question' style='width:98%' type='text'/>
 							<br>
@@ -121,6 +121,12 @@
 							<br>
 							Short Answer:<br>
 							<input id='qanda_answer_short' style='width:30%' type='text'/>
+							
+							<div class='fLn' id='qanda_show_xml' style='display:none'>
+								Answer Set XML:<br>
+								<textarea id='qanda_xml' style='width:98%;min-height:80px' ></textarea>
+							</div>
+							
 							<input id='qanda_dbname' type='hidden'>
 							<div class='bslink' id='qanda_add_bt' style='width:70px;margin-bottom:10px;text-align:center;float:right;font-size:16px;margin-top:10px;background:#EEE;margin-right:10px;'>Add</div>			
 							<div class='bslink' id='qanda_add_cancel_bt' style='width:70px;margin-bottom:10px;text-align:center;float:right;font-size:16px;margin-top:10px;background:#EEE;margin-right:10px;'>Cancel</div>			
