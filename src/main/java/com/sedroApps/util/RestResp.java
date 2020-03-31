@@ -29,6 +29,7 @@ import javax.ws.rs.core.UriInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import main.java.com.sedroApps.SCServer;
 import main.java.com.sedroApps.SCTenant;
 
 @JsonPropertyOrder({ "code", "info", "list"})
@@ -76,9 +77,10 @@ public class RestResp {
 			System.out.println("BAD ATOK: " + this.atok);
 			return null;
 		}
-		if (DButil.getSessionKey(this.atok) == null) return null;
-		// FIXME get from tenant ID in session
-		return SCTenant.getChatServer();
+		HashMap<String, Object> km = DButil.getSessionKey(this.atok);
+		if (km == null) return null;
+		String id = (String)km.get("tenant_id");
+		return SCServer.getTenant(id);
 	}
 	public String getAtok() {
 		return atok;

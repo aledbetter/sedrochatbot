@@ -23,8 +23,6 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 import main.java.com.sedroApps.adapter.ChatAdapter;
 import main.java.com.sedroApps.msgcb.CbExample;
 import main.java.com.sedroApps.msgcb.CbMessage;
@@ -39,17 +37,17 @@ public class SCTenant {
 	private int poll_interval = DEFAULT_INTERVAL;
 	private boolean init = false;
 	private String sedro_access_key;
+	private String id;
 
-	List<SCUser> uaList;	// list of users
+	private List<SCUser> uaList;	// list of users
 	
 	private String sedro_host = "https://inteligent-chatbots.p.rapidapi.com";
 	private String sedro_hostname = "inteligent-chatbots.p.rapidapi.com";
-//	private String sedro_host = "localhost:8080/api/1.0";
+
 
 	private HashMap<String, CbMessage> msgcbMap = null;
 	
-	private static SCTenant cs = null;
-	private static Timer proc_timer = null;
+	private Timer proc_timer = null;
 
 	
 	public SCTenant() {
@@ -63,25 +61,44 @@ public class SCTenant {
 		
 		
 	}
-	
-	// so a single static instance (could instaciate in the servlet... if it is always there)
-	static {
-		cs = new SCTenant();		
+
+	public void init() {
+		if (init) return;
+		// setup processing timers to run
+		this.setTimer();	
+		this.init = true;
+	}
+	public void setDefaults() {
+		if (init) return;
+		this.setPassword("password");
 	}
 	
-	public static SCTenant getChatServer() {
-		return cs;
+	// connect to sedro and validate info.../ get ID/user
+	public boolean setup(String sedro_access_key) {
+		HashMap<String, String> hm = SCSedroCall.getTenantId(this, sedro_access_key);
+		if (hm == null) {
+			System.out.println("SETUP FAIL: "+ sedro_access_key);
+			return false;
+		}
+		this.id = hm.get("id");
+		this.username = hm.get("username");
+		this.sedro_access_key = sedro_access_key;
+		return true;
+	}	
+	
+	
+	public String getId() {
+		return id;
+	}	
+	void setId(String id) {
+		this.id = id;
 	}
 	public String getSedro_access_key() {
 		return sedro_access_key;
 	}
-	public void setSedro_access_key(String sedro_access_key) {
-		this.sedro_access_key = sedro_access_key;
-	}
 	public String getSedro_host() {
 		return sedro_host;
 	}
-
 	public void setSedro_host(String sedro_host) {
 		this.sedro_host = sedro_host;
 		if (sedro_host != null) {
@@ -125,32 +142,21 @@ public class SCTenant {
 		return msgcbMap.keySet();
 	}
 	
+	private SCTenant getSelf() {
+		return this;
+	}
 	private void setTimer() {
 		if (proc_timer != null) proc_timer.cancel();
 		proc_timer = new Timer();
 		proc_timer.scheduleAtFixedRate(new TimerTask() {
 	            public void run() {
-	            	getChatServer().processInterval();
+	            	getSelf().processInterval();           	
 	            }
 	        }, DEFAULT_DELAY, poll_interval);
 	}
-	public void init() {
-		if (init) return;
-		username = "admin";
-		setPassword("admin");
-		
-		// load if persistance
-		load();
-		setPassword("admin");
-
-		// setup processing timers to run
-		setTimer();	
-		init = true;
-	}
-
 
 	public void setPassword(String password) {
-		synchronized (username) {
+		synchronized (this) {
 			this.password = SCServer.hashPassword(password);
 			//System.out.println("Passxxxx["+password+"]: " + this.password);
 		}
@@ -158,9 +164,9 @@ public class SCTenant {
 
 	
 	public void processInterval() {
-		if (uaList == null) return;
 		// process users	
-		synchronized (uaList) {
+		synchronized (this) {
+			if (uaList == null) return;
 			if (uaList.size() > 0) {
 				for (SCUser ua:uaList) {
 					ua.process();
@@ -173,8 +179,8 @@ public class SCTenant {
 		return uaList;
 	}
 	public SCUser getUser(String username) {
-		if (uaList == null) return null;
-		synchronized (uaList) {
+		synchronized (this) {
+			if (uaList == null) return null;
 			if (uaList.size() < 1) return null;
 			for (SCUser ua: uaList) {
 				if (ua.getCBUsername().equals(username)) return ua;
@@ -183,8 +189,8 @@ public class SCTenant {
 		return null;
 	}
 	public SCUser addUser(String username, boolean save) {
-		if (uaList == null) uaList = new ArrayList<>();
-		synchronized (uaList) {
+		synchronized (this) {
+			if (uaList == null) uaList = new ArrayList<>();
 			SCUser ua = new SCUser(this, username);
 			uaList.add(ua);
 			if (save) save();
@@ -192,8 +198,8 @@ public class SCTenant {
 		}
 	}
 	public boolean delUser(String username) {
-		if (uaList == null) return false;
-		synchronized (uaList) {
+		synchronized (this) {
+			if (uaList == null) return false;
 			if (uaList.size() < 1) return false;
 			for (SCUser ua: uaList) {
 				if (ua.getCBUsername().equals(username)) {
@@ -207,8 +213,8 @@ public class SCTenant {
 	}
 	
 	public ChatAdapter findChatService(String id) {
-		if (uaList == null) return null;
-		synchronized (uaList) {
+		synchronized (this) {
+			if (uaList == null) return null;
 			if (uaList.size() < 1) return null;
 			for (SCUser ua: uaList) {
 				ChatAdapter ca = ua.findChatService(id);
@@ -219,8 +225,8 @@ public class SCTenant {
 	}
 	
 	public SCCall findCallByID(String id) {
-		if (uaList == null) return null;
-		synchronized (uaList) {
+		synchronized (this) {
+			if (uaList == null) return null;
 			if (uaList.size() < 1) return null;
 			for (SCUser ua: uaList) {
 				SCCall call = ua.findCallByID(id);
@@ -230,45 +236,42 @@ public class SCTenant {
 		return null;
 	}
 	
-	
 	public void save() {
-
-		// Save the data
-		HashMap<String, Object> sm = getMap();
-		sm.put("password", this.password);
-		if (uaList != null) {
-			synchronized (uaList) {
-				if (uaList.size() > 0) {
-					List<HashMap<String, Object>> sl = new ArrayList<>();
-					for (SCUser ua:uaList) {
-						HashMap<String, Object> um = ua.getMap();
-						sl.add(um);
-					}
-					sm.put("users", sl);
+		synchronized (this) {
+			if (this.id == null) return;
+			// Save the data
+			HashMap<String, Object> sm = getMap();
+			sm.put("password", this.password);
+			if (uaList != null && uaList.size() > 0) {
+				List<HashMap<String, Object>> sl = new ArrayList<>();
+				for (SCUser ua:uaList) {
+					HashMap<String, Object> um = ua.getMap();
+					sl.add(um);
 				}
+				sm.put("users", sl);
 			}
+			DButil.save(this.id, sm, null);
 		}
-		DButil.save(DButil.SINGLE_KEY, sm, null);
 	}
 	
-	public void load() {
+	public void load(HashMap<String, Object> sm) {
 		// Load the data
-		HashMap<String, Object> sm = DButil.load(DButil.SINGLE_KEY);
+		if (sm == null) sm = DButil.load(this.id);
 		if (sm == null) return;
 		//  load from the data map
-		synchronized (username) {
-			this.password = (String)sm.get("password");
-			this.username = (String)sm.get("username");
-			this.sedro_access_key = (String)sm.get("sedro_access_key");
-			String host = (String)sm.get("sedro_host");
-			if (host != null) this.setSedro_host(host);
-			setPoll_interval((Integer)sm.get("poll_interval"));
-		}
-		List<HashMap<String, Object>> uml = (List<HashMap<String, Object>>)sm.get("users");
-		if (uml == null || uml.size() < 1) return;
-		
-		if (uaList == null) uaList = new ArrayList<>();
-		synchronized (uaList) {
+		synchronized (this) {
+				this.password = (String)sm.get("password");
+				this.username = (String)sm.get("username");
+				this.id = (String)sm.get("id");
+				this.sedro_access_key = (String)sm.get("sedro_access_key");
+				String host = (String)sm.get("sedro_host");
+				if (host != null) this.setSedro_host(host);
+				setPoll_interval((Integer)sm.get("poll_interval"));
+			
+			List<HashMap<String, Object>> uml = (List<HashMap<String, Object>>)sm.get("users");
+			if (uml == null || uml.size() < 1) return;
+			
+			if (uaList == null) uaList = new ArrayList<>();
 				for (HashMap<String, Object> um:uml) {
 				// load this user
 				String un = (String)um.get("username");
@@ -281,8 +284,9 @@ public class SCTenant {
 	// get al lthe user info as a map..
 	public HashMap<String, Object> getMap() {
 		HashMap<String, Object> m = new HashMap<>();
-		synchronized (username) {
+		synchronized (this) {
 			m.put("username", this.username);
+			m.put("id", this.id);
 			m.put("poll_interval", this.poll_interval);
 			m.put("sedro_access_key", this.sedro_access_key);
 			m.put("sedro_host", this.sedro_host);

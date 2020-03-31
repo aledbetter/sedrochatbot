@@ -47,20 +47,22 @@ $(document).ready(function() {
 				setAPIKey(data.info.sedro_access_key);
 				setAPIHost(data.info.sedro_host);
 				$("#message_here").html("keyset loading tenant...");
-
+				var ctx = null;
 				sedroGetAccount(null, function (ctx, data) {
 					if (data) {
 						showTenant(data.results[0]);
 						$("#message_here").html("").hide();
-					} else $("#message_here").html("ERROR: Getting Account for: " + chbot_glob_api_key);
+					} else {
+						$("#message_here").html("ERROR: Getting Account for: " + chbot_glob_api_key);
+					}
 				});
 			} else {
 				chbot_glob_api_key = null;
 				$("#api_key").val(""); 
-				$("#xtenant_action").html("ERROR: RAPID API key not set ");
+				$("#message_here").html("ERROR: RAPID API key not set ");
 			}
 		  }, error: function(xhr) {
-			$("#xtenant_action").html("ERROR: RAPID API key not set ");
+			$("#message_here").html("ERROR: RAPID API key not set ");
 		  }
 	});
 });

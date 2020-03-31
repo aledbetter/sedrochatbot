@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 public class SCServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static SCTenant tenant = null;
 	private static SCServer server = null;
 	static Logger logger = Logger.getLogger(SCServlet.class);	
 
@@ -84,12 +83,6 @@ public class SCServlet extends HttpServlet {
         // create sever instance
         server = new SCServer();
 
-        // init the server
-        tenant = SCTenant.getChatServer();
-        tenant.init();
-        
-        // load the users
-        // FIXME
     }
 
 }

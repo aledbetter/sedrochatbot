@@ -21,7 +21,9 @@ package main.java.com.sedroApps.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.commons.lang3.SerializationUtils;
 
@@ -54,7 +56,8 @@ public class DButil {
     	System.out.println("DBUtil: start initialize");
         try {      
 	        setupJDBC(); // RDB	
-	   //     dropDataTables();
+	        // WHEN reset is needed	        
+	        //dropDataTables();
 	        
 	        // verify tables
 	        if (!haveDBTable(SINGLE_KEY)) {
@@ -154,7 +157,7 @@ public class DButil {
     }
 
 	public static boolean createSessionTable() {
-		String sql = "CREATE TABLE IF NOT EXISTS "+SESS_TABLE_NAME+" (key VARCHAR(128) PRIMARY KEY, username VARCHAR(128), expire TIMESTAMP);";
+		String sql = "CREATE TABLE IF NOT EXISTS "+SESS_TABLE_NAME+" (key VARCHAR(128) PRIMARY KEY, username VARCHAR(128), tenant VARCHAR(128), expire TIMESTAMP);";
   		Connection conn = DButil.getConnection();
 		if (conn == null) {
   			System.out.println("ERROR createDirTable["+SESS_TABLE_NAME+"] connect fail");
@@ -171,13 +174,13 @@ public class DButil {
 		return true;
 	}
 	
-	public static Timestamp getSessionKey(String key) {
+	public static HashMap<String, Object> getSessionKey(String key) {
 		if (key == null) return null;
 		
  		Connection conn = DButil.getConnection();
   		if (conn == null) return null;
   		String sql = "SELECT * FROM "+SESS_TABLE_NAME + " WHERE key = '" + key+"'";
-  		Timestamp ts = null;
+  		HashMap<String, Object> km = null;
   		try {
   			Statement stmt = conn.createStatement();
 		    ResultSet rs = stmt.executeQuery(sql);
@@ -185,7 +188,13 @@ public class DButil {
 		    	try {
 				    String atok = rs.getString("key");
 				    String username = rs.getString("username");
-				    ts = rs.getTimestamp("expire");
+				    String tenant = rs.getString("tenant");
+				    Timestamp ts = rs.getTimestamp("expire");
+				    km = new HashMap<>();
+				    km.put("atok", atok);
+				    km.put("username", username);
+				    km.put("expire", ts);
+				    km.put("tenant_id", tenant);
 		    	} catch (Throwable t) {}
 			    	rs.close();	
 		    }
@@ -194,14 +203,14 @@ public class DButil {
 	  		DButil.closeConnection(conn); 		
 			e.printStackTrace();
 		}
-		return ts;
+		return km;
 	}
-	public static int saveSessionKey(String atok, String username, Timestamp expire) {
+	public static int saveSessionKey(String atok, String username, String tenant_id, Timestamp expire) {
 		if (atok == null || username == null) return 0;
 		int cnt = 0;
 	//	System.out.println("SAVEING[" + key + "] data: " + data.length);
 
-		String sql = "INSERT INTO " + SESS_TABLE_NAME + " (key, username, expire) VALUES(?, ?, ?) "
+		String sql = "INSERT INTO " + SESS_TABLE_NAME + " (key, username, tenant, expire) VALUES(?, ?, ?, ?) "
 		+ " ON CONFLICT (key) DO UPDATE SET expire = ?";
 		
   		Connection conn = DButil.getConnection();
@@ -214,10 +223,11 @@ public class DButil {
   			conn.setAutoCommit(false);
   			pstmt.setString(1, atok);
   			pstmt.setString(2, username);
-  			pstmt.setTimestamp(3, expire);
+  			pstmt.setString(3, tenant_id);
+  			pstmt.setTimestamp(4, expire);
 		
   			/// OR
-  			pstmt.setTimestamp(4, expire);								
+  			pstmt.setTimestamp(5, expire);								
   			pstmt.addBatch();		
 
   			pstmt.executeBatch();
@@ -254,7 +264,7 @@ public class DButil {
 	
 	
 	public static boolean createDataTable() {
-		String sql = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" (key VARCHAR(64) PRIMARY KEY, data bytea, sdata bytea);";
+		String sql = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" (key VARCHAR(128) PRIMARY KEY, data bytea, sdata bytea);";
   		Connection conn = DButil.getConnection();
 		if (conn == null) {
   			System.out.println("ERROR createDirTable["+TABLE_NAME+"] connect fail");
@@ -273,6 +283,8 @@ public class DButil {
 	
 	public static boolean dropDataTables() {
 		String sql = "DROP TABLE "+TABLE_NAME+", "+SESS_TABLE_NAME+";";
+		System.out.println("WARNING dropDataTables["+TABLE_NAME+"/"+SESS_TABLE_NAME+"] ");
+
   		Connection conn = DButil.getConnection();
 		if (conn == null) {
   			System.out.println("ERROR dropDataTables["+TABLE_NAME+"/"+SESS_TABLE_NAME+"] connect fail");
@@ -410,6 +422,54 @@ public class DButil {
 		return null;
     }
     
+    public static List<HashMap<String, Object>> loadAll() {
+    	if (!haveDB()) return null;
+
+  		Connection conn = DButil.getConnection();
+  		if (conn == null) return null;
+  		String sql = "SELECT * FROM "+TABLE_NAME + "";
+  		List<HashMap<String, Object>> tl = new ArrayList<>();
+  		try {
+  			Statement stmt = conn.createStatement();
+		    ResultSet rs = stmt.executeQuery(sql);
+		    while(rs.next()) {
+		  		InputStream data = null, datastate = null;
+		    	try {
+			    String label = rs.getString("key");
+				data = rs.getBinaryStream("data");
+				datastate = rs.getBinaryStream("data2");
+		    	} catch (Throwable t) {}
+		    	if (data == null && datastate == null) continue;
+		    	// use bytes
+				try {
+					byte[] bdata = new byte[data.available()];
+			    	data.read(bdata);
+			    	bdata = decrypteData(bdata);
+					HashMap<String, Object> obj = (HashMap<String, Object>)SerializationUtils.deserialize(bdata);
+					
+					if (datastate != null) {
+						byte[] bsdata = new byte[datastate.available()];
+						bsdata = decrypteData(bsdata);
+			// FIXME add to obj
+						HashMap<String, Object> objState = (HashMap<String, Object>)SerializationUtils.deserialize(bdata);
+						if (objState != null) {
+						//	List<HashMap<String, Object>> sl = obj.get("user");
+						//	obj.put(objState.get(key));
+						}
+					}
+					tl.add(obj);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		    }
+		    rs.close();	
+	  		DButil.closeConnection(conn); 		
+		} catch (SQLException e) { 
+	  		DButil.closeConnection(conn); 		
+			e.printStackTrace();
+		}
+		return tl;
+    }
     
     /////////////////////////////////////////
     // ENCRYPT DATA

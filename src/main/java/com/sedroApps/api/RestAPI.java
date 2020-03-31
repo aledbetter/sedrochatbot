@@ -86,9 +86,7 @@ public class RestAPI {
 		if (cs == null) return rr.ret(403);
 		
 		int exp = SESSION_TIME;
-		if (Sutil.compare(keep, "true")) {
-			exp = SESSION_KEEP_TIME;
-		}
+		if (Sutil.compare(keep, "true")) exp = SESSION_KEEP_TIME;
 				
 		// set cookie with atoken
 		String atok = Sutil.getGUIDString();	
@@ -96,7 +94,7 @@ public class RestAPI {
 		Calendar ex = Sutil.getUTCTimePlusSeconds(exp);
 		// add atok to session table
 		Timestamp expire = new Timestamp(ex.getTimeInMillis());
-		DButil.saveSessionKey(atok, username, expire);
+		DButil.saveSessionKey(atok, cs.getUsername(), cs.getId(), expire);
 		return rr.ret(cook);
 	}
 	@GET
@@ -110,6 +108,38 @@ public class RestAPI {
 		// drop cookie
 		NewCookie delCookie = new NewCookie("atok", null, "/", null, null, 0, false, true);
 		return rr.ret(delCookie);
+	}
+	@POST
+	@Path("/join")
+	public Response joinPOST(@Context UriInfo info, 
+			@Context HttpServletRequest hsr,
+			@CookieParam("atok") String cookie_access_key, 
+			String body) {
+		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
+
+		String sedro_access_key = null;
+		try {
+			JSONObject obj = new JSONObject(body);
+			sedro_access_key = RestUtil.getJStr(obj, "sedro_access_key");		
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}	
+		if (!RestUtil.paramHave(sedro_access_key)) return rr.ret(402);
+		//System.out.println("JOIN: " + sedro_access_key);
+		SCTenant cs = SCServer.newTenant(sedro_access_key);
+		if (cs == null) return rr.ret(403);
+
+		int exp = SESSION_TIME;
+		//if (Sutil.compare(keep, "true")) exp = SESSION_KEEP_TIME;
+				
+		// set cookie with atoken
+		String atok = Sutil.getGUIDString();	
+		NewCookie cook = new  NewCookie("atok", atok, "/", null, null, exp, false);
+		Calendar ex = Sutil.getUTCTimePlusSeconds(exp);
+		// add atok to session table
+		Timestamp expire = new Timestamp(ex.getTimeInMillis());
+		DButil.saveSessionKey(atok, cs.getUsername(), cs.getId(), expire);
+		return rr.ret(cook);
 	}
 
 	@GET
@@ -138,23 +168,24 @@ public class RestAPI {
 
 		try {
 			JSONObject obj = new JSONObject(body);
-			sedro_access_key = RestUtil.getJStr(obj, "sedro_access_key");
+			//sedro_access_key = RestUtil.getJStr(obj, "sedro_access_key");
 			sedro_host = RestUtil.getJStr(obj, "sedro_host");
 			poll_interval = RestUtil.getJStr(obj, "poll_interval");
-			username = RestUtil.getJStr(obj, "username");
+			//username = RestUtil.getJStr(obj, "username");
 			password = RestUtil.getJStr(obj, "password");			
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}	
 		if (!RestUtil.paramHave(password)) password = null;
-		if (!RestUtil.paramHave(username)) username = null;
-		if (!RestUtil.paramHave(sedro_access_key)) sedro_access_key = null;
+		//if (!RestUtil.paramHave(username)) username = null;
+		//if (!RestUtil.paramHave(sedro_access_key)) sedro_access_key = null;
 		if (!RestUtil.paramHave(sedro_host)) sedro_host = null;
 		if (!RestUtil.paramHave(poll_interval)) poll_interval = null;
 		if (password != null) cs.setPassword(password);
-		if (username != null) cs.setUsername(username);
+		//if (username != null) cs.setUsername(username);
 		if (sedro_host != null) cs.setSedro_host(sedro_host);
-		if (sedro_access_key != null) cs.setSedro_access_key(sedro_access_key);
+		//if (sedro_access_key != null) cs.setSedro_access_key(sedro_access_key);
+		//if (sedro_access_key != null) cs.setup(sedro_access_key);
 		if (poll_interval != null) {
 			cs.setPoll_interval(Sutil.toInt(poll_interval));
 			// FIXME must update timer
@@ -387,8 +418,7 @@ public class RestAPI {
     		@PathParam("id") String id,
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, null, null);
-		SCTenant cs = SCTenant.getChatServer();	
-		ChatAdapter ca = cs.findChatService(id);
+		ChatAdapter ca = SCServer.getServer().findChatService(id);
 		if (ca == null) return rr.ret(402);
 		ca.getReceiveMessages(body);
 		return rr.ret();
@@ -400,8 +430,7 @@ public class RestAPI {
     		@PathParam("id") String id,
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, null, null);
-		SCTenant cs = SCTenant.getChatServer();	
-		ChatAdapter ca = cs.findChatService(id);
+		ChatAdapter ca = SCServer.getServer().findChatService(id);
 		if (ca == null) return rr.ret(402);
 		ca.getReceiveMessages(body);
 		return rr.ret();

@@ -44,12 +44,12 @@ public class SCSedroCall extends SCCall {
 
 	
 	// get current personas
-	public List<String> getPersonas(String key) {
-		String url = getUrl("/tenant/personas");
+	public static List<String> getPersonas(SCTenant t, String key) {
+		String url = t.getSedro_host()+"/tenant/personas";
 				
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("x-rapidapi-key", key);
-		headers.put("x-rapidapi-host", getAPIHost());
+		headers.put("x-rapidapi-host", t.getSedro_hostname());
 		headers.put("Accept", "application/json");
 		String line = HttpUtil.getURLContent(url, headers);
 		if (line == null) return null;
@@ -67,6 +67,36 @@ public class SCSedroCall extends SCCall {
 			}
 		} catch (Throwable tt) {}		
 		return null;
+	}
+	// get teant ID
+	public static HashMap<String, String> getTenantId(SCTenant t, String key) {
+		String url = t.getSedro_host()+"/tenant/get";
+		
+		HashMap<String, String> headers = new HashMap<String, String>();
+		headers.put("x-rapidapi-key", key);
+		headers.put("x-rapidapi-host", t.getSedro_hostname());
+		headers.put("Accept", "application/json");
+		String line = HttpUtil.getURLContent(url, headers);
+		if (line == null) return null;
+		
+		HashMap<String, String> hm = null;
+		try {
+			JSONObject obj = new JSONObject(line);
+			JSONArray list = obj.getJSONArray("results");
+			JSONObject tn = list.getJSONObject(0);
+			String id = tn.getString("ctx");			
+			String name = tn.getString("name").toLowerCase();	
+			String username = name;
+			try {
+				username = tn.getString("username").toLowerCase();	
+			} catch (Throwable te) {}
+			//language / subscription
+			hm = new HashMap<>();
+			hm.put("id", id);
+			hm.put("name", name);
+			hm.put("username", username);
+		} catch (Throwable tt) {}		
+		return hm;
 	}
 
 	@Override

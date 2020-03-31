@@ -102,17 +102,16 @@ function serviceSave(id, username, service) {
 var glob_users = null;
 $(document).ready(function() {
 
-	$("#username, #password").removeClass("warn").val("");
-	$("#loginerror").hide().val("");
 	$("#show_settings").show();
 	$("#update_settings").hide();
-	$("#set_password").val(""); 
 	$("#update_settings_bt").html("Update");
 	$("#add_user_bt").html("Add User");
 	$("#add_username").val("");
 	$("#userInfo").hide();
-	$("#set_password2, #set_password").removeClass("error");
-	
+	$("#set_password2, #set_password").removeClass("error").val(""); 
+	$("#username, #password, #set_sedro_access_key").removeClass("warn").val(""); 
+	$("#loginerror, #apierror").hide().html("");
+
 	$("#userlist").show();
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,12 +126,11 @@ $(document).ready(function() {
 
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
-	// Add interactive message
+	// Login or join
 	$("#login_bt").on('click', function (e) {
 		var username = $("#username").val(); 
 		var password = $("#password").val(); 
-
-		$("#username, #password").removeClass("warn");
+		$("#username, #password, #set_sedro_access_key").removeClass("warn");
 
 		var fail = false;
 		if (!username || username.length < 3) {
@@ -143,19 +141,42 @@ $(document).ready(function() {
 			$("#password").addClass("warn");
 			fail = true;
 		}
+		$("#loginerror, #apierror").hide().html("");
 		if (fail) {
 			$("#password").val(""); 
 			return;
 		}
 		scsLogin(username, password, function(data) {
-			$("#username, #password").removeClass("warn").val("");
+			$("#username, #password, #set_sedro_access_key").removeClass("warn").html("");
+			$("#password").val(""); 
 			if (data.code == 200) {
 				window.location.href = "/server.html";
 			} else {
-				$("#loginerror").show().val("Incorrect username or password");
+				$("#loginerror").show().html("Incorrect username or password");
 			}
 		});
 	});
+	$("#join_bt").on('click', function (e) {
+		var api_key = $("#set_sedro_access_key").val(); 
+		$("#username, #password, #set_sedro_access_key").removeClass("warn");
+		$("#password, #username").val(""); 
+		$("#loginerror, #apierror").hide().html("");
+
+		if (!api_key || api_key.length < 15) {
+			$("#set_sedro_access_key").addClass("warn");
+			return;
+		}
+		scsJoin(api_key, function(data) {
+			$("#username, #password, #set_sedro_access_key").removeClass("warn").html("");
+			$("#set_sedro_access_key").val(""); 
+			if (data.code == 200) {
+				window.location.href = "/server.html";
+			} else {
+				$("#apierror").show().html("Incorrect API Key");
+			}
+		});
+	});
+	
 	
 	
 	//////////////////////////////////////////////////
@@ -237,7 +258,7 @@ function logout() {
 	
 
 function getSettings() {
-	$("#setting_username, #setting_poll_interval, #setting_sedro_access_key, #setting_sedro_host, #setting_database_path").html("..."); 
+	$("#setting_username, #setting_poll_interval, #setting_sedro_access_key, #setting_sedro_host, #setting_database_path, #setting_tenant").html("..."); 
 
 	scsGetSettings(function(data) {
 		if (data == null || data.code == 401) {
@@ -247,7 +268,7 @@ function getSettings() {
 		$("#setting_poll_interval").html(data.info.poll_interval); 
 		$("#set_poll_interval").val(data.info.poll_interval); 
 		$("#setting_username").html(data.info.username); 
-		$("#set_username").val(data.info.username); 
+		$("#setting_tenant").html(data.info.id); 
 		
 		if (data.info.database == true) {
 			$("#setting_database_path").html(data.info.database_path); 
@@ -259,7 +280,6 @@ function getSettings() {
 			$("#setting_sedro_host").html(data.info.sedro_host); 			
 		}
 		if (data.info.sedro_access_key) {
-			$("#set_sedro_access_key").val(data.info.sedro_access_key); 
 			$("#setting_sedro_access_key").html(data.info.sedro_access_key); 
 			glob_api_key = data.info.sedro_access_key;
 			setAPIKey(data.info.sedro_access_key);
@@ -293,8 +313,7 @@ function getSettings() {
 				}
 			});
 		} else {
-			$("#set_sedro_access_key").val(""); 
-			$("#setting_sedro_access_key").html("<span style='font-weight:bold;color:red'>KEY REQUIRED</span>"); 
+			$("#setting_sedro_access_key").html("<span style='font-weight:bold;color:red'>RAPID API KEY REQUIRED</span>"); 
 			glob_api_key = null;
 		}
 
@@ -504,12 +523,24 @@ function scsGetSettings(cb) {
 	});
 }
 
+function scsJoin(api_key, cb) {	
+	var dat = "{\"sedro_access_key\": \"" + api_key + "\"}";
+	$.ajax({url: "/api/1.0/join", type: 'POST', async: true, data: dat, contentType: 'application/json', 
+	  success: function(data){
+		  cb(data);
+	  }, error: function(xhr) {
+		  cb(null);
+	  }
+	});
+}
+
 function scsUpdateSettings(username, password, sedro_access_key, poll_interval, sedro_host, cb) {	
 	var dat = "{ "; 
-    if (username) dat += "\"username\": \"" + username + "\"";
+    dat += "\"nop\": \"nop\"";
+    //if (username) dat += "\"username\": \"" + username + "\"";
     if (password) dat += ", \"password\": \"" + password + "\"";
     if (poll_interval) dat += ", \"poll_interval\": \"" + poll_interval + "\"";
-    if (sedro_access_key) dat += ", \"sedro_access_key\": \"" + sedro_access_key + "\"";
+   // if (sedro_access_key) dat += ", \"sedro_access_key\": \"" + sedro_access_key + "\"";
     if (sedro_host) dat += ", \"sedro_host\": \"" + sedro_host + "\"";
     dat += "}";
 	

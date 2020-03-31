@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -36,6 +37,7 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import main.java.com.sedroApps.SCServer;
 import main.java.com.sedroApps.SCTenant;
 import main.java.com.sedroApps.util.HttpUtil;
 import main.java.com.sedroApps.util.RestResp;
@@ -339,9 +341,10 @@ public class RestExample {
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	// Get Weather via form
 	@POST
-	@Path("/weather")
+	@Path("/{tid}/weather")
 	public String getWeatherPOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
+    		@PathParam("tid") String tid,
     		@CookieParam("atok") String cookie_access_key, 
     		String body) {
 
@@ -382,9 +385,12 @@ public class RestExample {
 		}
 		} catch (Throwable t) {}
 
-
+		// get API key for tenant
+		SCTenant tenant = SCServer.getTenant(tid.trim());
+		if (tenant == null) return null;
+			
 		// get the KEY
-		String key = SCTenant.getChatServer().getSedro_access_key();
+		String key = tenant.getSedro_access_key();
 
 		////////////////////////////////////
 		// get externa info
@@ -440,10 +446,11 @@ public class RestExample {
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	// Get Movies via form
 	@POST
-	@Path("/movies")
+	@Path("/{tid}/movies")
 	public String getMoviesPOST(@Context UriInfo info, 
 			@Context HttpServletRequest hsr,
-    		@CookieParam("atok") String cookie_access_key, 
+    		@PathParam("tid") String tid,
+   		@CookieParam("atok") String cookie_access_key, 
     		String body) {
 
 		//System.out.println("MOVIES: " + body);		
@@ -485,9 +492,13 @@ public class RestExample {
 		} catch (Throwable t) {}
 		//System.out.println("SEACH["+fname+"]: " + qstr);
 
+		// get API key for tenant
+		SCTenant tenant = SCServer.getTenant(tid.trim());
+		if (tenant == null) return null;
+			
 		// get the KEY
-		String key = SCTenant.getChatServer().getSedro_access_key();
-
+		String key = tenant.getSedro_access_key();
+		
 		////////////////////////////////////
 		// get externa info
 	   List<HashMap<String, String>> ml = getMovieList(key, qstr);

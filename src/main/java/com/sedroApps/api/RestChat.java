@@ -36,6 +36,7 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONObject;
 
 import main.java.com.sedroApps.SCCall;
+import main.java.com.sedroApps.SCServer;
 import main.java.com.sedroApps.SCTenant;
 import main.java.com.sedroApps.adapter.ChatAdapter;
 import main.java.com.sedroApps.util.RestResp;
@@ -82,7 +83,7 @@ public class RestChat {
 		if (!RestUtil.paramHave(chat_id)) return rr.ret(402); // must have chid
 
 		// Find chat service
-		ChatAdapter cs = SCTenant.getChatServer().findChatService(chat_id);
+		ChatAdapter cs = SCServer.getServer().findChatService(chat_id);
 		if (cs == null) {
 			System.out.println("ERROR WAKE["+chat_id+"] Service NOT FOUND");
 			return rr.ret(404);
@@ -132,7 +133,7 @@ public class RestChat {
 		//System.out.println("MSG["+chid+"] " + text);
 		
 		// find the call
-		SCCall call = SCTenant.getChatServer().findCallByID(chid);
+		SCCall call = SCServer.getServer().findCallByID(chid);
 		if (call == null) return rr.ret(404); 
 				
 		HashMap<String, String> call_info = new HashMap<>();
@@ -168,7 +169,7 @@ public class RestChat {
 		if (!RestUtil.paramHave(chid)) return rr.ret(402); // must have chid
 		
 		// find the call
-		SCCall call = SCTenant.getChatServer().findCallByID(chid);
+		SCCall call = SCServer.getServer().findCallByID(chid);
 		if (call == null) return rr.ret(404); 
 		
 		HashMap<String, String> call_info = new HashMap<>();
@@ -203,7 +204,7 @@ public class RestChat {
 		//System.out.println("BYE["+chid+"] ");
 		
 		// find the call
-		SCCall call = SCTenant.getChatServer().findCallByID(chid);
+		SCCall call = SCServer.getServer().findCallByID(chid);
 		if (call == null) return rr.ret(404); 
 
 		HashMap<String, String> call_info = new HashMap<>();
