@@ -81,6 +81,9 @@ public class SCOrator {
 	public ChatAdapter getChatService() {
 		return this.service;
 	}
+	public SCTenant getTenant() {
+		return server;	
+	}
 	
 	// timed send for messages
 	private void startSendTimer() {
@@ -199,7 +202,7 @@ public class SCOrator {
 		int tzoffset = -1;
 		//System.out.println("CALL: " + call.toString());
 		
-		String key = SCTenant.getChatServer().getSedro_access_key();
+		String key = server.getSedro_access_key();
 		if (slatitude == null || slongitude == null || stz == null) {	
 			// api resolve[phone number/ipaddress]
 			String phonenumber = call.get("phonenumber");
@@ -274,7 +277,7 @@ public class SCOrator {
 		// clear the cache
 		this.getChatService().clearCache();
 		// save state (also re-saves config/everything)
-		SCTenant.getChatServer().save();
+		server.save();
 	}
 	
 	

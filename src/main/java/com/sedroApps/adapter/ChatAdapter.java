@@ -21,6 +21,7 @@ import java.util.List;
 
 import main.java.com.sedroApps.SCCall;
 import main.java.com.sedroApps.SCOrator;
+import main.java.com.sedroApps.SCTenant;
 import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.util.Sutil;
 
@@ -76,7 +77,9 @@ public class ChatAdapter {
 	public boolean isPolled() {
 		return true;	
 	}
-	
+	public SCTenant getTenant() {
+		return user.getTenant();	
+	}
 	
 	////////////////////////////////////////////
 	// Service state information

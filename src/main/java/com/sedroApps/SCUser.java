@@ -35,6 +35,7 @@ public class SCUser {
 	// chatbot info (name may be different accross services)
 	private String username;
 	private String sedro_persona;
+	private SCTenant tenant = null;
 	
 	// service info
 	HashMap<String, HashMap<String, String>> service_info = null;
@@ -45,7 +46,8 @@ public class SCUser {
 	private CbMessage msgcb = null;
 	
 	
-	SCUser(String username) {
+	SCUser(SCTenant tenant, String username) {
+		this.tenant = tenant;
 		this.username = username;
 	}
 		
@@ -53,6 +55,9 @@ public class SCUser {
 		return username;
 	}
 	
+	public SCTenant getTenant() {
+		return tenant;	
+	}
 	
 	public String getSedroPersona() {
 		return sedro_persona;
@@ -80,7 +85,7 @@ public class SCUser {
 		this.msgcb = msgcb;
 	}
 	public void setMessageCb(String callback) {
-		this.msgcb = SCTenant.getChatServer().getCbMsg(callback);
+		this.msgcb = getTenant().getCbMsg(callback);
 	}	
 
 	
@@ -247,7 +252,7 @@ public class SCUser {
 					if (!cs.isPublicMsg()) {
 						readPublic = respPublic = false;
 					}
-					SCOrator orat = new SCOrator(SCTenant.getChatServer(), cs, this, readPublic, respPublic);
+					SCOrator orat = new SCOrator(getTenant(), cs, this, readPublic, respPublic);
 					this.addOrator(orat);
 				} else {
 	// ?
@@ -262,11 +267,11 @@ public class SCUser {
 	// Functionality
 	public void save() {
 		// always save all
-		SCTenant.getChatServer().save();
+		getTenant().save();
 	}
 	public void saveState() {
 		// always save all
-		SCTenant.getChatServer().save();
+		getTenant().save();
 	}
 	
 	@SuppressWarnings("unchecked")

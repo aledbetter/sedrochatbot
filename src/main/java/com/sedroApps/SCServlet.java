@@ -36,7 +36,8 @@ import org.apache.log4j.Logger;
 public class SCServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static SCTenant chats = null;
+	private static SCTenant tenant = null;
+	private static SCServer server = null;
 	static Logger logger = Logger.getLogger(SCServlet.class);	
 
 	
@@ -65,7 +66,7 @@ public class SCServlet extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-	public static void loadService(boolean server) {
+	public static void loadService(boolean svr) {
 		TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
 			 	   	
         ////////////
@@ -80,9 +81,12 @@ public class SCServlet extends HttpServlet {
         logger.setLevel(Level.ERROR); // set the log level to INFO
         System.out.println("Sedro Chatbot initializing log4j Complete");   
         
+        // create sever instance
+        server = new SCServer();
+
         // init the server
-        chats = SCTenant.getChatServer();
-        chats.init();
+        tenant = SCTenant.getChatServer();
+        tenant.init();
         
         // load the users
         // FIXME

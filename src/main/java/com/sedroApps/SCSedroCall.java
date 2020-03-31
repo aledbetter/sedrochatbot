@@ -35,16 +35,16 @@ public class SCSedroCall extends SCCall {
 		super(adapter, readPublic, respPublic, directMsg);
 	}
 	
-	private static String getAPIHost() {
-		return SCTenant.getChatServer().getSedro_hostname();
+	private String getAPIHost() {
+		return getTenant().getSedro_hostname();
 	}
-	private static String getUrl(String ending) {
-		return SCTenant.getChatServer().getSedro_host()+ending;
+	private String getUrl(String ending) {
+		return getTenant().getSedro_host()+ending;
 	}
 
 	
 	// get current personas
-	public static List<String> getPersonas(String key) {
+	public List<String> getPersonas(String key) {
 		String url = getUrl("/tenant/personas");
 				
 		HashMap<String, String> headers = new HashMap<String, String>();

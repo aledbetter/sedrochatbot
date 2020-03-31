@@ -185,7 +185,7 @@ public class SCTenant {
 	public SCUser addUser(String username, boolean save) {
 		if (uaList == null) uaList = new ArrayList<>();
 		synchronized (uaList) {
-			SCUser ua = new SCUser(username);
+			SCUser ua = new SCUser(this, username);
 			uaList.add(ua);
 			if (save) save();
 			return ua;

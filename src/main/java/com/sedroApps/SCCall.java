@@ -89,7 +89,10 @@ public class SCCall {
 	public ChatAdapter getChatService() {
 		return adapter;
 	}
-
+	public SCTenant getTenant() {
+		return adapter.getTenant();	
+	}
+	
 	//////////////////////////////////////////////////
 	// provider info
 	public String getPersona() {
