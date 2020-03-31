@@ -55,7 +55,7 @@ Sedro Blog series on Chatbots
 	
 ### Login
 	
-	default username: admin
-	default password: admin
+	default username: taken from lowercase of rapid api name
+	default password: password
 	- if not running on https credentials and data are not secure
 
