@@ -43,6 +43,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import main.java.com.sedroApps.SCServer;
+import main.java.com.sedroApps.SCTenant;
 import main.java.com.sedroApps.SCUser;
 import main.java.com.sedroApps.adapter.ChatAdapter;
 import main.java.com.sedroApps.util.DButil;
@@ -68,7 +69,6 @@ public class RestAPI {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
 		String username = null, password = null, keep = null;
 
-		SCServer cs = SCServer.getChatServer();		
 		try {
 			JSONObject obj = new JSONObject(body);
 			username = RestUtil.getJStr(obj, "username");
@@ -82,8 +82,8 @@ public class RestAPI {
 		}	
 		if (!RestUtil.paramHave(username) || !RestUtil.paramHave(password)) return rr.ret(402);
 		
-		boolean resp = cs.login(username, password);
-		if (!resp) return rr.ret(403);
+		SCTenant cs = SCServer.login(username, password);
+		if (cs == null) return rr.ret(403);
 		
 		int exp = SESSION_TIME;
 		if (Sutil.compare(keep, "true")) {
@@ -118,9 +118,9 @@ public class RestAPI {
 			@Context HttpServletRequest hsr, 
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		if (!rr.isAuth()) return rr.ret(401);
+		SCTenant cs = rr.isAuth();
+		if (cs == null) return rr.ret(401);
 		
-		SCServer cs = SCServer.getChatServer();
 		rr.setInfo(cs.getMap());
 		return rr.ret();
 	}
@@ -131,8 +131,8 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		if (!rr.isAuth()) return rr.ret(401);
-		SCServer cs = SCServer.getChatServer();
+		SCTenant cs = rr.isAuth();
+		if (cs == null) return rr.ret(401);
 
 		String sedro_access_key = null, sedro_host = null, username = null, password = null, poll_interval = null;
 
@@ -169,9 +169,9 @@ public class RestAPI {
 			@Context HttpServletRequest hsr, 
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		if (!rr.isAuth()) return rr.ret(401);
+		SCTenant cs = rr.isAuth();
+		if (cs == null) return rr.ret(401);
 		
-		SCServer cs = SCServer.getChatServer();
 		Set<String> ms = cs.getCbMsgNames();
 		if (ms != null && ms.size() > 0) {
 			List<Object> cbl = new ArrayList<>();
@@ -208,8 +208,9 @@ public class RestAPI {
 			@Context HttpServletRequest hsr, 
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		if (!rr.isAuth()) return rr.ret(401);
-		SCServer cs = SCServer.getChatServer();
+		SCTenant cs = rr.isAuth();
+		if (cs == null) return rr.ret(401);
+		
 		List<SCUser> ual = cs.getUsers();
 		if (ual == null || ual.size() < 1) return rr.ret();
 		
@@ -226,8 +227,8 @@ public class RestAPI {
     		@PathParam("user") String user,
     		@CookieParam("atok") String cookie_access_key) { 
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		if (!rr.isAuth()) return rr.ret(401);
-		SCServer cs = SCServer.getChatServer();
+		SCTenant cs = rr.isAuth();
+		if (cs == null) return rr.ret(401);
 		SCUser ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
 		rr.setInfo(ua.getMap());
@@ -241,7 +242,6 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		if (!rr.isAuth()) return rr.ret(401);
 		String username = null, sedro_persona = null, callback = null;
 
 		try {
@@ -255,8 +255,9 @@ public class RestAPI {
 		if (!RestUtil.paramHave(username)) return rr.ret(402);
 		if (!RestUtil.paramHave(sedro_persona)) return rr.ret(402);
 		if (!RestUtil.paramHave(callback)) callback = null;
-
-		SCServer cs = SCServer.getChatServer();
+		
+		SCTenant cs = rr.isAuth();
+		if (cs == null) return rr.ret(401);
 		SCUser ua = cs.getUser(username);
 		if (ua != null) return rr.ret(409);
 			
@@ -277,12 +278,10 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		if (!rr.isAuth()) return rr.ret(401);
-
-		SCServer cs = SCServer.getChatServer();
+		SCTenant cs = rr.isAuth();
+		if (cs == null) return rr.ret(401);
 		SCUser ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
-		
 		cs.delUser(user);
 		
 		// add all the doc content
@@ -296,9 +295,8 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		if (!rr.isAuth()) return rr.ret(401);
-
-		SCServer cs = SCServer.getChatServer();
+		SCTenant cs = rr.isAuth();
+		if (cs == null) return rr.ret(401);
 		ChatAdapter ca = cs.findChatService(id);
 		if (ca == null) return rr.ret(404);
 		ca.getUser().removeChatService(id);
@@ -315,9 +313,8 @@ public class RestAPI {
 			@CookieParam("atok") String cookie_access_key, 
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, cookie_access_key, cookie_access_key);
-		if (!rr.isAuth()) return rr.ret(401);
-
-		SCServer cs = SCServer.getChatServer();
+		SCTenant cs = rr.isAuth();
+		if (cs == null) return rr.ret(401);
 		SCUser ua = cs.getUser(user);
 		if (ua == null) return rr.ret(404);
 		
@@ -390,7 +387,7 @@ public class RestAPI {
     		@PathParam("id") String id,
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, null, null);
-		SCServer cs = SCServer.getChatServer();	
+		SCTenant cs = SCTenant.getChatServer();	
 		ChatAdapter ca = cs.findChatService(id);
 		if (ca == null) return rr.ret(402);
 		ca.getReceiveMessages(body);
@@ -403,7 +400,7 @@ public class RestAPI {
     		@PathParam("id") String id,
 			String body) {
 		RestResp rr = new RestResp(info, hsr, null, null, null);
-		SCServer cs = SCServer.getChatServer();	
+		SCTenant cs = SCTenant.getChatServer();	
 		ChatAdapter ca = cs.findChatService(id);
 		if (ca == null) return rr.ret(402);
 		ca.getReceiveMessages(body);

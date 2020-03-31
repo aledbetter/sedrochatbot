@@ -36,7 +36,7 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import main.java.com.sedroApps.SCServer;
+import main.java.com.sedroApps.SCTenant;
 import main.java.com.sedroApps.util.HttpUtil;
 import main.java.com.sedroApps.util.RestResp;
 import main.java.com.sedroApps.util.RestUtil;
@@ -384,7 +384,7 @@ public class RestExample {
 
 
 		// get the KEY
-		String key = SCServer.getChatServer().getSedro_access_key();
+		String key = SCTenant.getChatServer().getSedro_access_key();
 
 		////////////////////////////////////
 		// get externa info
@@ -486,7 +486,7 @@ public class RestExample {
 		//System.out.println("SEACH["+fname+"]: " + qstr);
 
 		// get the KEY
-		String key = SCServer.getChatServer().getSedro_access_key();
+		String key = SCTenant.getChatServer().getSedro_access_key();
 
 		////////////////////////////////////
 		// get externa info

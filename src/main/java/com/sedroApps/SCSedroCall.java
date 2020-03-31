@@ -36,10 +36,10 @@ public class SCSedroCall extends SCCall {
 	}
 	
 	private static String getAPIHost() {
-		return SCServer.getChatServer().getSedro_hostname();
+		return SCTenant.getChatServer().getSedro_hostname();
 	}
 	private static String getUrl(String ending) {
-		return SCServer.getChatServer().getSedro_host()+ending;
+		return SCTenant.getChatServer().getSedro_host()+ending;
 	}
 
 	

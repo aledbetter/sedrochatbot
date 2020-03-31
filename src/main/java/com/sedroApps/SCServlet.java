@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 public class SCServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static SCServer chats = null;
+	private static SCTenant chats = null;
 	static Logger logger = Logger.getLogger(SCServlet.class);	
 
 	
@@ -81,7 +81,7 @@ public class SCServlet extends HttpServlet {
         System.out.println("Sedro Chatbot initializing log4j Complete");   
         
         // init the server
-        chats = SCServer.getChatServer();
+        chats = SCTenant.getChatServer();
         chats.init();
         
         // load the users

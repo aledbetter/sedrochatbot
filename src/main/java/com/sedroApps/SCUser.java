@@ -80,7 +80,7 @@ public class SCUser {
 		this.msgcb = msgcb;
 	}
 	public void setMessageCb(String callback) {
-		this.msgcb = SCServer.getChatServer().getCbMsg(callback);
+		this.msgcb = SCTenant.getChatServer().getCbMsg(callback);
 	}	
 
 	
@@ -247,7 +247,7 @@ public class SCUser {
 					if (!cs.isPublicMsg()) {
 						readPublic = respPublic = false;
 					}
-					SCOrator orat = new SCOrator(SCServer.getChatServer(), cs, this, readPublic, respPublic);
+					SCOrator orat = new SCOrator(SCTenant.getChatServer(), cs, this, readPublic, respPublic);
 					this.addOrator(orat);
 				} else {
 	// ?
@@ -262,11 +262,11 @@ public class SCUser {
 	// Functionality
 	public void save() {
 		// always save all
-		SCServer.getChatServer().save();
+		SCTenant.getChatServer().save();
 	}
 	public void saveState() {
 		// always save all
-		SCServer.getChatServer().save();
+		SCTenant.getChatServer().save();
 	}
 	
 	@SuppressWarnings("unchecked")

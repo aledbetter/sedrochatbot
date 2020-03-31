@@ -29,6 +29,8 @@ import javax.ws.rs.core.UriInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import main.java.com.sedroApps.SCTenant;
+
 @JsonPropertyOrder({ "code", "info", "list"})
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RestResp {
@@ -68,14 +70,15 @@ public class RestResp {
 	    return null;
 	}
 	
-	public boolean isAuth() {
-		if (this.atok == null) return false;
+	public SCTenant isAuth() {
+		if (this.atok == null) return null;
 		if (this.atok.length() != 36) {
 			System.out.println("BAD ATOK: " + this.atok);
-			return false;
+			return null;
 		}
-		if (DButil.getSessionKey(this.atok) == null) return false;
-		return true;
+		if (DButil.getSessionKey(this.atok) == null) return null;
+		// FIXME get from tenant ID in session
+		return SCTenant.getChatServer();
 	}
 	public String getAtok() {
 		return atok;

@@ -39,7 +39,7 @@ public class SCOrator {
 	private List<SCSedroCall> calls = null;
 	
 	private ChatAdapter service = null;
-	private SCServer server = null;
+	private SCTenant server = null;
 	private SCUser user = null;
 	
 	// messages to send to users
@@ -49,7 +49,7 @@ public class SCOrator {
 	private SCCall callPublic = null;
 	boolean procPoll = false;
 	
-	SCOrator(SCServer server, ChatAdapter service, SCUser user, boolean readPublic, boolean respPublic) {
+	SCOrator(SCTenant server, ChatAdapter service, SCUser user, boolean readPublic, boolean respPublic) {
 		this.service = service;
 		this.server = server;
 		this.user = user;
@@ -199,7 +199,7 @@ public class SCOrator {
 		int tzoffset = -1;
 		//System.out.println("CALL: " + call.toString());
 		
-		String key = SCServer.getChatServer().getSedro_access_key();
+		String key = SCTenant.getChatServer().getSedro_access_key();
 		if (slatitude == null || slongitude == null || stz == null) {	
 			// api resolve[phone number/ipaddress]
 			String phonenumber = call.get("phonenumber");
@@ -274,7 +274,7 @@ public class SCOrator {
 		// clear the cache
 		this.getChatService().clearCache();
 		// save state (also re-saves config/everything)
-		SCServer.getChatServer().save();
+		SCTenant.getChatServer().save();
 	}
 	
 	
