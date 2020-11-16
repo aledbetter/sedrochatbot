@@ -42,8 +42,8 @@ public class DButil {
 	
     static String prod_user = null;
     static String prod_pass = null;
-    static String prod_DB = "jdbc:postgresql://aafbtx2xad9u71.cg07na9ichnw.us-east-2.rds.amazonaws.com:5432/ebdb";
-    
+   // static String prod_DB = "jdbc:postgresql://aafbtx2xad9u71.cg07na9ichnw.us-east-2.rds.amazonaws.com:5432/ebdb";
+    static String prod_DB = "jdbc:postgresql://aa1i44i88c7bh07.cg07na9ichnw.us-east-2.rds.amazonaws.com:5432/ebdb";   
     static String prod_db = "public";
 	static final String JDBC_DRIVER = "org.postgresql.Driver";  //org.postgresql.Driver
 	static boolean dbinit = false;
