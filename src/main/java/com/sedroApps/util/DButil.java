@@ -31,7 +31,6 @@ import org.apache.commons.lang3.SerializationUtils;
 /*
  * DButil
  * Data Base access and configuration utility for use in all of the RESET calls
- * 
  */
 public class DButil {	
 	public static final String DEFAULT_CYR_KEY = "Sedro Know's All";
@@ -42,12 +41,14 @@ public class DButil {
 	
     static String prod_user = null;
     static String prod_pass = null;
-   // static String prod_DB = "jdbc:postgresql://aafbtx2xad9u71.cg07na9ichnw.us-east-2.rds.amazonaws.com:5432/ebdb";
-    static String prod_DB = "jdbc:postgresql://aa1i44i88c7bh07.cg07na9ichnw.us-east-2.rds.amazonaws.com:5432/ebdb";   
     static String prod_db = "public";
 	static final String JDBC_DRIVER = "org.postgresql.Driver";  //org.postgresql.Driver
 	static boolean dbinit = false;
-	static String encrypte_key = null;
+	static String encrypt_key = null;
+	
+	// should not have a default
+    static String prod_DB = "jdbc:postgresql://aa1i44i88c7bh07.cg07na9ichnw.us-east-2.rds.amazonaws.com:5432/ebdb";   
+
 	
 	/*
 	 *  GET URL: heroku run echo \$JDBC_DATABASE_URL
@@ -69,36 +70,31 @@ public class DButil {
         }
     }
     
-    public static void setupDB() {
-    	String RDS_DB_URL = System.getenv("RDS_DB_URL"); // The hostname of the DB instance.
-    	if (RDS_DB_URL == null) {
-	    	String RDS_HOSTNAME = System.getenv("RDS_HOSTNAME"); // The hostname of the DB instance.
-	    	String RDS_PORT = System.getenv("RDS_PORT"); // The port on which the DB instance accepts connections. The default value varies among DB engines.
-	    	String prod_db = System.getenv("RDS_DB_NAME"); // The database name, ebdb.
-	    	if (RDS_HOSTNAME != null && RDS_PORT != null) {
-		    	prod_DB = "jdbc:postgresql://" + RDS_HOSTNAME + ":"+RDS_PORT+"/"+prod_db;    	
-		    	System.out.println("SETUP DB: " + prod_DB);
-	    	}
-    	} else {
-	    	prod_DB = RDS_DB_URL;    	
-	    	System.out.println("SETUP DBurl: " + prod_DB);
-   		
-    	}
-    	
-    	// get encrypte key
-    	encrypte_key = System.getenv("ENC_KEY");
-    	if (encrypte_key == null) encrypte_key = DEFAULT_CYR_KEY;
-    	
-    	// user/pass
-    	prod_user = System.getenv("RDS_USERNAME"); // The user name that you configured for your database..
-    	prod_pass = System.getenv("RDS_PASSWORD"); // The password that you configured for your database.
-    }
-
-    
     private static void setupJDBC() {
 	   try{
-		   Class.forName(JDBC_DRIVER);
-		   setupDB();
+		   	Class.forName(JDBC_DRIVER);
+	    	String RDS_DB_URL = System.getenv("RDS_DB_URL"); // The hostname of the DB instance.
+	    	if (RDS_DB_URL == null) {
+		    	String RDS_HOSTNAME = System.getenv("RDS_HOSTNAME"); // The hostname of the DB instance.
+		    	String RDS_PORT = System.getenv("RDS_PORT"); // The port on which the DB instance accepts connections. The default value varies among DB engines.
+		    	String prod_db = System.getenv("RDS_DB_NAME"); // The database name, ebdb.
+		    	if (RDS_HOSTNAME != null && RDS_PORT != null) {
+			    	prod_DB = "jdbc:postgresql://" + RDS_HOSTNAME + ":"+RDS_PORT+"/"+prod_db;    	
+			    	System.out.println("SETUP DB: " + prod_DB);
+		    	}
+	    	} else {
+		    	prod_DB = RDS_DB_URL;    	
+		    	System.out.println("SETUP DBurl: " + prod_DB);
+	   		
+	    	}
+	    	
+	    	// get encrypte key
+	    	encrypt_key = System.getenv("ENC_KEY");
+	    	if (encrypt_key == null) encrypt_key = DEFAULT_CYR_KEY;
+	    	
+	    	// user/pass
+	    	prod_user = System.getenv("RDS_USERNAME"); // The user name that you configured for your database..
+	    	prod_pass = System.getenv("RDS_PASSWORD"); // The password that you configured for your database.
 	   } catch(Exception e){
 	      e.printStackTrace();
 	   }
@@ -109,9 +105,11 @@ public class DButil {
 		   if (dbinit) System.out.println("DBUtil: JDBC Initialized: " + prod_DB);
 	   }
     }
+    
     public static boolean haveDB() {
     	return dbinit;
     }
+    
     public static String getRDBPath() {
     	return prod_DB;
     }    
@@ -134,9 +132,6 @@ public class DButil {
             se.printStackTrace();
          }
     }  
-    //      String sql = "CREATE DATABASE STUDENTS";
-
-//    String sql = "CREATE TABLE REGISTRATION (id INTEGER not NULL, first VARCHAR(255), last VARCHAR(255), age INTEGER, PRIMARY KEY ( id ))"; 
     public static boolean createTable(String sql) {
     	Connection conn = getConnection();
     	if (conn == null) return false;
@@ -170,7 +165,6 @@ public class DButil {
 		//	e.printStackTrace();
 			return false;
 		}
-		//System.out.println("createDirTable["+DIR_NAME+"] Complete");
 		return true;
 	}
 	
@@ -208,7 +202,6 @@ public class DButil {
 	public static int saveSessionKey(String atok, String username, String tenant_id, Timestamp expire) {
 		if (atok == null || username == null) return 0;
 		int cnt = 0;
-	//	System.out.println("SAVEING[" + key + "] data: " + data.length);
 
 		String sql = "INSERT INTO " + SESS_TABLE_NAME + " (key, username, tenant, expire) VALUES(?, ?, ?, ?) "
 		+ " ON CONFLICT (key) DO UPDATE SET expire = ?";
@@ -259,9 +252,6 @@ public class DButil {
 		
 		DButil.closeConnection(conn);		
 	} 
-
-	
-	
 	
 	public static boolean createDataTable() {
 		String sql = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" (key VARCHAR(128) PRIMARY KEY, data bytea, sdata bytea);";
@@ -383,7 +373,7 @@ public class DButil {
 		    ResultSet rs = stmt.executeQuery(sql);
 		    if (rs.next()) {
 		    	try {
-			    String label = rs.getString("key");
+			   // String label = rs.getString("key");
 				data = rs.getBinaryStream("data");
 				datastate = rs.getBinaryStream("data2");
 		    	} catch (Throwable t) {}
@@ -402,12 +392,14 @@ public class DButil {
 			byte[] bdata = new byte[data.available()];
 	    	data.read(bdata);
 	    	bdata = decrypteData(bdata);
+			@SuppressWarnings("unchecked")
 			HashMap<String, Object> obj = (HashMap<String, Object>)SerializationUtils.deserialize(bdata);
 			
 			if (datastate != null) {
 				byte[] bsdata = new byte[datastate.available()];
 				bsdata = decrypteData(bsdata);
 	// FIXME add to obj
+				@SuppressWarnings("unchecked")
 				HashMap<String, Object> objState = (HashMap<String, Object>)SerializationUtils.deserialize(bdata);
 				if (objState != null) {
 				//	List<HashMap<String, Object>> sl = obj.get("user");
@@ -435,7 +427,7 @@ public class DButil {
 		    while(rs.next()) {
 		  		InputStream data = null, datastate = null;
 		    	try {
-			    String label = rs.getString("key");
+			   // String label = rs.getString("key");
 				data = rs.getBinaryStream("data");
 				datastate = rs.getBinaryStream("data2");
 		    	} catch (Throwable t) {}
@@ -445,12 +437,14 @@ public class DButil {
 					byte[] bdata = new byte[data.available()];
 			    	data.read(bdata);
 			    	bdata = decrypteData(bdata);
+					@SuppressWarnings("unchecked")
 					HashMap<String, Object> obj = (HashMap<String, Object>)SerializationUtils.deserialize(bdata);
 					
 					if (datastate != null) {
 						byte[] bsdata = new byte[datastate.available()];
 						bsdata = decrypteData(bsdata);
 			// FIXME add to obj
+						@SuppressWarnings("unchecked")
 						HashMap<String, Object> objState = (HashMap<String, Object>)SerializationUtils.deserialize(bdata);
 						if (objState != null) {
 						//	List<HashMap<String, Object>> sl = obj.get("user");
@@ -474,15 +468,15 @@ public class DButil {
     /////////////////////////////////////////
     // ENCRYPT DATA
     private static byte[] encrypteData(byte[] bdata) {
-    	if (encrypte_key == null) return bdata;
-        String en = EncryptUtil.encryptBytes(encrypte_key, bdata);
+    	if (encrypt_key == null) return bdata;
+        String en = EncryptUtil.encryptBytes(encrypt_key, bdata);
         bdata = en.getBytes(); 	
     	return bdata;
     }
     private static byte[]  decrypteData(byte[] bdata) {
-    	if (encrypte_key == null) return bdata;
+    	if (encrypt_key == null) return bdata;
     	String data = new String(bdata);
-    	bdata = EncryptUtil.decryptBytes(encrypte_key, data); 	
+    	bdata = EncryptUtil.decryptBytes(encrypt_key, data); 	
     	return bdata;
     }
 }
