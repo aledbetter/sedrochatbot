@@ -15,7 +15,7 @@
  * from Aaron Ledbetter.
  */
 
-package main.java.com.sedroApps.util;
+package com.sedroApps.util;
 
 import org.apache.commons.httpclient.CircularRedirectException;
 import org.apache.commons.httpclient.HttpClient;

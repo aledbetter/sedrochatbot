@@ -14,16 +14,16 @@
  * is strictly forbidden unless prior written permission is obtained
  * from Aaron Ledbetter.
  */
-package main.java.com.sedroApps.adapter;
+package com.sedroApps.adapter;
 
 import java.util.HashMap;
 import java.util.List;
 
-import main.java.com.sedroApps.SCCall;
-import main.java.com.sedroApps.SCOrator;
-import main.java.com.sedroApps.SCTenant;
-import main.java.com.sedroApps.SCUser;
-import main.java.com.sedroApps.util.Sutil;
+import com.sedroApps.SCCall;
+import com.sedroApps.SCOrator;
+import com.sedroApps.SCTenant;
+import com.sedroApps.SCUser;
+import com.sedroApps.util.Sutil;
 
 
 public class ChatAdapter {

@@ -15,7 +15,7 @@
  * from Aaron Ledbetter.
  */
 
-package main.java.com.sedroApps.util;
+package com.sedroApps.util;
 
 
 import java.io.IOException;

@@ -14,7 +14,7 @@
  * is strictly forbidden unless prior written permission is obtained
  * from Aaron Ledbetter.
  */
-package main.java.com.sedroApps;
+package com.sedroApps;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,10 +23,10 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import main.java.com.sedroApps.adapter.ChatAdapter;
-import main.java.com.sedroApps.msgcb.CbExample;
-import main.java.com.sedroApps.msgcb.CbMessage;
-import main.java.com.sedroApps.util.DButil;
+import com.sedroApps.adapter.ChatAdapter;
+import com.sedroApps.msgcb.CbExample;
+import com.sedroApps.msgcb.CbMessage;
+import com.sedroApps.util.DButil;
 
 public class SCTenant {
 	private static final int DEFAULT_INTERVAL = (1000*60)*1;

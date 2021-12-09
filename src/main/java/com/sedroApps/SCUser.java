@@ -14,22 +14,22 @@
  * is strictly forbidden unless prior written permission is obtained
  * from Aaron Ledbetter.
  */
-package main.java.com.sedroApps;
+package com.sedroApps;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import main.java.com.sedroApps.adapter.ChatAdapter;
-import main.java.com.sedroApps.adapter.ChatEmail;
-import main.java.com.sedroApps.adapter.ChatFacebook;
-import main.java.com.sedroApps.adapter.ChatSMS;
-import main.java.com.sedroApps.adapter.ChatTwitter;
-import main.java.com.sedroApps.adapter.ChatVoice;
-import main.java.com.sedroApps.adapter.ChatWebRest;
-import main.java.com.sedroApps.adapter.ChatWhatsapp;
-import main.java.com.sedroApps.msgcb.CbMessage;
-import main.java.com.sedroApps.util.Sutil;
+import com.sedroApps.adapter.ChatAdapter;
+import com.sedroApps.adapter.ChatEmail;
+import com.sedroApps.adapter.ChatFacebook;
+import com.sedroApps.adapter.ChatSMS;
+import com.sedroApps.adapter.ChatTwitter;
+import com.sedroApps.adapter.ChatVoice;
+import com.sedroApps.adapter.ChatWebRest;
+import com.sedroApps.adapter.ChatWhatsapp;
+import com.sedroApps.msgcb.CbMessage;
+import com.sedroApps.util.Sutil;
 
 public class SCUser {
 	// chatbot info (name may be different accross services)

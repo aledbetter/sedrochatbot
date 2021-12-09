@@ -14,13 +14,13 @@
  * is strictly forbidden unless prior written permission is obtained
  * from Aaron Ledbetter.
  */
-package main.java.com.sedroApps;
+package com.sedroApps;
 
 import java.util.HashMap;
 import java.util.List;
 
-import main.java.com.sedroApps.adapter.ChatAdapter;
-import main.java.com.sedroApps.util.Sutil;
+import com.sedroApps.adapter.ChatAdapter;
+import com.sedroApps.util.Sutil;
 
 
 public class SCCall {

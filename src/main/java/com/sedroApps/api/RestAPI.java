@@ -16,7 +16,7 @@
  */
 
 
-package main.java.com.sedroApps.api;
+package com.sedroApps.api;
 
 
 import java.sql.Timestamp;
@@ -42,14 +42,14 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import main.java.com.sedroApps.SCServer;
-import main.java.com.sedroApps.SCTenant;
-import main.java.com.sedroApps.SCUser;
-import main.java.com.sedroApps.adapter.ChatAdapter;
-import main.java.com.sedroApps.util.DButil;
-import main.java.com.sedroApps.util.RestResp;
-import main.java.com.sedroApps.util.RestUtil;
-import main.java.com.sedroApps.util.Sutil;
+import com.sedroApps.SCServer;
+import com.sedroApps.SCTenant;
+import com.sedroApps.SCUser;
+import com.sedroApps.adapter.ChatAdapter;
+import com.sedroApps.util.DButil;
+import com.sedroApps.util.RestResp;
+import com.sedroApps.util.RestUtil;
+import com.sedroApps.util.Sutil;
 
 
 

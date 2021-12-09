@@ -1,4 +1,4 @@
-package main.java.com.sedroApps.util;
+package com.sedroApps.util;
 
 
 import javax.crypto.Cipher;

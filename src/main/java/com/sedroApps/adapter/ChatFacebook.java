@@ -15,7 +15,7 @@
  * from Aaron Ledbetter.
  */
 
-package main.java.com.sedroApps.adapter;
+package com.sedroApps.adapter;
 
 
 import java.util.HashMap;
@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 
 import com.github.messenger4j.Messenger;
 
-import main.java.com.sedroApps.SCCall;
-import main.java.com.sedroApps.SCOrator;
-import main.java.com.sedroApps.SCSedroCall;
-import main.java.com.sedroApps.SCUser;
-import main.java.com.sedroApps.util.Sutil;
+import com.sedroApps.SCCall;
+import com.sedroApps.SCOrator;
+import com.sedroApps.SCSedroCall;
+import com.sedroApps.SCUser;
+import com.sedroApps.util.Sutil;
 
 
 /*

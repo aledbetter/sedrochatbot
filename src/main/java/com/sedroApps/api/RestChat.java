@@ -16,7 +16,7 @@
  */
 
 
-package main.java.com.sedroApps.api;
+package com.sedroApps.api;
 
 
 
@@ -35,13 +35,13 @@ import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
 
-import main.java.com.sedroApps.SCCall;
-import main.java.com.sedroApps.SCServer;
-import main.java.com.sedroApps.SCTenant;
-import main.java.com.sedroApps.adapter.ChatAdapter;
-import main.java.com.sedroApps.util.RestResp;
-import main.java.com.sedroApps.util.RestUtil;
-import main.java.com.sedroApps.util.Sutil;
+import com.sedroApps.SCCall;
+import com.sedroApps.SCServer;
+import com.sedroApps.SCTenant;
+import com.sedroApps.adapter.ChatAdapter;
+import com.sedroApps.util.RestResp;
+import com.sedroApps.util.RestUtil;
+import com.sedroApps.util.Sutil;
 
 
 

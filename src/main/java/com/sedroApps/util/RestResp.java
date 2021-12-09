@@ -15,7 +15,7 @@
  * from Aaron Ledbetter.
  */
 
-package main.java.com.sedroApps.util;
+package com.sedroApps.util;
 
 import java.util.*;
 
@@ -29,8 +29,8 @@ import javax.ws.rs.core.UriInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import main.java.com.sedroApps.SCServer;
-import main.java.com.sedroApps.SCTenant;
+import com.sedroApps.SCServer;
+import com.sedroApps.SCTenant;
 
 @JsonPropertyOrder({ "code", "info", "list"})
 @JsonInclude(JsonInclude.Include.NON_NULL)

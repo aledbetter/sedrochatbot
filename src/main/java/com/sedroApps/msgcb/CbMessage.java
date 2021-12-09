@@ -14,11 +14,11 @@
  * is strictly forbidden unless prior written permission is obtained
  * from Aaron Ledbetter.
  */
-package main.java.com.sedroApps.msgcb;
+package com.sedroApps.msgcb;
 
 import java.util.HashMap;
 
-import main.java.com.sedroApps.SCCall;
+import com.sedroApps.SCCall;
 
 abstract public class CbMessage {
 	private String name;

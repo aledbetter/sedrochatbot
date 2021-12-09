@@ -15,7 +15,7 @@
  * from Aaron Ledbetter.
  */
 
-package main.java.com.sedroApps;
+package com.sedroApps;
 
 import java.io.IOException;
 import java.util.TimeZone;

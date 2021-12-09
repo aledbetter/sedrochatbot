@@ -15,16 +15,16 @@
  * from Aaron Ledbetter.
  */
 
-package main.java.com.sedroApps.adapter;
+package com.sedroApps.adapter;
 
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import main.java.com.sedroApps.SCCall;
-import main.java.com.sedroApps.SCSedroCall;
-import main.java.com.sedroApps.SCUser;
-import main.java.com.sedroApps.util.Sutil;
+import com.sedroApps.SCCall;
+import com.sedroApps.SCSedroCall;
+import com.sedroApps.SCUser;
+import com.sedroApps.util.Sutil;
 import twitter4j.DirectMessage;
 import twitter4j.Status;
 import twitter4j.Twitter;

@@ -1,4 +1,4 @@
-package main.java.com.sedroApps;
+package com.sedroApps;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-import main.java.com.sedroApps.adapter.ChatAdapter;
-import main.java.com.sedroApps.util.DButil;
+import com.sedroApps.adapter.ChatAdapter;
+import com.sedroApps.util.DButil;
 
 public class SCServer {
 	private static SCServer serv = null;

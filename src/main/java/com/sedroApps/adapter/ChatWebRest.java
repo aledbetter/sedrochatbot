@@ -15,13 +15,13 @@
  * from Aaron Ledbetter.
  */
 
-package main.java.com.sedroApps.adapter;
+package com.sedroApps.adapter;
 
 
 import java.util.HashMap;
 
-import main.java.com.sedroApps.SCCall;
-import main.java.com.sedroApps.SCUser;
+import com.sedroApps.SCCall;
+import com.sedroApps.SCUser;
 
 
 

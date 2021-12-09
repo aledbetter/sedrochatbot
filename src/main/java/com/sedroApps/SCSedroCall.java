@@ -14,7 +14,7 @@
  * is strictly forbidden unless prior written permission is obtained
  * from Aaron Ledbetter.
  */
-package main.java.com.sedroApps;
+package com.sedroApps;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,9 +24,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import main.java.com.sedroApps.adapter.ChatAdapter;
-import main.java.com.sedroApps.util.HttpUtil;
-import main.java.com.sedroApps.util.Sutil;
+import com.sedroApps.adapter.ChatAdapter;
+import com.sedroApps.util.HttpUtil;
+import com.sedroApps.util.Sutil;
 
 
 public class SCSedroCall extends SCCall {
