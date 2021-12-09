@@ -16,9 +16,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java-version>1.8</java-version>
 		<jetty.version>9.4.12.RC2</jetty.version>
-			
 		<jersey.version>2.29</jersey.version>
-		<!-- **VERSION**  -->
 		<buildNumber>A.626567696e</buildNumber>
 	</properties>
 
